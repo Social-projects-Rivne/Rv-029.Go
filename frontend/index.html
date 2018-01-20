@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Frontend Container</h1>
+    <button id="send">Send</button>
+    <h3 id="message"></h3>
+    <div id="tweets"></div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.0/jquery.min.js"></script>
+<script>
+    var API_URL = 'http://'+ location.host +':8080'
+    $('#send').click(function() {
+        $.ajax({
+            url: API_URL,
+            method: 'get',
+            dataType: 'json',
+            success: function(response) {
+                $("#message").html(response.message);
+                $("#tweets").empty();
+                if (response.status) {
+                    $.each(response.tweets, function(i, val){
+                        $("#tweets").append("<strong>ID: "+ i +"</strong><p>Message: " + val + "</p>");
+                    })
+                }
+                console.log(response);
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+    });
+</script>
+</html>

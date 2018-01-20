@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  golang:
+    image: golang:1.8
+    tty: true
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend:/go/src/app
+    working_dir: /go/src/app
+    depends_on:
+      - cassandra
+    networks: 
+      - backend
+
+  cassandra:
+    image: cassandra:3.11.1
+    ports:
+      - 7000:7000
+    volumes:
+      - cassandra-storage:/var/lib/cassandra
+    networks: 
+      - backend
+
+  react:
+    image: sinet/nginx-node:latest
+    volumes:
+      - ./docker/nginx/sites:/etc/nginx/conf.d
+      - ./frontend:/var/www/app
+    working_dir: /var/www/app
+    ports:
+      - 80:80
+      - 443:443
+    networks: 
+      - frontend
+
+volumes:
+  cassandra-storage:
+networks:
+  backend:
+  frontend:
