@@ -10,7 +10,7 @@ import (
 
 func YourHandler(w http.ResponseWriter, r *http.Request) {
 	// connect to the cluster
-	cluster := gocql.NewCluster("cassandra")
+	cluster := gocql.NewCluster("127.0.0.1")
 	cluster.Keyspace = "example"
 	cluster.Consistency = gocql.Quorum
 	session, _ := cluster.CreateSession()
@@ -56,5 +56,5 @@ func main() {
     r.HandleFunc("/", YourHandler)
 
     // Bind to a port and pass our router in
-    log.Fatal(http.ListenAndServe(":80", r))
+    log.Fatal(http.ListenAndServe(":8080", r))
 }
