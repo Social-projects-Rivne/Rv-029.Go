@@ -20,7 +20,7 @@ services:
     image: sinet/nginx-node:latest
     volumes:
       - ./docker/nginx/sites:/etc/nginx/conf.d
-      - ./frontend:/var/www/app
+      - ./:/var/www/app
     working_dir: /var/www/app
     ports:
       - ${HOST_HTTP_PORT}:80
