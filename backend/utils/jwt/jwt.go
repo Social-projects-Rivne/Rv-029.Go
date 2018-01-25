@@ -8,6 +8,7 @@ import (
 	"time"
 
 	gojwt "github.com/dgrijalva/jwt-go"
+	"github.com/auth0/go-jwt-middleware"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,6 +21,13 @@ type JWTConfig struct {
 }
 
 var config *JWTConfig
+
+var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+	ValidationKeyGetter: func(token *gojwt.Token) (interface{}, error) {
+		return []byte(config.Secret), nil
+	},
+	SigningMethod: gojwt.SigningMethodHS256,
+})
 
 func init() {
 	filename, _ := filepath.Abs("./backend/config/jwt.yml")
