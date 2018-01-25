@@ -1,27 +1,27 @@
 package jwt
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"time"
-	"gopkg.in/yaml.v2"
-	"path/filepath"
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"reflect"
+	"time"
+
+	gojwt "github.com/dgrijalva/jwt-go"
+	"gopkg.in/yaml.v2"
 )
 
 type JWTConfig struct {
-	Claims map[string]interface{}
-	Secret string
-	Ttl int
+	Claims      map[string]interface{}
+	Secret      string
+	Ttl         int
 	Refresh_ttl int
-	Algo *jwt.SigningMethodHMAC
+	Algo        *gojwt.SigningMethodHMAC
 }
 
-var config *JWTConfig
+var Config *JWTConfig
 
-
-func init()  {
+func init() {
 	filename, _ := filepath.Abs("./config/jwt.yml")
 	yamlFile, err := ioutil.ReadFile(filename)
 
@@ -29,11 +29,11 @@ func init()  {
 		log.Fatalf("error: %v", err)
 	}
 
-	config = &JWTConfig{
-		Algo: jwt.SigningMethodHS256,
+	Config = &JWTConfig{
+		Algo: gojwt.SigningMethodHS256,
 	}
 
-	err = yaml.Unmarshal(yamlFile, &config)
+	err = yaml.Unmarshal(yamlFile, &Config)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -43,18 +43,18 @@ type withClaims interface {
 	GetClaims() map[string]interface{}
 }
 
-func generateToken(wc withClaims) (string, error)  {
+func generateToken(wc withClaims) (string, error) {
 	/* Create the token */
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := gojwt.New(gojwt.SigningMethodHS256)
 
 	/* Create a map to store our claims */
-	claims := token.Claims.(jwt.MapClaims)
+	claims := token.Claims.(gojwt.MapClaims)
 
-	if val, ok := config.Claims["iss"]; ok {
+	if val, ok := Config.Claims["iss"]; ok {
 		claims["iss"] = val
 	}
 
-	if val, ok := config.Claims["iat"]; ok {
+	if val, ok := Config.Claims["iat"]; ok {
 		if val == nil {
 			claims["iat"] = time.Now().Unix()
 		} else {
@@ -62,15 +62,15 @@ func generateToken(wc withClaims) (string, error)  {
 		}
 	}
 
-	if val, ok := config.Claims["exp"]; ok {
+	if val, ok := Config.Claims["exp"]; ok {
 		if val == nil {
-			claims["exp"] = time.Now().Add(time.Duration(config.Ttl) * time.Minute).Unix()
+			claims["exp"] = time.Now().Add(time.Duration(Config.Ttl) * time.Minute).Unix()
 		} else {
 			claims["exp"] = val
 		}
 	}
 
-	if val, ok := config.Claims["nbf"]; ok {
+	if val, ok := Config.Claims["nbf"]; ok {
 		if val == nil {
 			claims["nbf"] = claims["iat"]
 		} else {
@@ -88,5 +88,5 @@ func generateToken(wc withClaims) (string, error)  {
 	}
 
 	/* Sign the token with our secret */
-	return token.SignedString(config.Secret)
+	return token.SignedString(Config.Secret)
 }
