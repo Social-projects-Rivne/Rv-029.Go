@@ -1,11 +1,11 @@
 package model
 
 import (
-	"crypto/rand"
-	"io"
+	"fmt"
+	"time"
 
+	"github.com/Social-projects-Rivne/Rv-029.Go/db"
 	"github.com/gocql/gocql"
-	"golang.org/x/crypto/scrypt"
 )
 
 //User type
@@ -14,41 +14,33 @@ type User struct {
 	Email     string
 	FirstName string
 	LastName  string
-	Password  []byte
-	Salt      []byte
+	Password  string
+	Salt      string
 	Role      string
-	CreatedAt 
-	UpdatedAt 
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
-const (
-	PW_SALT_BYTES = 32
-	PW_HASH_BYTES = 64
-)
+//Insert func insert user object in database
+func (user *User) Insert() {
 
-//generateSalt is generating random salt
-func (u *User) generateSalt() error {
-	u.Salt = make([]byte, PW_SALT_BYTES)
-	_, err := io.ReadFull(rand.Reader, u.Salt)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-//EncryptPassword is encrypt your password by salt
-func (u *User) EncryptPassword() error {
-
-	u.generateSalt()
-
-	pas, err := scrypt.Key(u.Password, u.Salt, 1<<14, 8, 1, PW_HASH_BYTES)
-	u.Password = pas
-	if err != nil {
-		return err
+	defer db.Session.Close()
+	if err := db.Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,salt,role,created_at,update_at) VALUES (?,?,?,?,?,?,?,?,?);	`,
+		gocql.TimeUUID(), user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+		fmt.Println(err)
 	}
 
-	return nil
-
 }
 
+//UpdateEmail func updates user's email in database(don't touch this shit)
+func (user *User) UpdateEmail(Session *gocql.Session) {
 
+	defer db.Session.Close()
+	if err := db.Session.Query(`UPDATE example.users 
+		SET email = ?
+		WHERE email id = ?;`,
+		gocql.TimeUUID(), user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+		fmt.Println(err)
+	}
+
+}
