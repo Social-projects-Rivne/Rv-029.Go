@@ -9,7 +9,6 @@ import (
 
 	gojwt "github.com/dgrijalva/jwt-go"
 	"gopkg.in/yaml.v2"
-	"fmt"
 )
 
 type JWTConfig struct {
@@ -51,8 +50,6 @@ func GenerateToken(wc WithClaims) (string, error) {
 
 	/* Create a map to store our claims */
 	claims := token.Claims.(gojwt.MapClaims)
-
-	fmt.Printf("Default claims: %v", claims)
 
 	if val, ok := Config.Claims["iss"]; ok {
 		claims["iss"] = val

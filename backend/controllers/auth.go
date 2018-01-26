@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"encoding/json"
-	"fmt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
@@ -32,11 +31,11 @@ func Login(w http.ResponseWriter, r *http.Request)  {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonResponse)
+		return
 	}
 
-	fmt.Println("%v", credentials)
 	user := models.User{}
-	//TODO: find user by email
+	user.FindByEmail(credentials.Email)
 
 	if user.Password != password.EncodePassword(credentials.Password, user.Salt) {
 		response := loginResponse{
@@ -48,6 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request)  {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonResponse)
+		return
 	}
 
 	// generate jwt token from user claims
@@ -64,8 +64,4 @@ func Login(w http.ResponseWriter, r *http.Request)  {
 	jsonResponse, _ := json.Marshal(response)
 
 	w.Write(jsonResponse)
-
-
-	//TODO: check if password is valid
-	//TODO: generate jwt token
 }
