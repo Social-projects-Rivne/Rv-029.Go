@@ -12,6 +12,9 @@ func init()  {
 
 	authRouter := Router.PathPrefix("/auth").Subrouter()
 	applyAuthRoutes(authRouter)
+
+	//adminRouter := Router.PathPrefix("/admin").Subrouter()
+	//applyAdminRoutes(adminRouter)
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -22,3 +25,7 @@ func applyAuthRoutes(r *mux.Router)  {
 	//r.HandleFunc("/forget-password", controllers.ForgetPassword)
 	//r.HandleFunc("/", controllers.ForgetPassword)
 }
+
+//func applyAdminRoutes(r *mux.Router)  {
+//	r.HandleFunc("/users", controllers.Users)
+//}

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	gojwt "github.com/dgrijalva/jwt-go"
-	"github.com/auth0/go-jwt-middleware"
 	"gopkg.in/yaml.v2"
+	"fmt"
 )
 
 type JWTConfig struct {
@@ -20,14 +20,7 @@ type JWTConfig struct {
 	Algo        *gojwt.SigningMethodHMAC
 }
 
-var config *JWTConfig
-
-var AuthMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: func(token *gojwt.Token) (interface{}, error) {
-		return []byte(config.Secret), nil
-	},
-	SigningMethod: gojwt.SigningMethodHS256,
-})
+var Config *JWTConfig
 
 func init() {
 	filename, _ := filepath.Abs("./backend/config/jwt.yml")
@@ -37,11 +30,11 @@ func init() {
 		log.Fatalf("error: %v", err)
 	}
 
-	config = &JWTConfig{
+	Config = &JWTConfig{
 		Algo: gojwt.SigningMethodHS256,
 	}
 
-	err = yaml.Unmarshal(yamlFile, &config)
+	err = yaml.Unmarshal(yamlFile, &Config)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -51,6 +44,7 @@ type WithClaims interface {
 	GetClaims() map[string]interface{}
 }
 
+// Generate jwt token with default and custom claims
 func GenerateToken(wc WithClaims) (string, error) {
 	/* Create the token */
 	token := gojwt.New(gojwt.SigningMethodHS256)
@@ -58,11 +52,13 @@ func GenerateToken(wc WithClaims) (string, error) {
 	/* Create a map to store our claims */
 	claims := token.Claims.(gojwt.MapClaims)
 
-	if val, ok := config.Claims["iss"]; ok {
+	fmt.Printf("Default claims: %v", claims)
+
+	if val, ok := Config.Claims["iss"]; ok {
 		claims["iss"] = val
 	}
 
-	if val, ok := config.Claims["iat"]; ok {
+	if val, ok := Config.Claims["iat"]; ok {
 		if val == nil {
 			claims["iat"] = time.Now().Unix()
 		} else {
@@ -70,15 +66,15 @@ func GenerateToken(wc WithClaims) (string, error) {
 		}
 	}
 
-	if val, ok := config.Claims["exp"]; ok {
+	if val, ok := Config.Claims["exp"]; ok {
 		if val == nil {
-			claims["exp"] = time.Now().Add(time.Duration(config.Ttl) * time.Minute).Unix()
+			claims["exp"] = time.Now().Add(time.Duration(Config.Ttl) * time.Minute).Unix()
 		} else {
 			claims["exp"] = val
 		}
 	}
 
-	if val, ok := config.Claims["nbf"]; ok {
+	if val, ok := Config.Claims["nbf"]; ok {
 		if val == nil {
 			claims["nbf"] = claims["iat"]
 		} else {
@@ -96,5 +92,5 @@ func GenerateToken(wc WithClaims) (string, error) {
 	}
 
 	/* Sign the token with our secret */
-	return token.SignedString([]byte(config.Secret))
+	return token.SignedString([]byte(Config.Secret))
 }

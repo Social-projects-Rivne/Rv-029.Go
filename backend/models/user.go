@@ -1,10 +1,10 @@
-package model
+package models
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/Social-projects-Rivne/Rv-029.Go/db"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/db"
 	"github.com/gocql/gocql"
 )
 
@@ -23,7 +23,6 @@ type User struct {
 
 //Insert func insert user object in database
 func (user *User) Insert() {
-
 	defer db.Session.Close()
 	if err := db.Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,salt,role,created_at,update_at) VALUES (?,?,?,?,?,?,?,?,?);	`,
 		gocql.TimeUUID(), user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
@@ -43,4 +42,14 @@ func (user *User) UpdateEmail(Session *gocql.Session) {
 		fmt.Println(err)
 	}
 
+}
+
+// Return list of claims to generate jwt token
+func (user *User) GetClaims() map[string]interface{} {
+	claims := make(map[string]interface{})
+
+	claims["id"] = user.UUID.Bytes()
+	claims["email"] = user.Email
+
+	return claims
 }
