@@ -22,7 +22,7 @@ type JWTConfig struct {
 
 var config *JWTConfig
 
-var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+var AuthMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 	ValidationKeyGetter: func(token *gojwt.Token) (interface{}, error) {
 		return []byte(config.Secret), nil
 	},
