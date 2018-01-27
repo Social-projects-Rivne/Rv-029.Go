@@ -1,41 +1,35 @@
 const path = require('path');
+const webpack = require('webpack');
 
-const config = {
-  entry: './frontend/src/index.js',
-
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'frontend/public')
+module.exports = {
+  devtool: 'cheap-module-eval-source-map',
+  devServer: {
+    port: 8080,
+    hot: true,
+    inline: true,
+    headers: { 'Access-Control-Allow-Origin': '*' }
   },
-
-  devtool: 'inline-source-map',
-
+  entry: {
+    'app': [
+      'babel-polyfill',
+      'react-hot-loader/patch',
+      './frontend/src/index.js'
+    ],
+  },
+  output: {
+    path: path.resolve(__dirname, './frontend/public'),
+    filename: 'bundle.js',
+    publicPath: 'http://localhost:8080/'
+  },
+  plugins: [
+    new webpack.NamedModulesPlugin(),
+    new webpack.HotModuleReplacementPlugin()
+  ],
   module: {
-    rules:[
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      },
-      {
-        test: /\.svg$|\.jpg$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            publicPath: 'public/'
-          }
-        }
-      },
-      {
-        test: /\.js$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ["react", "es2015", "stage-2"]
-          }
-        }
-      }
+    rules: [
+      { test: /\.js$|\.jsx$/, exclude: /node_modules/, loader: 'babel-loader' },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      { test: /\.svg$|\.png$/, loader: 'file-loader' }
     ]
-  }
+  },
 };
-
-module.exports = config;

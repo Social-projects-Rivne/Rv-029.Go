@@ -1,12 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-import App from './jsx/app';
+import { AppContainer } from 'react-hot-loader'
+import App from './jsx/App.jsx';
 
-//require ('./sass/global.sass');
+const render = Component => {
+  ReactDOM.render(
+    <AppContainer>
+      <Component />
+    </AppContainer>,
+    document.getElementById('root')
+  )
+}
 
-ReactDOM.render((
-    <App />
-  ), document.getElementById('root')
-);
+render(App)
+
+if (module.hot) {
+  module.hot.accept('./jsx/App.jsx', () => { render(App) })
+}
 
