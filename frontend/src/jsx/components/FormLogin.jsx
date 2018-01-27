@@ -32,7 +32,7 @@ class FormLogin extends Component {
 
     const MD5 = this.props.MD5hash;
 
-    axios.post('/login', {
+    axios.post('/auth/login', {
       email: this.state.email,
       password: MD5(this.state.password)
     })

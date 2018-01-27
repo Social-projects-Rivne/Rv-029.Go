@@ -3,12 +3,14 @@ package router
 import (
 	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
+	"net/http"
 )
 
 var Router *mux.Router
 
 func init()  {
 	Router = mux.NewRouter()
+	Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/public"))))
 
 	authRouter := Router.PathPrefix("/auth").Subrouter()
 	applyAuthRoutes(authRouter)
