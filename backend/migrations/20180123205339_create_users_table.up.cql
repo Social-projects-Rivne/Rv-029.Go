@@ -1,10 +1,11 @@
-CREATE TABLE IF NOT EXISTS task_manager.users (
-    id uuid,
-    email varchar,
+CREATE TABLE task_manager.users (
+    id uuid PRIMARY KEY,
+    created_at timestamp,
+    email text,
+    first_name text,
+    last_name text,
     password text,
-    fname varchar,
-    lname varchar,
-    role varchar,
-    img varchar,
-    PRIMARY KEY (id, email)
+    role text,
+    salt text,
+    updated_at timestamp
 );
