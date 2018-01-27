@@ -4,15 +4,12 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
-	"reflect"
-	"time"
-
 	gojwt "github.com/dgrijalva/jwt-go"
 	"gopkg.in/yaml.v2"
 )
 
 type JWTConfig struct {
-	Claims      map[string]interface{}
+	Claims      gojwt.MapClaims
 	Secret      string
 	Ttl         int
 	Refresh_ttl int
@@ -45,49 +42,15 @@ type WithClaims interface {
 
 // Generate jwt token with default and custom claims
 func GenerateToken(wc WithClaims) (string, error) {
-	/* Create the token */
-	token := gojwt.New(gojwt.SigningMethodHS256)
-
-	/* Create a map to store our claims */
-	claims := token.Claims.(gojwt.MapClaims)
-
-	if val, ok := Config.Claims["iss"]; ok {
-		claims["iss"] = val
+	// Merge default and custom claims
+	claims := Config.Claims
+	for key, value := range wc.GetClaims() {
+		claims[key] = value
 	}
+	//TODO: use ttl to generate exp
+	// Create the token
+	token := gojwt.NewWithClaims(gojwt.SigningMethodHS256, claims)
 
-	if val, ok := Config.Claims["iat"]; ok {
-		if val == nil {
-			claims["iat"] = time.Now().Unix()
-		} else {
-			claims["iat"] = val
-		}
-	}
-
-	if val, ok := Config.Claims["exp"]; ok {
-		if val == nil {
-			claims["exp"] = time.Now().Add(time.Duration(Config.Ttl) * time.Minute).Unix()
-		} else {
-			claims["exp"] = val
-		}
-	}
-
-	if val, ok := Config.Claims["nbf"]; ok {
-		if val == nil {
-			claims["nbf"] = claims["iat"]
-		} else {
-			claims["nbf"] = time.Now().Add(time.Duration(val.(int)) * time.Minute).Unix()
-		}
-	}
-
-	for key, val := range wc.GetClaims() {
-		ref := reflect.TypeOf(wc)
-		if _, ok := ref.MethodByName("Get" + key); !ok {
-			claims[key] = val
-		} else {
-			claims[key] = reflect.ValueOf(wc).MethodByName("Get" + key).Call([]reflect.Value{})
-		}
-	}
-
-	/* Sign the token with our secret */
+	// Sign the token with our secret
 	return token.SignedString([]byte(Config.Secret))
 }
