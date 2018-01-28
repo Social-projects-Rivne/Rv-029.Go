@@ -12,7 +12,7 @@ cp .env.example .env
 docker-compose up -d cassandra react
 ```
 
-# Migrations
+## Migrations
 
 ## Create keyspace
 
