@@ -21,7 +21,7 @@ export default class FormInput extends Component {
 
   render() {
 
-    // TODO rewrite to make more flexible
+    // TODO make inputs more flexible
     // implement this.props.message
 
     const message = this.props.isValid ? "" :
@@ -30,6 +30,7 @@ export default class FormInput extends Component {
     return(
       <Grid item xs={12}>
         <TextField
+          autoFocus={this.props.autoFocus || false}
           error={!this.props.isValid}
           helperText={message}
           margin="normal"

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import FormInput from './FormInput.jsx';
+import SnackBar from './SnackBar.jsx'
 import injectValidation from '../decorators/validate.jsx';
 import injectHash from '../decorators/hash.jsx';
 import Paper from 'material-ui/Paper';
@@ -33,7 +34,6 @@ class FormLogin extends Component {
   sendUserData = (e) => {
     e.preventDefault();
     
-    // TODO check validation onBlur
     if (!this.checkValidation()) return;
 
     const MD5 = this.props.MD5hash;
@@ -51,7 +51,12 @@ class FormLogin extends Component {
       switch (err.response.status) {
       case 401:
         this.setState({
-          errorMessage: err.response.data.Message
+          errorMessage: "Wrong Email or password"
+        });
+        break;
+      case 500:
+        this.setState({
+          errorMessage: "Server error occured, please try again later"
         });
         break;
       default:
@@ -102,15 +107,16 @@ class FormLogin extends Component {
         </Typography>
         
         <FormInput
-          isValid={this.state.isValidEmail}
           type='text'
           name='Email'
+          autoFocus={true}
+          isValid={this.state.isValidEmail}
           onUserInput={this.handleEmailInput} />
 
         <FormInput
-          isValid={this.state.isValidPassword}
           type='password'
           name='Password'
+          isValid={this.state.isValidPassword}
           onUserInput={this.handlePasswordInput} />
 
         <Grid item xs={12}>
@@ -122,13 +128,10 @@ class FormLogin extends Component {
             Submit
           </Button>
         </Grid>
-  
-        {/* TODO make banner more elegance */}
-        {errorMessage ? (
-          <Typography>
-            {errorMessage}
-          </Typography>
-        ):(null)}
+        
+        <SnackBar
+          message={errorMessage}
+          isOpen={!!this.state.errorMessage} />
         
       </Paper>
     )
