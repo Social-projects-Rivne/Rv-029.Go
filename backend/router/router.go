@@ -22,6 +22,7 @@ func init()  {
 func applyAuthRoutes(r *mux.Router)  {
 	r.HandleFunc("/login/", controllers.Login)
 	r.HandleFunc("/login", controllers.Login)
+	//r.HandleFunc("/register/", controllers.Register)
 	//r.HandleFunc("/register", controllers.Register)
 	//r.HandleFunc("/logout", controllers.Logout)
 	//r.HandleFunc("/forget-password", controllers.ForgetPassword)

@@ -8,6 +8,14 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 )
 
+type Role string
+
+const ROLE_ADMIN = "Admin"
+const ROLE_STAFF = "Staff"
+const ROLE_OWNER = "Owner"
+const ROLE_USER = "User"
+
+
 //User type
 type User struct {
 	UUID      gocql.UUID
