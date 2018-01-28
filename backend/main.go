@@ -10,11 +10,6 @@ import (
 )
 
 func main() {
-
-
-
-
-
 	var cmd string
 
 	if len(os.Args) > 1 {
@@ -30,7 +25,4 @@ func main() {
 			defer db.Session.Close()
 			log.Fatal(http.ListenAndServe(":3000", router.Router))
 	}
-
-
-
 }

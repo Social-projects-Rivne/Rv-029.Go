@@ -40,13 +40,9 @@ func (user *User) Insert() {
 }
 
 //FindByID func finds user from database
-func (user *User)FindByID(id string){
-
-	if err := db.Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, created_at, updated_at FROM users WHERE id = ? LIMIT 1`,
-		id).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Salt, &user.Role, &user.CreatedAt, &user.UpdatedAt); err != nil {
-		fmt.Println(err)
-	}
-
+func (user *User)FindByID(id string) error {
+	return db.Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, created_at, updated_at FROM users WHERE id = ? LIMIT 1`,
+		id).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Salt, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 }
 
 //FindByEmail func finds user from database

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"math/rand"
+	"crypto/md5"
 )
 
 const letterBytes = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -31,4 +32,11 @@ func GenerateSalt(n int) string {
 	}
 
 	return string(b)
+}
+
+func EncodeMD5(string string) string  {
+	hasher := md5.New()
+	hasher.Write([]byte(string))
+
+	return hex.EncodeToString(hasher.Sum(nil))
 }
