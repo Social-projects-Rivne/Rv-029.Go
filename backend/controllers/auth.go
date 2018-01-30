@@ -116,3 +116,28 @@ func Register(w http.ResponseWriter, r *http.Request)  {
 	w.Write(jsonResponse)
 	return
 }
+
+
+func ForgotPassword(w http.ResponseWriter, r *http.Request){
+
+	var forgotRequestData validator.ForgotPasswordRequestData
+
+	err := decodeAndValidate(r, &forgotRequestData)
+	if err != nil {
+		jsonResponse, _ := json.Marshal(errorResponse{
+			Status: false,
+			Message: err.Error(),
+		})
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResponse)
+		return
+	}
+	user := &models.User{}
+
+	user.FindByEmail(forgotRequestData.Email)
+
+	
+
+}

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader'
 import App from './jsx/App.jsx';
 
+var API_URL = "http://localhost:3000";
 const render = Component => {
   ReactDOM.render(
     <AppContainer>

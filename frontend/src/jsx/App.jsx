@@ -5,6 +5,8 @@ import FormRegister from './components/FormRegister.jsx';
 import FormContainer from './containers/FormContainer.jsx';
 //import PropTypes from 'prop-types';
 
+var API_URL = "http://localhost:3000";
+
 export default class App extends Component {
   render() {
     return (
