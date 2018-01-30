@@ -19,6 +19,7 @@ func init()  {
 	authorizedUserRouter := Router.PathPrefix("/dashboard").Subrouter()
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
+
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -29,7 +30,7 @@ func applyAuthRoutes(r *mux.Router)  {
 	r.HandleFunc("/register", controllers.Register)
 
 	//r.HandleFunc("/logout", controllers.Logout)
-	//r.HandleFunc("/forget-password", controllers.ForgetPassword)
+	r.HandleFunc("/forget-password", controllers.ForgotPassword)
 	//r.HandleFunc("/", controllers.ForgetPassword)
 }
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gocql/gocql"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/gocql/gocql"
 )
 
 type Role string
@@ -14,7 +14,6 @@ const ROLE_ADMIN = "Admin"
 const ROLE_STAFF = "Staff"
 const ROLE_OWNER = "Owner"
 const ROLE_USER = "User"
-
 
 //User type
 type User struct {
@@ -40,13 +39,13 @@ func (user *User) Insert() {
 }
 
 //FindByID func finds user from database
-func (user *User)FindByID(id string) error {
+func (user *User) FindByID(id string) error {
 	return db.Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, created_at, updated_at FROM users WHERE id = ? LIMIT 1`,
 		id).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Salt, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 }
 
 //FindByEmail func finds user from database
-func (user *User)FindByEmail(email string){
+func (user *User) FindByEmail(email string) {
 
 	if err := db.Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, created_at, updated_at FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`,
 		email).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Salt, &user.Role, &user.CreatedAt, &user.UpdatedAt); err != nil {
@@ -56,7 +55,7 @@ func (user *User)FindByEmail(email string){
 }
 
 //UpdateEmail func updates user's email in database(don't touch this shit)
-func (user *User) UpdateEmail(Session *gocql.Session) {
+func (user *User) UpdateEmail() {
 
 	if err := db.Session.Query(`UPDATE example.users 
 		SET email = ?
@@ -64,6 +63,13 @@ func (user *User) UpdateEmail(Session *gocql.Session) {
 		gocql.TimeUUID(), user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 		fmt.Println(err)
 	}
+
+}
+
+//Update func updates user's email in database(don't touch this shit)
+func (user *User) Update() {
+
+	//TODO
 
 }
 
