@@ -1,21 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader'
-import App from './jsx/App.jsx';
+import React from 'react'
+import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import configureStore from './store/configureStore'
+import App from './App'
 
-var API_URL = "http://localhost:3000";
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Component />
-    </AppContainer>,
-    document.getElementById('root')
-  )
-}
+const store = configureStore()
 
-render(App)
-
-if (module.hot) {
-  module.hot.accept('./jsx/App.jsx', () => { render(App) })
-}
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
 

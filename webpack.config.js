@@ -1,35 +1,49 @@
 const path = require('path');
 const webpack = require('webpack');
+const publicPath = 'http://localhost:3000';
 
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
-  devServer: {
-    port: 8080,
-    hot: true,
-    inline: true,
-    headers: { 'Access-Control-Allow-Origin': '*' }
-  },
-  entry: {
-    'app': [
-      'babel-polyfill',
-      'react-hot-loader/patch',
-      './frontend/src/index.js'
-    ],
-  },
+  entry: './frontend/src/index.js',
+  devtool: 'cheap-module-source-map',
+
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+  ],
+
   output: {
     path: path.resolve(__dirname, './frontend/public'),
-    filename: 'bundle.js',
-    publicPath: 'http://localhost:8080/'
+    filename: '[name].bundle.js',
+    publicPath: this.hmr ? 'http://localhost:3000/' : '',
+    sourceMapFilename: '[name].map',
   },
-  plugins: [
-    new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
-  ],
+
+  devServer: {
+    port: 3000,
+    host: 'localhost',
+    historyApiFallback: true,
+    noInfo: false,
+    stats: 'minimal',
+    publicPath: publicPath,
+    contentBase: path.join(__dirname, publicPath),
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    inline: true,
+    hot: true
+  },
+
   module: {
     rules: [
-      { test: /\.js$|\.jsx$/, exclude: /node_modules/, loader: 'babel-loader' },
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.svg$|\.png$/, loader: 'file-loader' }
-    ]
+      { 
+        test: /\.svg$|\.png$/, 
+        loader: 'file-loader' 
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: ['file-loader']
+      },
+      {
+        test: /\.js|.jsx?$/,
+        exclude: /(node_modules)/,
+        loaders: ["babel-loader"]
+      }]
   },
-};
+}

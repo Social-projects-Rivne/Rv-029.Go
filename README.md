@@ -72,25 +72,25 @@ $ npm install
 
 start webpack dev server
 ```sh
-$ npm run dev
+$ npm start
 ```
 
 serve static html
 ```sh
 $ go run dev.go
 ```
-go to localhost:3000
+go to localhost:8080
 
 
 ## Get prebuild app
 
 run
 ```sh
-$ npm run build
+$ npm run build:prod
 ```
 in your index.html change
 ```html
-<script src="http://localhost:8080/bundle.js"></script>
+<script src="http://localhost:3000/bundle.js"></script>
 ```
 to
 ```sh
