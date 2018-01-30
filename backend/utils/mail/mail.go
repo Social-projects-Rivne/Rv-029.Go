@@ -56,15 +56,6 @@ func init()  {
 		Mailer.auth = smtp.PlainAuth("", Mailer.Connection.Username, Mailer.Connection.Password, Mailer.Connection.Host)
 	}
 }
-func (m *smtpMailer) SendMail(to string, message string) error {
-	address := fmt.Sprintf("%s:%s", m.Connection.Host, m.Connection.Port)
-
-	receiver := []string{
-		to,
-	}
-
-	return smtp.SendMail(address, m.auth, m.Sender.Email, receiver, []byte(message))
-}
 
 func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 	from := mail.Address{m.Sender.Name, m.Sender.Email}
@@ -84,7 +75,7 @@ func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 	message += "\r\n" + msg
 
 	// Connect to the SMTP Server
-	c, err := smtp.Dial(fmt.Sprintf("%s:%s", m.Connection.Host, m.Connection.Port))
+	c, err := smtp.Dial(fmt.Sprintf("%s:%d", m.Connection.Host, m.Connection.Port))
 	if err != nil {
 		log.Panic(err)
 	} else {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 )
 
 type InputValidation interface {
@@ -13,7 +14,7 @@ type InputValidation interface {
 
 func validateMaxLenght(value string, max int) error {
 	if len(value) > max {
-		return errors.New(fmt.Sprint("Length should be less than %v chars", max))
+		return errors.New(fmt.Sprintf("Length should be less than %v chars", max))
 	}
 
 	return nil
@@ -21,7 +22,7 @@ func validateMaxLenght(value string, max int) error {
 
 func ValidateMinLenght(value string, min int) error {
 	if len(value) < min {
-		return errors.New(fmt.Sprint("Length should be more than %v chars", min))
+		return errors.New(fmt.Sprintf("Length should be more than %v chars", min))
 	}
 
 	return nil
@@ -45,3 +46,24 @@ func ValidateEmail (email string) error {
 	return nil
 }
 
+func ValidateEmailUnique(email string) error  {
+	user := models.User{}
+
+	user.FindByEmail(email)
+	if user.Email != "" {
+		return errors.New(fmt.Sprintf("User with %s email already exists", email))
+	}
+
+	return nil
+}
+
+func ValidateEmailExists(email string) error  {
+	user := models.User{}
+
+	user.FindByEmail(email)
+	if user.Email == "" {
+		return errors.New(fmt.Sprintf("User with %s email not exists", email))
+	}
+
+	return nil
+}

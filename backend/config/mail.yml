@@ -2,10 +2,10 @@ sender:
   name: "Some Sender"
   email: "sender@mail.com"
 connection:
-  host: gmail.com
+  host: smtp.mailtrap.io
   port: 465
   username: 53474641218b36
   password: f291f70e8436d6
   # plain, login, cram_md5
   auth: plain
-  tls: false
+  tls: true
