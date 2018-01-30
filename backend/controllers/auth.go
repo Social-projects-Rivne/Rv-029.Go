@@ -7,8 +7,10 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
 	"github.com/gocql/gocql"
 	"time"
+	"fmt"
 )
 
 type errorResponse struct {
@@ -104,6 +106,9 @@ func Register(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	user.Insert()
+
+	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\"\n. Your ID: %s\n Regards\n", user.FirstName, user.UUID)
+	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
 
 	jsonResponse, _ := json.Marshal(registerResponse{
 		Status: true,
