@@ -23,6 +23,6 @@ func main() {
 			seeder.Run()
 		default:
 			defer db.Session.Close()
-			log.Fatal(http.ListenAndServe(":3000", router.Router))
+			log.Fatal(http.ListenAndServe(":8080", router.Router))
 	}
 }

@@ -17,15 +17,15 @@ const ROLE_USER = "User"
 
 //User type
 type User struct {
-	UUID      gocql.UUID
-	Email     string
-	FirstName string
-	LastName  string
-	Password  string
-	Salt      string
-	Role      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	UUID      gocql.UUID `cql:"id"`
+	Email     string	 `cql:"email"`
+	FirstName string	 `cql:"first_name"`
+	LastName  string	 `cql:"last_name"`
+	Password  string	 `cql:"password"`
+	Salt      string	 `cql:"salt"`
+	Role      string	 `cql:"role"`
+	CreatedAt time.Time	 `cql:"created_at"`
+	UpdatedAt time.Time	 `cql:"updated_at"`
 }
 
 //Insert func inserts user object in database

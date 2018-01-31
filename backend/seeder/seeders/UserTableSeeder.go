@@ -13,19 +13,20 @@ type UsersTableSeeder struct {
 
 func (UsersTableSeeder) Run() {
 
+	b := models.BaseModel{}
+
 	salt := password.GenerateSalt(8)
-	user := &models.User{
+	user := models.User{
 		UUID:      gocql.TimeUUID(),
-		Email:     "user@gmail.com",
-		FirstName: "Some",
-		LastName:  "User",
+		Email:     "test@gmail.com",
+		FirstName: "User",
+		LastName:  "Good",
 		Salt:      salt,
 		Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
 		Role:      models.ROLE_USER,
 		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 
-	user.Insert()
+	b.Insert("users",user)
 
 }
