@@ -3,8 +3,8 @@ package validator
 import "net/http"
 
 type RegisterRequestData struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"name"`
+	LastName  string `json:"surname"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
@@ -21,10 +21,10 @@ func (d *RegisterRequestData) Validate(r *http.Request) error {
 		return err
 	}
 
-	err = ValidateEmailExists(d.Email)
-	if err != nil {
-		return err
-	}
+	// err = ValidateEmailExists(d.Email)
+	// if err != nil {
+	// 	return err
+	// }
 
 	//TODO:
 	//err = ValidatePasswordConfirmed(d.Password, d.ConfirmPassword)

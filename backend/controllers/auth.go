@@ -102,13 +102,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Salt:      salt,
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
+		Status:	   false,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	user.Insert()
 
-	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\"\n. Your ID: %s\n Regards\n", user.FirstName, user.UUID)
+	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\".\n To activate your account please go to the <a href=\"http://localhost/confirm/%s\">LINK</a>\n Your ID: %s\n Regards\n", user.FirstName, user.Password, user.UUID)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
 
 	jsonResponse, _ := json.Marshal(registerResponse{
@@ -123,9 +124,44 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func ConfirmRegistration(w http.ResponseWriter, r *http.Request)  {
+	var confirmRegistrationRequestData validator.ConfirmRegistrationRequestData
+
+	err := decodeAndValidate(r, &confirmRegistrationRequestData)
+	if err != nil {
+		jsonResponse, _ := json.Marshal(errorResponse{
+			Status:  false,
+			Message: err.Error(),
+		})
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResponse)
+		return
+	}
+	user := &models.User{}
+
+	user.FindByToken(confirmRegistrationRequestData.Token)
+	user.Status = true
+
+	user.Update()
+
+	jsonResponse, _ := json.Marshal(struct {
+		Status bool
+		Message string
+	}{
+		Status:  true,
+		Message: "Your account was successfully activated.",
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+	return
+}
+
 //ForgotPassword ..
 func ForgotPassword(w http.ResponseWriter, r *http.Request) {
-
 	var forgotRequestData validator.ForgotPasswordRequestData
 
 	err := decodeAndValidate(r, &forgotRequestData)
@@ -144,9 +180,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.FindByEmail(forgotRequestData.Email)
 
-	url := fmt.Sprintf("<a href=\"http://localhost:3000/auth/reset_password/%s\">LINK</a>", user.Password)
-
-	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password %s\n", user.FirstName, url)
+	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/reset-password/%s\">LINK</a>\n", user.FirstName, user.Password)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
 
 	jsonResponse, _ := json.Marshal(registerResponse{
@@ -164,7 +198,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 //ResetPassword ..
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var resetRequestData validator.ResetPasswordRequestData
-
+	fmt.Println(resetRequestData)
 	err := decodeAndValidate(r, &resetRequestData)
 
 	if err != nil {
@@ -182,7 +216,15 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.FindByEmail(resetRequestData.Email)
 	if user.Password != resetRequestData.Token {
+		jsonResponse, _ := json.Marshal(errorResponse{
+			Status:  false,
+			Message: "Invalid reset token",
+		})
 
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResponse)
+		return
 	}
 
 	user.Password = password.EncodePassword(resetRequestData.Password, user.Salt)

@@ -32,8 +32,8 @@ const FormRegister = ({ classes, form, action, ...decorator}) => {
 
       action.setStatus(err.response.data.status)
 
-      if (err.response.message) {
-        action.setErrorMessage(err.response.data.message)
+      if (err.response.data.Message) {
+        action.setErrorMessage(err.response.data.Message)
       } else {
         action.setErrorMessage("Server error occured")
       }

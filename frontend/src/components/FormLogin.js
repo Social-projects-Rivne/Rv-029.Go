@@ -27,11 +27,10 @@ const FormLogin = ({classes, form, action, ...decorator}) => {
       sessionStorage.setItem('token', res.token)
     })
     .catch((err) => {
-
       action.setStatus(err.response.data.status)
 
-      if (err.response.message) {
-        action.setErrorMessage(err.response.data.message)
+      if (err.response.data.Message) {
+        action.setErrorMessage(err.response.data.Message)
       } else {
         action.setErrorMessage("Server error occured")
       }

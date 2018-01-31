@@ -66,6 +66,8 @@ func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 	headers["From"] = from.String()
 	headers["To"] = to.String()
 	headers["Subject"] = subject
+	headers["MIME-version"] = " 1.0;"
+	headers["Content-Type"] = "text/html; charset=\"UTF-8\";"
 
 	// Setup message
 	message := ""
