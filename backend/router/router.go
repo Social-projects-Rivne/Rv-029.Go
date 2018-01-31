@@ -31,6 +31,7 @@ func applyAuthRoutes(r *mux.Router)  {
 
 	//r.HandleFunc("/logout", controllers.Logout)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
+	r.HandleFunc("/reset_password/{token}", controllers.ResetPassword)
 	//r.HandleFunc("/", controllers.ForgetPassword)
 }
 

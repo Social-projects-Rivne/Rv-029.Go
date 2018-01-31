@@ -18,7 +18,7 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
 
     if (!checkValidation()) return
 
-    axios.post('/auth/restore', {
+    axios.post('/auth/forget-password', {
       email: form.email,
     })
     .then((res) => {
@@ -29,8 +29,8 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
 
       action.setStatus(err.response.data.status)
 
-      if (err.response.message) {
-        action.setErrorMessage(err.response.data.message)
+      if (err.response.data.Message) {
+        action.setErrorMessage(err.response.data.Message)
       } else {
         action.setErrorMessage("Server error occured")
       }

@@ -164,7 +164,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 //ResetPassword ..
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var resetRequestData validator.ResetPasswordRequestData
-
+	fmt.Println(resetRequestData)
 	err := decodeAndValidate(r, &resetRequestData)
 
 	if err != nil {
@@ -182,6 +182,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.FindByEmail(resetRequestData.Email)
 	if user.Password != resetRequestData.Token {
+
+		//TODO
 
 	}
 
