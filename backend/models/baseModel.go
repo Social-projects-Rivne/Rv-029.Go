@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-
+const PRIMERY  = "primery"
 
 type BaseModel struct{
 	Fields string
@@ -49,16 +49,18 @@ func (b *BaseModel) Insert(table string,structure interface{}) {
 func (b *BaseModel) UpdateHelper(structure interface{}) {
 
 
-	s := reflect.ValueOf(structure).Type()
+	s := reflect.ValueOf(structure)
+	typeOfS := s.Type()
 
 	for i := 0; i < s.NumField(); i++ {
-		if strings.ToLower(s.Field(i).Tag.Get("key")) == "primery" {
+
+		if strings.ToLower(typeOfS.Field(i).Tag.Get("key")) == PRIMERY || s.Field(i).Interface() == 0  || s.Field(i).Interface() == ""{
 			continue
 		}
 		if i == s.NumField()-1 {
-			b.Fields += fmt.Sprintf("%s = ? ", s.Field(i).Tag.Get("cql"))
+			b.Fields += fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql"))
 		} else {
-			b.Fields += fmt.Sprintf("%s = ? , ", s.Field(i).Tag.Get("cql"))
+			b.Fields += fmt.Sprintf("%s = ? , ", typeOfS.Field(i).Tag.Get("cql"))
 		}
 	}
 
