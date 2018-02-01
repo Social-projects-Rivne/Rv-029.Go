@@ -6,6 +6,7 @@ import FormContainer from './containers/FormContainer'
 import FormLogin from './components/FormLogin'
 import FormRegister from './components/FormRegister'
 import FormRestorePassword from './components/FormRestorePassword'
+import FormNewPassword from './components/FormNewPassword'
 
 import { clearState } from './actions/FormActions'
 import { store } from './store/configureStore'
@@ -22,6 +23,7 @@ export const routes = (
         <Route path="login" component={FormLogin}/>
         <Route path="register" component={FormRegister}/>
         <Route path="restore-password" component={FormRestorePassword}/>
+        <Route path="new-password/:token" component={FormNewPassword}/>
       </Route>
     </Route>
   </div>

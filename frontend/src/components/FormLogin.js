@@ -42,8 +42,6 @@ const FormLogin = ({ classes, form, action, ...decorator }) => {
   }
   
   const checkValidation = () => {
-    action.clearState()
-
     let emailValidation = decorator.validateEmail(form.email)
     let passwordValidation = decorator.validatePassword(form.password)
     
