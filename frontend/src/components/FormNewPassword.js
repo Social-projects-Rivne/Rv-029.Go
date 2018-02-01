@@ -3,6 +3,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
@@ -21,7 +22,7 @@ const FormNewPassword = ({ classes, form, action, ownProps, ...decorator }) => {
 
         if (!checkValidation()) return
 
-        axios.post('/auth/new-password', {
+        axios.post(API_URL + 'auth/new-password', {
         token: ownProps.params.token,
         email: form.email,
         password: decorator.MD5Encode(form.password)

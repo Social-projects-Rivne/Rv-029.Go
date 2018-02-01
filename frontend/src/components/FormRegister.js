@@ -4,6 +4,7 @@ import axios from 'axios'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
+import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
@@ -22,7 +23,7 @@ const FormRegister = ({ classes, form, action, ...decorator}) => {
 
     if (!checkValidation()) return
 
-    axios.post('/auth/register', {
+    axios.post(API_URL + 'auth/register', {
       email: form.email,
       name: form.name,
       surname: form.surname,

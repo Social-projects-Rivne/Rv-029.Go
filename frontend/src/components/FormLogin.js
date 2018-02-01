@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
@@ -15,14 +16,35 @@ import Button from 'material-ui/Button'
 import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
 
-const FormLogin = ({ classes, form, action, ...decorator }) => {
+const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
+
+  console.log(API_URL + 'auth/login')
+
+  if (ownProps.location.query.token) {
+    axios.post(API_URL + 'auth/confirm', {
+      token: ownProps.location.query.token
+    })
+    .then((res) => {
+      // TODO snackbar notification
+      console.log(res)
+    })
+    .catch((err) => {
+      action.setStatus(err.response.data.status)
+
+      if (err.response.data.Message) {
+        action.setErrorMessage(err.response.data.Message)
+      } else {
+        action.setErrorMessage("Server error occured")
+      }
+    })
+  }
 
   const sendUserData = (e) => {
     e.preventDefault()
 
     if (!checkValidation()) return
 
-    axios.post('/auth/login', {
+    axios.post(API_URL + 'auth/login', {
       email: form.email,
       password: decorator.MD5Encode(form.password)
     })
