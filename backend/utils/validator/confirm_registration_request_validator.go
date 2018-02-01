@@ -4,6 +4,7 @@ import "net/http"
 
 //ForgotPasswordRequestData ..
 type ConfirmRegistrationRequestData struct{
+	*baseValidator
 	Token string
 }
 
@@ -11,7 +12,7 @@ type ConfirmRegistrationRequestData struct{
 func (d *ConfirmRegistrationRequestData) Validate(r *http.Request) error {
 	var err error
 
-	err = ValidateRequired(d.Token)
+	err = d.ValidateRequired(d.Token)
 	if err != nil {
 		return err
 	}

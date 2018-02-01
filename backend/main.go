@@ -23,7 +23,9 @@ func main() {
 	case "db:seed":
 		seeder.Run()
 	default:
-		defer db.Session.Close()
+		dbConnection := db.GetInstance()
+		defer dbConnection.Session.Close()
+
 		log.Fatal(http.ListenAndServe(":8080", router.Router))
 	}
 }

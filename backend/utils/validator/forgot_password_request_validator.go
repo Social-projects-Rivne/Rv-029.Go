@@ -4,19 +4,23 @@ import "net/http"
 
 //ForgotPasswordRequestData ..
 type ForgotPasswordRequestData struct{
+	*baseValidator
 	Email string
 }
 
 //Validate ..
 func (d *ForgotPasswordRequestData) Validate(r *http.Request) error {
 	var err error
-	err = ValidateEmail(d.Email)
+
+	err = d.ValidateEmail(d.Email)
 	if err != nil {
 		return err
 	}
-	err = ValidateEmailExists(d.Email)
+
+	err = d.ValidateEmailExists(d.Email)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
