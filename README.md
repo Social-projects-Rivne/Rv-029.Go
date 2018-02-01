@@ -79,7 +79,7 @@ serve static html
 ```sh
 $ go run dev.go
 ```
-go to localhost:8080
+go to localhost:8080/static/
 
 
 ## Get prebuild app

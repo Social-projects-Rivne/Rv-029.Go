@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { Link } from 'react-router'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
 import injectValidation from '../decorators/validate'
@@ -11,8 +15,8 @@ import Button from 'material-ui/Button'
 import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
 
-const FormLogin = ({classes, form, action, ...decorator}) => {
-  
+const FormLogin = ({ classes, form, action, ...decorator }) => {
+
   const sendUserData = (e) => {
     e.preventDefault()
 
@@ -38,6 +42,8 @@ const FormLogin = ({classes, form, action, ...decorator}) => {
   }
   
   const checkValidation = () => {
+    action.clearState()
+
     let emailValidation = decorator.validateEmail(form.email)
     let passwordValidation = decorator.validatePassword(form.password)
     
@@ -53,14 +59,6 @@ const FormLogin = ({classes, form, action, ...decorator}) => {
 
   const handlePasswordInput = (e) => {
     action.handlePassword(e.target.value)
-  }
-
-  const toggleFormToRestorePassword = () => {
-    action.toggleFormType('restorePassword')
-  }
-
-  const toggleformToRegister = () => {
-    action.toggleFormType('register')
   }
 
   return (
@@ -99,25 +97,29 @@ const FormLogin = ({classes, form, action, ...decorator}) => {
             onClick={sendUserData}>
             Submit
           </Button>
-          <Button
-            color={'secondary'}
-            onClick={toggleformToRegister}>
-            Registration
-          </Button>
+          <Link to={'/authorization/register'}
+            className={classes.link}>
+            <Button
+              color={'secondary'}>
+              Registration
+            </Button>
+          </Link>
       </Grid>
 
       <Grid
         container
         justify={'center'}>
 
-        <Typography
-          style={{marginTop: 15, cursor: 'pointer'}}
-          type='caption'
-          color='primary'
-          component='h3'
-          onClick={toggleFormToRestorePassword}>
-          I have forgotten my password
-        </Typography>
+        <Link to={'/authorization/restore-password'}>
+          <Typography
+            style={{marginTop: 15, cursor: 'pointer'}}
+            type='caption'
+            color='primary'
+            component='h3'>
+            I have forgotten my password
+          </Typography>
+        </Link>
+
       </Grid>
 
       <SnackBar
@@ -144,11 +146,29 @@ const styles = {
   buttons: {
     marginTop: '1.5em',
   },
+  link: {
+    textDecoration: 'none'
+  }
+}
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    form: state.form,
+    ownProps
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    action: bindActionCreators(formActions, dispatch)
+  }
 }
 
 export default injectHash(
   injectValidation(
-    withStyles(styles)(FormLogin)
+    withStyles(styles)(
+      connect(mapStateToProps, mapDispatchToProps)(FormLogin)
+    )
   )
 )
 

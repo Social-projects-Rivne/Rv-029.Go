@@ -1,14 +1,16 @@
-import { HANDLE_EMAIL_INPUT } from "../constants/Form"
-import { HANDLE_PASSWORD_INPUT } from "../constants/Form"
-import { IS_VALID_EMAIL } from "../constants/Form"
-import { IS_VALID_PASSWORD } from "../constants/Form"
-import { IS_VALID_NAME } from "../constants/Form"
-import { IS_VALID_SURNAME } from "../constants/Form"
-import { STATUS } from "../constants/Form"
-import { ERROR_MESSAGE } from "../constants/Form"
-import { HANDLE_NAME_INPUT } from "../constants/Form"
-import { HANDLE_SURNAME_INPUT } from "../constants/Form"
-import { FORM_TYPE } from "../constants/Form"
+import {
+  HANDLE_EMAIL_INPUT,
+  HANDLE_PASSWORD_INPUT,
+  IS_VALID_EMAIL,
+  IS_VALID_NAME,
+  IS_VALID_SURNAME,
+  IS_VALID_PASSWORD,
+  STATUS,
+  ERROR_MESSAGE,
+  HANDLE_NAME_INPUT,
+  HANDLE_SURNAME_INPUT,
+  CLEAR_STATE
+} from '../constants/Form'
 
 const initialState = {
   email: '',
@@ -20,8 +22,7 @@ const initialState = {
   isValidName: true,
   isValidSurname: true,
   status: null,
-  errorMessage: null,
-  type: 'login'
+  errorMessage: null
 }
 
 export default function login(state = initialState, action) {
@@ -46,8 +47,8 @@ export default function login(state = initialState, action) {
       return { ...state, surname: action.payload }
     case ERROR_MESSAGE:
       return { ...state, errorMessage: action.payload }
-    case FORM_TYPE:
-      return { ...initialState, type: action.payload }
+    case CLEAR_STATE:
+      return { ...initialState }
     default:
       return state
   }
