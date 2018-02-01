@@ -6,6 +6,7 @@ import (
 	"github.com/relops/cqlr"
 	"log"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"strings"
 )
 
 
@@ -51,7 +52,7 @@ func (b *BaseModel) UpdateHelper(structure interface{}) {
 	s := reflect.ValueOf(structure).Type()
 
 	for i := 0; i < s.NumField(); i++ {
-		if s.Field(i).Offset == 0{
+		if strings.ToLower(s.Field(i).Tag.Get("key")) == "primery" {
 			continue
 		}
 		if i == s.NumField()-1 {
@@ -70,7 +71,6 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 	b.UpdateHelper(structure)
 
 	query := fmt.Sprintf("UPDATE %v SET  ",table) + b.Fields + b.Condition
-	fmt.Print(query)
 
 	bind := cqlr.Bind(query, structure)
 	if err := bind.Exec(db.Session); err != nil {

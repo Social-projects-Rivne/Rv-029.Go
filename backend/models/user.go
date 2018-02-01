@@ -19,14 +19,14 @@ const ROLE_USER = "User"
 
 
 type User struct {
-	UUID      gocql.UUID	`cql:"id"`
+	UUID      gocql.UUID	`cql:"id" key:"primery"` 
 	Email     string		`cql:"email"`
 	FirstName string		`cql:"first_name"`
 	LastName  string		`cql:"last_name"`
 	Password  string		`cql:"password"`
 	Salt      string		`cql:"salt"`
 	Role      string		`cql:"role"`
-	Status    bool			`cql:"status"`
+	Status    int			`cql:"status"`
 	CreatedAt time.Time		`cql:"created_at"`
 	UpdatedAt time.Time		`cql:"updated_at"`
 

@@ -102,7 +102,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Salt:      salt,
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
-		Status:	   false,
+		Status:	   0,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -142,7 +142,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request)  {
 	user := &models.User{}
 
 	user.FindByToken(confirmRegistrationRequestData.Token)
-	user.Status = true
+	user.Status = 1
 
 	user.Update()
 
