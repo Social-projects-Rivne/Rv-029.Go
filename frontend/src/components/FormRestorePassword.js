@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { Link } from 'react-router'
+import { API_URL } from '../constants/global'
+import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
 import injectValidation from '../decorators/validate'
@@ -18,7 +23,7 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
 
     if (!checkValidation()) return
 
-    axios.post('/auth/forget-password', {
+    axios.post(API_URL + 'auth/forget-password', {
       email: form.email,
     })
     .then((res) => {
@@ -84,11 +89,13 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
           className={classes.button}>
           Submit
         </Button>
-        <Button
-          color={'secondary'}
-          onClick={toggleFormToLogin}>
-          Cancel
-        </Button>
+        <Link to={'/authorization/login'}
+          className={classes.link}>
+          <Button
+            color={'secondary'}>
+            Cancel
+          </Button>
+        </Link>
       </Grid>
 
       <SnackBar
@@ -106,6 +113,9 @@ const styles = {
   buttons: {
     marginTop: '1.5em',
   },
+  link: {
+    textDecoration: 'none'
+  }
 }
 
 FormRestorePassword.propTypes = {
@@ -115,8 +125,22 @@ FormRestorePassword.propTypes = {
   action: PropTypes.object.isRequired
 }
 
+const mapStateToProps = (state) => {
+  return {
+    form: state.form
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    action: bindActionCreators(formActions, dispatch)
+  }
+}
+
 export default injectHash(
   injectValidation(
-    withStyles(styles)(FormRestorePassword)
+    withStyles(styles)(
+      connect(mapStateToProps, mapDispatchToProps)(FormRestorePassword)
+    )
   )
 )

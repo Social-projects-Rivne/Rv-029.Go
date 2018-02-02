@@ -102,14 +102,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Salt:      salt,
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
-		Status:	   false,
+		Status:	   0,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	user.Insert()
 
-	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\".\n To activate your account please go to the <a href=\"http://localhost/confirm/%s\">LINK</a>\n Your ID: %s\n Regards\n", user.FirstName, user.Password, user.UUID)
+	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\".\n To activate your account please go to the <a href=\"http://localhost/authorization/login/%s\">LINK</a>\n Your ID: %s\n Regards\n", user.FirstName, user.Password, user.UUID)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
 
 	jsonResponse, _ := json.Marshal(registerResponse{
@@ -142,7 +142,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request)  {
 	user := &models.User{}
 
 	user.FindByToken(confirmRegistrationRequestData.Token)
-	user.Status = true
+	user.Status = 1
 
 	user.Update()
 
@@ -180,7 +180,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.FindByEmail(forgotRequestData.Email)
 
-	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/reset-password/%s\">LINK</a>\n", user.FirstName, user.Password)
+	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/authorization/new-password/%s\">LINK</a>\n", user.FirstName, user.Password)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
 
 	jsonResponse, _ := json.Marshal(registerResponse{

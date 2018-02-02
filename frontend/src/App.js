@@ -1,12 +1,11 @@
-import React, { Component } from 'react'
-import FormContainer from './containers/FormContainer'
+import React from 'react'
 
-class App extends Component {
-  render() {
-    return (
-      <FormContainer />
-    )
-  }
+const App = ({ children }) => {
+  return (
+    <div>
+      { children }
+    </div>
+  )
 }
 
 export default App

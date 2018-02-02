@@ -5,6 +5,7 @@ CREATE TABLE task_manager.users (
     first_name text,
     last_name text,
     password text,
+    status int,
     role text,
     salt text,
     updated_at timestamp
