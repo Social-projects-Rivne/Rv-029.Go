@@ -23,15 +23,15 @@ const FormNewPassword = ({ classes, form, action, ownProps, ...decorator }) => {
         if (!checkValidation()) return
 
         axios.post(API_URL + 'auth/new-password', {
-        token: ownProps.params.token,
-        email: form.email,
-        password: decorator.MD5Encode(form.password)
+          token: ownProps.params.token,
+          email: form.email,
+          password: decorator.MD5Encode(form.password)
         })
         .then((res) => {
-        console.log(res)
+          browserHistory.push('/authorization/login/?newPassword=true')
         })
         .catch((err) => {
-        action.setStatus(err.response.data.status)
+          action.setStatus(err.response.data.status)
 
         if (err.response.data.Message) {
             action.setErrorMessage(err.response.data.Message)
@@ -72,6 +72,7 @@ const FormNewPassword = ({ classes, form, action, ownProps, ...decorator }) => {
             </Typography>
 
             <FormInput
+              fullWidth
               type='text'
               name='Email'
               autoFocus={true}
@@ -79,6 +80,7 @@ const FormNewPassword = ({ classes, form, action, ownProps, ...decorator }) => {
               onUserInput={handleEmailInput} />
 
             <FormInput
+              fullWidth
               type='password'
               name='Password'
               isValid={form.isValidPassword}

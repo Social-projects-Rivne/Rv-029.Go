@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui/Grid'
@@ -15,6 +15,7 @@ const FormInput = (props) => {
   return(
     <Grid item xs={12}>
       <TextField
+        fullWidth={props.fullWidth || false}
         margin="normal"
         autoFocus={props.autoFocus || false}
         error={!props.isValid}
@@ -32,6 +33,7 @@ FormInput.propTypes = {
   autoFocus: PropTypes.bool,
   isValid: PropTypes.bool.isRequired,
   onUserInput: PropTypes.func.isRequired,
+  fullWidth: PropTypes.bool
 }
 
 export default FormInput

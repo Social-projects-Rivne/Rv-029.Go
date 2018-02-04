@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { bindActionCreators } from 'redux'
@@ -8,6 +8,7 @@ import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
+import ModalNotification from './ModalNotification'
 import injectValidation from '../decorators/validate'
 import injectHash from '../decorators/hash'
 import Paper from 'material-ui/Paper'
@@ -26,9 +27,8 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
     axios.post(API_URL + 'auth/forget-password', {
       email: form.email,
     })
-    .then((res) => {
-      //TODO restore password
-      console.log(res)
+    .then(() => {
+      action.setNotificationMessage('Please, check your email')
     })
     .catch((err) => {
 
@@ -52,10 +52,6 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
     action.handleEmail(e.target.value)
   }
 
-  const toggleFormToLogin = () => {
-    action.toggleFormType('login')
-  }
-
   return (
     <Paper
       className={classes.root}
@@ -68,13 +64,18 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
         Restore password
       </Typography>
 
+      <Typography
+        type='body1'>
+        Please, provide us your Email, to we could restore your password.
+      </Typography>
+
       <FormInput
+        fullWidth={true}
         type='text'
         name='Email'
         autoFocus={true}
         isValid={form.isValidEmail}
-        onUserInput={handleEmailInput}
-      />
+        onUserInput={handleEmailInput} />
 
       <Grid
         container
@@ -101,6 +102,11 @@ const FormRestorePassword = ({ classes, form, action, ...decorator }) => {
       <SnackBar
         errorMessage={form.errorMessage}
         setErrorMessage={action.setErrorMessage}/>
+
+      <ModalNotification
+        title='Restore password'
+        content={form.notificationMessage}
+        setNotificationMessage={action.setNotificationMessage}/>
 
     </Paper>
   )

@@ -16,6 +16,7 @@ class SimpleSnackbar extends React.Component {
   
   static propTypes = {
     classes: PropTypes.object.isRequired,
+    setErrorMessage: PropTypes.func.isRequired,
     errorMessage: PropTypes.string
   }
   

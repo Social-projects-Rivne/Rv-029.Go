@@ -1,13 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import { Link, browserHistory } from 'react-router'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
+import ModalNotification from './ModalNotification'
 import injectValidation from '../decorators/validate'
 import injectHash from '../decorators/hash'
 import Paper from 'material-ui/Paper'
@@ -18,15 +19,13 @@ import { withStyles } from 'material-ui/styles'
 
 const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
-  console.log(API_URL + 'auth/login')
-
   if (ownProps.location.query.token) {
     axios.post(API_URL + 'auth/confirm', {
       token: ownProps.location.query.token
     })
     .then((res) => {
-      // TODO snackbar notification
-      console.log(res)
+      // TODO change to message from server, if exists
+      action.setNotificationMessage('You has been successfully registered')
     })
     .catch((err) => {
       action.setStatus(err.response.data.status)
@@ -39,6 +38,16 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
     })
   }
 
+  if (ownProps.location.query.newPassword) {
+    // TODO change to message from server, if exists
+    action.setNotificationMessage('You has been successfully changed your password')
+  }
+
+  if (ownProps.location.query.newUser) {
+    // TODO change to message from server, if exists
+    action.setNotificationMessage('Please, check your Email')
+  }
+
   const sendUserData = (e) => {
     e.preventDefault()
 
@@ -49,8 +58,8 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
       password: decorator.MD5Encode(form.password)
     })
     .then((res) => {
-      console.log(res)
       sessionStorage.setItem('token', res.token)
+      browserHistory.push('/home-page')
     })
     .catch((err) => {
       action.setStatus(err.response.data.status)
@@ -83,10 +92,10 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
   return (
     <Paper
-      className={classes.root}
+      className={classes.paper}
       elevation={8}
       component='form'>
-      
+
       <Typography
         type='headline'
         component='h3'>
@@ -145,7 +154,12 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
       <SnackBar
         errorMessage={form.errorMessage}
         setErrorMessage={action.setErrorMessage}/>
-      
+
+      <ModalNotification
+        title='Notification'
+        content={form.notificationMessage}
+        setNotificationMessage={action.setNotificationMessage}/>
+
     </Paper>
   )
 }
@@ -160,8 +174,8 @@ FormLogin.propTypes = {
 }
 
 const styles = {
-  root: {
-    padding: '4em 3em'
+  paper: {
+    padding: '4em 3em',
   },
   buttons: {
     marginTop: '1.5em',

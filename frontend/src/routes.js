@@ -1,6 +1,9 @@
 import React from 'react'
 import { Route, IndexRoute, IndexRedirect } from 'react-router'
 
+import { clearState } from './actions/FormActions'
+import { store } from './store/configureStore'
+
 import App from './App'
 import FormContainer from './containers/FormContainer'
 import FormLogin from './components/FormLogin'
@@ -8,8 +11,7 @@ import FormRegister from './components/FormRegister'
 import FormRestorePassword from './components/FormRestorePassword'
 import FormNewPassword from './components/FormNewPassword'
 
-import { clearState } from './actions/FormActions'
-import { store } from './store/configureStore'
+import HomePage from './containers/HomePage'
 
 const reset = () => {
   store.dispatch(clearState())
@@ -25,6 +27,7 @@ export const routes = (
         <Route path="restore-password" component={FormRestorePassword}/>
         <Route path="new-password/:token" component={FormNewPassword}/>
       </Route>
+      <Route path="home-page" component={HomePage}/>
     </Route>
   </div>
 )

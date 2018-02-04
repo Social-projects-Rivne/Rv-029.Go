@@ -9,8 +9,8 @@ import {
   ERROR_MESSAGE,
   HANDLE_NAME_INPUT,
   HANDLE_SURNAME_INPUT,
-  CLEAR_STATE
-} from '../constants/Form'
+  CLEAR_STATE, NOTIFICATION_MESSAGE
+} from '../constants/form'
 
 const initialState = {
   email: '',
@@ -22,7 +22,8 @@ const initialState = {
   isValidName: true,
   isValidSurname: true,
   status: null,
-  errorMessage: null
+  errorMessage: null,
+  notificationMessage: null
 }
 
 export default function login(state = initialState, action) {
@@ -47,6 +48,8 @@ export default function login(state = initialState, action) {
       return { ...state, surname: action.payload }
     case ERROR_MESSAGE:
       return { ...state, errorMessage: action.payload }
+    case NOTIFICATION_MESSAGE:
+      return { ...state, notificationMessage: action.payload }
     case CLEAR_STATE:
       return { ...initialState }
     default:

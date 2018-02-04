@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import { Link, browserHistory} from 'react-router'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import FormInput from './FormInput'
@@ -30,8 +30,7 @@ const FormRegister = ({ classes, form, action, ...decorator}) => {
       password: decorator.MD5Encode(form.password)
     })
     .then((res) => {
-      // TODO action after registration
-      console.log(res)
+      browserHistory.push('/authorization/login/?newUser=true')
     })
     .catch((err) => {
 
@@ -151,7 +150,7 @@ const FormRegister = ({ classes, form, action, ...decorator}) => {
 
 const styles = {
   root: {
-    padding: '4em 4em'
+    padding: '4em 3em',
   },
   buttons: {
     marginTop: '1.5em',

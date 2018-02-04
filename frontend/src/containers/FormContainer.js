@@ -16,8 +16,8 @@ const FormContainer = ({ classes, form, formActions, children }) => {
 
 const styles = {
   root: {
-    height: '100vh',
-    backgroundColor: '#2B2D42'
+    minHeight: '100vh',
+    backgroundColor: '#2B2D42',
   }
 }
 

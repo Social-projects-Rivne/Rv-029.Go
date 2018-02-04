@@ -7,10 +7,11 @@ import {
   IS_VALID_PASSWORD,
   STATUS,
   ERROR_MESSAGE,
+  NOTIFICATION_MESSAGE,
   HANDLE_NAME_INPUT,
   HANDLE_SURNAME_INPUT,
   CLEAR_STATE
-} from '../constants/Form'
+} from '../constants/form'
 
 export const handleEmail = (email) => {
   return {
@@ -78,6 +79,13 @@ export const setStatus = (message) => {
 export const setErrorMessage = (message) => {
   return {
     type: ERROR_MESSAGE,
+    payload: message
+  }
+}
+
+export const setNotificationMessage = (message) => {
+  return {
+    type: NOTIFICATION_MESSAGE,
     payload: message
   }
 }
