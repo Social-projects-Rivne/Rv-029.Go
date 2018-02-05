@@ -40,7 +40,7 @@ func (b *BaseModel) Insert(table string,structure interface{}) {
 	query := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v)",table,b.Fields,b.Pointers)
 
 	bind := cqlr.Bind(query, structure)
-	if err := bind.Exec(db.Session); err != nil {
+	if err := bind.Exec(db.GetInstance().Session); err != nil {
 		log.Fatal(err)
 	}
 
@@ -75,7 +75,7 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 	query := fmt.Sprintf("UPDATE %v SET  ",table) + b.Fields + b.Condition
 
 	bind := cqlr.Bind(query, structure)
-	if err := bind.Exec(db.Session); err != nil {
+	if err := bind.Exec(db.GetInstance().Session); err != nil {
 		log.Fatal(err)
 	}
 	b.Condition = ""
