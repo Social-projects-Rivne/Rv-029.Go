@@ -30,7 +30,8 @@ const FormRegister = ({ classes, form, action, ...decorator}) => {
       password: decorator.MD5Encode(form.password)
     })
     .then((res) => {
-      browserHistory.push('/authorization/login/?newUser=true')
+      action.setNotificationMessage("Please check your email")
+      browserHistory.push('/authorization/login')
     })
     .catch((err) => {
 

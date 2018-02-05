@@ -148,7 +148,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request)  {
 	b := models.BaseModel{}
 
 	b.Where("id","=", confirmRegistrationRequestData.UUID)
-	b.AndWhere("password", "=", confirmRegistrationRequestData.Token)
+	//b.AndWhere("password", "=", confirmRegistrationRequestData.Token)
 	b.Update("users", user)
 
 	jsonResponse, _ := json.Marshal(struct {
@@ -217,9 +217,11 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonResponse)
 		return
 	}
-	user := &models.User{}
+	user := models.User{}
 
 	user.FindByEmail(resetRequestData.Email)
+
+	// FIXME doesn't work properly
 	if user.Password != resetRequestData.Token {
 		jsonResponse, _ := json.Marshal(errorResponse{
 			Status:  false,
@@ -234,7 +236,9 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = password.EncodePassword(resetRequestData.Password, user.Salt)
 
-	user.Update()
+	b := models.BaseModel{}
+	b.Where("id", "=", user.UUID)
+	b.Update("users", user)
 
 	jsonResponse, _ := json.Marshal(registerResponse{
 		Status:  true,

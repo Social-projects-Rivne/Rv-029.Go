@@ -9,7 +9,7 @@ import {
   ERROR_MESSAGE,
   HANDLE_NAME_INPUT,
   HANDLE_SURNAME_INPUT,
-  CLEAR_STATE, NOTIFICATION_MESSAGE
+  CLEAR_INPUT_STATE, NOTIFICATION_MESSAGE
 } from '../constants/form'
 
 const initialState = {
@@ -50,8 +50,13 @@ export default function login(state = initialState, action) {
       return { ...state, errorMessage: action.payload }
     case NOTIFICATION_MESSAGE:
       return { ...state, notificationMessage: action.payload }
-    case CLEAR_STATE:
-      return { ...initialState }
+    case CLEAR_INPUT_STATE:
+      return { ...state,
+        isValidEmail: true,
+        isValidPassword: true,
+        isValidName: true,
+        isValidSurname: true,
+      }
     default:
       return state
   }

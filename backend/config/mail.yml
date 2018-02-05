@@ -4,8 +4,8 @@ sender:
 connection:
   host: smtp.mailtrap.io
   port: 465
-  username: 53474641218b36
-  password: f291f70e8436d6
+  username: 7becbf096c9b34
+  password: deb0640e7fac43
   # plain, login, cram_md5
   auth: plain
   tls: true

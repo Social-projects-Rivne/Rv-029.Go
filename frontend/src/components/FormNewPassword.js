@@ -2,6 +2,7 @@ import React from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { browserHistory } from 'react-router'
 import axios from 'axios'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
@@ -28,16 +29,17 @@ const FormNewPassword = ({ classes, form, action, ownProps, ...decorator }) => {
           password: decorator.MD5Encode(form.password)
         })
         .then((res) => {
-          browserHistory.push('/authorization/login/?newPassword=true')
+          action.setNotificationMessage("You successfully restored your password")
+          browserHistory.push('/authorization/login')
         })
         .catch((err) => {
           action.setStatus(err.response.data.status)
 
-        if (err.response.data.Message) {
-            action.setErrorMessage(err.response.data.Message)
-        } else {
-            action.setErrorMessage("Server error occured")
-        }
+          if (err.response.data.Message) {
+              action.setErrorMessage(err.response.data.Message)
+          } else {
+              action.setErrorMessage("Server error occured")
+          }
         })
     }
 
