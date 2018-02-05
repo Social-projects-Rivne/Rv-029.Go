@@ -1,6 +1,8 @@
 package validator
 
-import "net/http"
+import (
+	"net/http"
+)
 
 //ForgotPasswordRequestData ..
 type ConfirmRegistrationRequestData struct{

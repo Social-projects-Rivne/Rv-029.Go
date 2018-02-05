@@ -24,7 +24,7 @@ func (v *baseValidator) ValidateMaxLenght(value string, max int) error {
 
 func (v *baseValidator) ValidateMinLenght(value string, min int) error {
 	if len(value) < min {
-		return errors.New(fmt.Sprintf("Length should be more than %v chars", min))
+		return errors.New(fmt.Sprintf("length should be more than %v chars", min))
 	}
 
 	return nil
@@ -32,7 +32,15 @@ func (v *baseValidator) ValidateMinLenght(value string, min int) error {
 
 func (v *baseValidator) ValidateRequired (value interface{}) error {
 	if value == nil {
-		return errors.New("Value cannot be empty")
+		return errors.New("value is not set")
+	} else {
+		switch value.(type) {
+		case string:
+			if value == "" {
+				return errors.New("value cannot be empty string")
+			}
+		//TODO: add other types
+		}
 	}
 
 	return nil
