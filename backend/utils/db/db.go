@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"gopkg.in/yaml.v2"
+	"sync"
 )
 
 type dbConfig struct {
@@ -15,10 +16,24 @@ type dbConfig struct {
 	Authenticator 	gocql.PasswordAuthenticator
 }
 
-//Session it's exporting pointer for using database connection
-var Session *gocql.Session
+type DB struct {
+	Session *gocql.Session
+}
 
-func init() {
+var instance *DB
+var once sync.Once
+
+func GetInstance() *DB {
+	once.Do(func() {
+		instance = &DB{}
+		instance.init()
+	})
+
+	return instance
+}
+
+
+func (db *DB) init() {
 	filename, _ := filepath.Abs("./backend/config/db.yml")
 	yamlFile, err := ioutil.ReadFile(filename)
 
@@ -38,6 +53,6 @@ func init() {
 	cluster.Authenticator = config.Authenticator
 	cluster.Consistency = gocql.One
 	session, _ := cluster.CreateSession()
-	
-	Session = session
+
+	db.Session = session
 }
