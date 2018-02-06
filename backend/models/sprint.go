@@ -5,11 +5,10 @@ import (
 	"time"
 )
 
-type Board struct {
-	ID      gocql.UUID `cql:"id" key:"primary"`
-	ProjectID gocql.UUID `cql:"project_id"`
+type Sprint struct {
+	ID        gocql.UUID `cql:"id" key:"primary"`
+	BoardId   gocql.UUID `cql:"board_id"`
+	Goal      string     `cql:"goal"`
 	CreatedAt time.Time  `cql:"created_at"`
 	UpdatedAt time.Time  `cql:"updated_at"`
 }
-
-
