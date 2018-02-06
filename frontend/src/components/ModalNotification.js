@@ -10,8 +10,16 @@ import Dialog, {
 } from 'material-ui/Dialog'
 
 class ResponsiveDialog extends React.Component {
-  state = {
-    open: false,
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      open: !!this.props.content,
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({ open: !!nextProps.content })
   }
 
   static propTypes = {
@@ -21,18 +29,17 @@ class ResponsiveDialog extends React.Component {
     content: PropTypes.string
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.state.open = !!nextProps.content
-  }
-
   handleClose = () => {
     this.setState({ open: false })
+  }
 
+  clearMessage = () => {
     this.props.setNotificationMessage(null)
   }
 
   render() {
     const { fullScreen } = this.props
+    console.log('modalnotification render')
 
     return (
       <div>
@@ -40,6 +47,7 @@ class ResponsiveDialog extends React.Component {
           fullScreen={fullScreen}
           open={this.state.open}
           onClose={this.handleClose}
+          onExited={this.clearMessage}
           aria-labelledby="responsive-dialog-title" >
 
           <DialogTitle id="responsive-dialog-title">{this.props.title}</DialogTitle>

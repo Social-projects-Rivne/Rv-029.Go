@@ -82,8 +82,14 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 	query := fmt.Sprintf("UPDATE %v SET  ", table) + b.Fields + b.Condition
 	fmt.Println(query)
 	bind := cqlr.Bind(query, structure)
+
+	fmt.Println(b.Fields)
+	fmt.Println(b.Condition)
+	fmt.Println(structure)
+
 	if err := bind.Exec(db.Session); err != nil {
 		log.Fatal(err)
+		fmt.Println("message")
 	}
 	b.Condition = ""
 

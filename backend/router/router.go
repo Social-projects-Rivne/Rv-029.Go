@@ -37,7 +37,7 @@ func applyAuthRoutes(r *mux.Router)  {
 
 	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
-	r.HandleFunc("/reset-password", controllers.ResetPassword)
+	r.HandleFunc("/new-password", controllers.ResetPassword)
 }
 
 func applyAuthorizedUserRoutes(r *mux.Router)  {
