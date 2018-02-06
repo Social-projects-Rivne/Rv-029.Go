@@ -20,7 +20,7 @@ func init()  {
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
 
-	projectRouter := Router
+	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
 
@@ -46,8 +46,10 @@ func applyAuthorizedUserRoutes(r *mux.Router)  {
 }
 
 func applyProjectsRoutes(r *mux.Router)  {
-	r.HandleFunc("/project/create/", controllers.StoreProject)
-	r.HandleFunc("/project/create", controllers.StoreProject)
+	r.HandleFunc("/create/", controllers.StoreProject)
+	r.HandleFunc("/create", controllers.StoreProject)
+	r.HandleFunc("/update/{id}", controllers.UpdateProject)
+	r.HandleFunc("/update/{id}/", controllers.UpdateProject)
 }
 
 //func applyAdminRoutes(r *mux.Router)  {
