@@ -93,7 +93,7 @@ func (b *BaseModel) AndWhere(column string, sign string, value interface{}) {
 }
 
 //FindUser finds user by any field
-func (b *BaseModel) FindUser() *User {
+func (b *BaseModel) FindUser() {
 
 	query := fmt.Sprintf("SELECT * FROM users %v ", b.Condition)
 
@@ -104,9 +104,8 @@ func (b *BaseModel) FindUser() *User {
 
 	for c.Scan(&user) {
 		log.Println(user.UUID)
-		return user
+		fmt.Println(user)
 	}
-	return nil
 }
 
 //FindIssue finds issue by any field

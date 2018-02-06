@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"	
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
@@ -12,6 +12,10 @@ import (
 
 func main() {
 	var cmd string
+
+	b := &models.BaseModel{}
+	b.Where("email","=","asdf@df.df")
+	b.FindUser()
 
 	if len(os.Args) > 1 {
 		cmd = os.Args[1]
