@@ -19,13 +19,14 @@ import { withStyles } from 'material-ui/styles'
 
 const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
-  if (ownProps.location.query.token) {
+  if (ownProps.location.query.token && ownProps.location.query.uuid) {
     axios.post(API_URL + 'auth/confirm', {
-      token: ownProps.location.query.token
+      token: ownProps.location.query.token,
+      uuid: ownProps.location.query.uuid
     })
     .then((res) => {
-      // TODO change to message from server, if exists
-      action.setNotificationMessage('You has been successfully registered')
+      action.setNotificationMessage(res.data.Message)
+      browserHistory.push("/authorization/login")
     })
     .catch((err) => {
       action.setStatus(err.response.data.status)
@@ -36,16 +37,6 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
         action.setErrorMessage("Server error occured")
       }
     })
-  }
-
-  if (ownProps.location.query.newPassword) {
-    // TODO change to message from server, if exists
-    action.setNotificationMessage('You has been successfully changed your password')
-  }
-
-  if (ownProps.location.query.newUser) {
-    // TODO change to message from server, if exists
-    action.setNotificationMessage('Please, check your Email')
   }
 
   const sendUserData = (e) => {
