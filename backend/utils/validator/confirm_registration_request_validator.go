@@ -2,12 +2,17 @@ package validator
 
 import (
 	"net/http"
+<<<<<<< HEAD
+=======
+	"github.com/gocql/gocql"
+>>>>>>> fixes
 )
 
 //ForgotPasswordRequestData ..
 type ConfirmRegistrationRequestData struct{
 	*baseValidator
 	Token string
+	UUID  gocql.UUID
 }
 
 //Validate ..

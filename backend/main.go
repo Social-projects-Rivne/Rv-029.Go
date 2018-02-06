@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"os"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -20,12 +20,16 @@ func main() {
 	}
 
 	switch cmd {
-	case "db:seed":
-		seeder.Run()
-	default:
-		dbConnection := db.GetInstance()
-		defer dbConnection.Session.Close()
+		case "db:seed":
+			seeder.Run()
+		default:
+			handler := cors.New(cors.Options{
+				AllowedOrigins: []string{"*"},
+				AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},
+				AllowedHeaders: []string{"*"},
+			}).Handler(router.Router)
 
-		log.Fatal(http.ListenAndServe(":8080", router.Router))
+			defer db.Session.Close()
+			log.Fatal(http.ListenAndServe(":8080", handler ))
 	}
 }

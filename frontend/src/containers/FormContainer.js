@@ -2,7 +2,7 @@ import React from 'react'
 import { withStyles } from 'material-ui/styles'
 import Grid from 'material-ui/Grid'
 
-const FormContainer = ({ classes, form, formActions, children }) => {
+const FormContainer = ({ classes, children }) => {
   return (
     <Grid container
       className={classes.root}
