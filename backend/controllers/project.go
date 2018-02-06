@@ -5,9 +5,9 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"encoding/json"
 	"reflect"
-	"github.com/gocql/gocql"
-	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	//"github.com/gocql/gocql"
+	//"time"
+	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"fmt"
 )
 
@@ -41,15 +41,15 @@ func StoreProject(w http.ResponseWriter, r *http.Request)  {
 
 	user := r.Context().Value("user")
 	w.Write([]byte("Project"))
-
+	//
 	userUUID := reflect.ValueOf(user).FieldByName("UUID")
 	fmt.Println(userUUID)
-	q := gocql.UUID{}
-	project := models.Project{gocql.TimeUUID(),q.String(userUUID),"firstProject",time.Now(),time.Now()}
-
-	b := models.BaseModel{}
-
-	b.Insert("projects",project)
+	//q := gocql.UUID{}
+	//project := models.Project{gocql.TimeUUID(),q.String(userUUID),"firstProject",time.Now(),time.Now()}
+	//
+	//b := models.BaseModel{}
+	//
+	//b.Insert("projects",project)
 
 }
 
