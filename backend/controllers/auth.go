@@ -92,7 +92,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonResponse)
 		return
 	}
-
+	
 	salt := password.GenerateSalt(8)
 	user := models.User{
 		UUID:      gocql.TimeUUID(),
@@ -107,9 +107,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now(),
 	}
 
-	user.Insert()
+	b := models.BaseModel{}
+	b.Insert("users",user)
 
-	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\".\n To activate your account please go to the <a href=\"http://localhost/authorization/login/%s\">LINK</a>\n Your ID: %s\n Regards\n", user.FirstName, user.Password, user.UUID)
+	message := fmt.Sprintf("Hello %s,\nYou was successfully registered in \"Task manager\".\n To activate your account please go to the <a href=\"http://localhost/authorization/login/?token=%s&uuid=%s\">LINK</a>\n Your ID: %s\n Regards\n", user.FirstName, user.Password, user.UUID, user.UUID)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
 
 	jsonResponse, _ := json.Marshal(registerResponse{
@@ -139,12 +140,16 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request)  {
 		w.Write(jsonResponse)
 		return
 	}
-	user := &models.User{}
-
-	user.FindByToken(confirmRegistrationRequestData.Token)
+	fmt.Println(confirmRegistrationRequestData)
+	user := models.User{}
 	user.Status = 1
+	fmt.Println(user)
 
-	user.Update()
+	b := models.BaseModel{}
+
+	b.Where("id","=", confirmRegistrationRequestData.UUID)
+	b.AndWhere("password", "=", confirmRegistrationRequestData.Token)
+	b.Update("users", user)
 
 	jsonResponse, _ := json.Marshal(struct {
 		Status bool

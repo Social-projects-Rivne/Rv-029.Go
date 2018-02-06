@@ -7,6 +7,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"os"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -22,7 +23,14 @@ func main() {
 		case "db:seed":
 			seeder.Run()
 		default:
+			handler := cors.New(cors.Options{
+				AllowedOrigins: []string{"*"},
+				AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},
+				AllowedHeaders: []string{"*"},
+			}).Handler(router.Router)
+
 			defer db.Session.Close()
-			log.Fatal(http.ListenAndServe(":8080", router.Router))
+			log.Fatal(http.ListenAndServe(":8080", handler ))
+			
 	}
 }

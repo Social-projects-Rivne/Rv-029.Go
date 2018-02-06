@@ -7,6 +7,7 @@ import (
 	"log"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"strings"
+	"time"
 )
 
 const PRIMERY  = "primery"
@@ -52,19 +53,25 @@ func (b *BaseModel) UpdateHelper(structure interface{}) {
 	s := reflect.ValueOf(structure)
 	typeOfS := s.Type()
 
+	var emptyTime time.Time
+
+	var fields []string
+
 	for i := 0; i < s.NumField(); i++ {
 
-		if strings.ToLower(typeOfS.Field(i).Tag.Get("key")) == PRIMERY || s.Field(i).Interface() == 0  || s.Field(i).Interface() == ""{
+		if strings.ToLower(typeOfS.Field(i).Tag.Get("key")) == PRIMERY || s.Field(i).Interface() == emptyTime || s.Field(i).Interface() == 0  || s.Field(i).Interface() == ""{
 			continue
 		}
-		if i == s.NumField()-1 {
-			b.Fields += fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql"))
-		} else {
-			b.Fields += fmt.Sprintf("%s = ? , ", typeOfS.Field(i).Tag.Get("cql"))
-		}
+
+		fields = append(fields, fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql")))
+		// if i == s.NumField() - 1 {
+			// b.Fields += fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql"))
+		// } else {
+			// b.Fields += fmt.Sprintf("%s = ? , ", typeOfS.Field(i).Tag.Get("cql"))
+		// }
 	}
 
-
+	b.Fields += strings.Join(fields, ", ")
 }
 
 
@@ -72,8 +79,8 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 
 	b.UpdateHelper(structure)
 
-	query := fmt.Sprintf("UPDATE %v SET  ",table) + b.Fields + b.Condition
-
+	query := fmt.Sprintf("UPDATE %v SET  ", table) + b.Fields + b.Condition
+	fmt.Println(query)
 	bind := cqlr.Bind(query, structure)
 	if err := bind.Exec(db.Session); err != nil {
 		log.Fatal(err)
@@ -84,7 +91,7 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 
 func (b *BaseModel) Where( column string, sign string ,value interface{} ) {
 
-	b.Condition = "WHERE " + column + sign
+	b.Condition = " WHERE " + column + sign
 	b.Condition += fmt.Sprintf("%v",value)
 
 
@@ -92,7 +99,7 @@ func (b *BaseModel) Where( column string, sign string ,value interface{} ) {
 
 func (b *BaseModel) AndWhere( column string, sign string ,value interface{} ) {
 
-	b.Condition = "AND " + column + sign
+	b.Condition += " AND " + column + sign
 	b.Condition += fmt.Sprintf("%v",value)
 
 
