@@ -111,7 +111,7 @@ func (b *BaseModel) Select(table string,structure interface{}) interface{} {
 
 	query := fmt.Sprintf("SELECT * FROM %v %v ",table, b.Condition)
 
-	q := db.Session.Query(query)
+	q := db.GetInstance().Session.Query(query)
 	c := cqlr.BindQuery(q)
 
 	s := reflect.ValueOf(structure)
