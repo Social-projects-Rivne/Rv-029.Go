@@ -12,6 +12,7 @@ import FormRestorePassword from './components/FormRestorePassword'
 import FormNewPassword from './components/FormNewPassword'
 
 import HomePage from './containers/HomePage'
+import ProjectsPage from "./containers/ProjectsPage";
 
 const reset = () => {
   store.dispatch(clearState())
@@ -27,6 +28,7 @@ export const routes = (
         <Route path="restore-password" component={FormRestorePassword}/>
         <Route path="new-password/:token" component={FormNewPassword}/>
       </Route>
+      <Route name="projects_list" path="project/list" component={ProjectsPage}/>
       <Route path="home-page" component={HomePage}/>
     </Route>
   </div>

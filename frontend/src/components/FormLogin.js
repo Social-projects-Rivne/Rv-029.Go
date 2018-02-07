@@ -19,7 +19,6 @@ import { withStyles } from 'material-ui/styles'
 
 const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
-  console.log(ownProps.location.query);
   if (ownProps.location.query.token && ownProps.location.query.uuid) {
     axios.post(API_URL + 'auth/confirm', {
       token: ownProps.location.query.token,

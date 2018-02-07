@@ -1,9 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
-const publicPath = 'http://localhost:3000';
 
 module.exports = {
-  entry: './frontend/src/index.js',
+  entry:'./frontend/src/index.js',
   devtool: 'cheap-module-source-map',
 
   plugins: [
@@ -13,18 +12,17 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './frontend/public'),
     filename: '[name].bundle.js',
-    publicPath: this.hmr ? 'http://localhost:3000/' : '',
     sourceMapFilename: '[name].map',
   },
 
   devServer: {
-    port: 3000,
-    host: 'localhost',
+    port: 80,
+    host: '0.0.0.0',
     historyApiFallback: true,
     noInfo: false,
     stats: 'minimal',
-    publicPath: publicPath,
-    contentBase: path.join(__dirname, publicPath),
+    publicPath: "/",
+    contentBase: path.resolve(__dirname, './frontend/public'),
     headers: { 'Access-Control-Allow-Origin': '*' },
     inline: true,
     hot: true
