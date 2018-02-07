@@ -96,3 +96,34 @@ to
 ```sh
 <script src="bundle.js"></script>
 ```
+
+# Route List
+
+| Action | Route | Input | Method | Auth |
+| ------ | ------ | ------ | ------ | ------ |
+| Login | auth/login | JSON{ email, password } | POST | NO |
+| Registration | auth/register | JSON{ email, name, surname, password } | POST | NO |
+| Forget Password | auth/forget-password | JSON{ email } | POST | NO |
+| New Password | auth/new-password | JSON{ token, email, password } | POST | NO |
+| Create Project | project/create | JSON{ name } | POST | YES |
+| Update Project | project/update/:id | JSON{ name } | PUT | YES |
+| Delete Project | project/delete/:id | - | DELETE | YES |
+| Projects list | project/list | - | GET | YES |
+| Show Project | project/show/:id | - | GET | YES |
+| Create Board | project/:project_id/board/create | JSON{ name, desc } | POST | YES |
+| Update Board | project/board/update/:board_id | JSON{ name, desc } | PUT | YES |
+| Delete Board | project/board/delete/:board_id | - | Delete | YES |
+| Boards list | project/:project_id/board/list | - | GET | YES |
+| Show Board | project/board/show/:board_id | - | GET | YES |
+| Create Sprint | project/board/:board_id/sprint/create | JSON{ goal, name, desc } | POST | YES |
+| Update Sprint | project/board/sprint/update/:sprint_id | JSON{ goal, name, desc, status, ...fields } | PUT | YES |
+| Delete Sprint | project/board/sprint/delete/:sprint_id | - | Delete | YES |
+| Spints list | project/board/:board_id/sprint/list | - | GET | YES |
+| Show Sprint | project/board/sprint/show/:sprint_id | - | GET | YES |
+| Create Issue | project/board/:board_id/issue/create | JSON{ name, desc, assigned?, estimate?, status?, sprint_id? } | POST | YES |
+| Update Issue | project/board/issue/update/:issue_id | JSON{ name, desc, assigned?, estimate?, status?, sprint_id? ...fields } | PUT | YES |
+| Delete Issue | project/board/issue/delete/:issue_id | - | Delete | YES |
+| Board Issues list | project/board/:board_id/issue/list | - | GET | YES |
+| Sprint Issues list | project/board/sprint/:sprint_id/issue/list | - | GET | YES |
+| Show Issue | project/board/issue/show/:issue_id | - | GET | YES |
+
