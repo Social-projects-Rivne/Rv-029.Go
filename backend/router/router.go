@@ -46,10 +46,21 @@ func applyAuthorizedUserRoutes(r *mux.Router)  {
 }
 
 func applyProjectsRoutes(r *mux.Router)  {
-	r.HandleFunc("/create/", controllers.StoreProject)
-	r.HandleFunc("/create", controllers.StoreProject)
-	r.HandleFunc("/update/{id}", controllers.UpdateProject)
-	r.HandleFunc("/update/{id}/", controllers.UpdateProject)
+
+	r.HandleFunc("/create/", controllers.StoreProject).Methods("POST")
+	r.HandleFunc("/create", controllers.StoreProject).Methods("POST")
+
+	r.HandleFunc("/update/{id}/", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/update/{id}", controllers.UpdateProject).Methods("PUT")
+
+	r.HandleFunc("/delete/{id}/", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/delete/{id}", controllers.DeleteProject).Methods("DELETE")
+
+	r.HandleFunc("/show/{id}/", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{id}", controllers.ShowProjects).Methods("GET")
+
+	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {
