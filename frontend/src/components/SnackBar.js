@@ -10,7 +10,7 @@ class SimpleSnackbar extends React.Component {
     super(props)
     
     this.state = {
-      isOpen: false
+      isOpen: !!props.errorMessage
     }
   }
   

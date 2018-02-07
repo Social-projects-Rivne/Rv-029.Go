@@ -3,10 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
-	"os"
 	"github.com/rs/cors"
 )
 
@@ -29,8 +30,10 @@ func main() {
 				AllowedHeaders: []string{"*"},
 			}).Handler(router.Router)
 
-			defer db.Session.Close()
+			dbConnection := db.GetInstance()
+			defer dbConnection.Session.Close()
+
 			log.Fatal(http.ListenAndServe(":8080", handler ))
-			
+
 	}
 }

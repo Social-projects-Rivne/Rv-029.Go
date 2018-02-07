@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"encoding/json"
-	"reflect"
-	//"github.com/gocql/gocql"
-	//"time"
-	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"fmt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/gocql/gocql"
+	"time"
+	"github.com/gorilla/mux"
+	"log"
 )
 
 
@@ -18,9 +18,42 @@ type projectResponse struct {
 }
 
 
-func IndexProject(w http.ResponseWriter, r *http.Request) {
+func ProjectsList(w http.ResponseWriter, r *http.Request) {
+	project := models.Project{}
 
+	projects , err := project.GetAll()
+	if err != nil{
+		log.Fatal("Can't get all projects ",err)
+	}
+
+	projectJsonResponse, _ := json.Marshal(projects)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(projectJsonResponse)
 }
+
+func ShowProjects(w http.ResponseWriter, r *http.Request) {
+
+
+	vars := mux.Vars(r)
+
+	id , err := gocql.ParseUUID(vars["id"])
+	if err != nil {
+		log.Fatal("Can't parse uuid ",err)
+	}
+	project := models.Project{}
+
+	project.UUID = id
+	project.FindByID()
+
+	projectJsonResponse, _ := json.Marshal(project)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(projectJsonResponse)
+}
+
 
 func StoreProject(w http.ResponseWriter, r *http.Request)  {
 
@@ -39,25 +72,85 @@ func StoreProject(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	user := r.Context().Value("user")
-	w.Write([]byte("Project"))
-	//
-	userUUID := reflect.ValueOf(user).FieldByName("UUID")
-	fmt.Println(userUUID)
-	//q := gocql.UUID{}
-	//project := models.Project{gocql.TimeUUID(),q.String(userUUID),"firstProject",time.Now(),time.Now()}
-	//
-	//b := models.BaseModel{}
-	//
-	//b.Insert("projects",project)
+	user := r.Context().Value("user").(models.User)
+
+	project := models.Project{gocql.TimeUUID(),user.UUID,projectRequestData.Name,time.Now(),time.Now()}
+
+	project.Insert()
+
+	jsonResponse, _ := json.Marshal(projectResponse{
+		Status:  true,
+		Message: "Your project created",
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 
 }
 
 func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
+	var projectRequestData validator.ProjectRequestData
+
+	err := decodeAndValidate(r, &projectRequestData)
+	if err != nil {
+		jsonResponse, _ := json.Marshal(errorResponse{
+			Status:  false,
+			Message: err.Error(),
+		})
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResponse)
+		return
+	}
+
+	vars := mux.Vars(r)
+
+	id , err := gocql.ParseUUID(vars["id"])
+	if err != nil {
+		log.Fatal("Can't parse uuid ",err)
+	}
+	project := models.Project{}
+
+	project.UUID = id
+	project.Name = projectRequestData.Name
+	project.UpdatedAt = time.Now()
+
+	project.Update()
+
+	jsonResponse, _ := json.Marshal(projectResponse{
+		Status:  true,
+		Message: "Your project updated",
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+
 }
 
-func DestroyProject(w http.ResponseWriter, r *http.Request)  {
+func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 
+	vars := mux.Vars(r)
+
+	id , err := gocql.ParseUUID(vars["id"])
+	if err != nil {
+		log.Fatal("Can't parse uuid ",err)
+	}
+	project := models.Project{}
+
+	project.UUID = id
+	project.Delete()
+
+	jsonResponse, _ := json.Marshal(projectResponse{
+		Status:  true,
+		Message: "Your project deleted",
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }
 

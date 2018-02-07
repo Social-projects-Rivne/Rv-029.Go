@@ -20,7 +20,7 @@ func init()  {
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
 
-	projectRouter := Router
+	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
 
@@ -37,7 +37,7 @@ func applyAuthRoutes(r *mux.Router)  {
 
 	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
-	r.HandleFunc("/reset-password", controllers.ResetPassword)
+	r.HandleFunc("/new-password", controllers.ResetPassword)
 }
 
 func applyAuthorizedUserRoutes(r *mux.Router)  {
@@ -46,8 +46,21 @@ func applyAuthorizedUserRoutes(r *mux.Router)  {
 }
 
 func applyProjectsRoutes(r *mux.Router)  {
-	r.HandleFunc("/project/create/", controllers.StoreProject)
-	r.HandleFunc("/project/create", controllers.StoreProject)
+
+	r.HandleFunc("/create/", controllers.StoreProject).Methods("POST")
+	r.HandleFunc("/create", controllers.StoreProject).Methods("POST")
+
+	r.HandleFunc("/update/{id}/", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/update/{id}", controllers.UpdateProject).Methods("PUT")
+
+	r.HandleFunc("/delete/{id}/", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/delete/{id}", controllers.DeleteProject).Methods("DELETE")
+
+	r.HandleFunc("/show/{id}/", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{id}", controllers.ShowProjects).Methods("GET")
+
+	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {
