@@ -7,9 +7,15 @@ import (
 	"os"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"	
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
+<<<<<<< HEAD
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/rs/cors"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"		
+=======
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
+	"github.com/rs/cors"
+>>>>>>> origin/project
 )
 
 func main() {

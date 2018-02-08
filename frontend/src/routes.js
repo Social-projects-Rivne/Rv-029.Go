@@ -1,7 +1,11 @@
 import React from 'react'
 import { Route, IndexRoute, IndexRedirect } from 'react-router'
+import axios from 'axios'
+import { API_URL } from './constants/global'
 
 import { clearInputState } from './actions/FormActions'
+import { setNotificationMessage } from './actions/FormActions'
+import { setErrorMessage } from './actions/FormActions'
 import { store } from './store/configureStore'
 
 import App from './App'
@@ -12,9 +16,36 @@ import FormRestorePassword from './components/FormRestorePassword'
 import FormNewPassword from './components/FormNewPassword'
 
 import HomePage from './containers/HomePage'
+import ProjectsPage from "./containers/ProjectsPage";
 
+// TODO move these out of here
+// e.g. routeEvents.js
 const reset = () => {
   store.dispatch(clearInputState())
+}
+
+const queryCheck = (nextState, replace, callback) => {
+  if (nextState.location.query.token && nextState.location.query.uuid) {
+    axios.post(API_URL + 'auth/confirm', {
+      token: nextState.location.query.token,
+      uuid: nextState.location.query.uuid
+    })
+    .then((res) => {
+      store.dispatch(setNotificationMessage(res.data.Message))
+      replace("/authorization/login")
+      callback()
+    })
+    .catch((err) => {
+      replace("/authorization/login")
+
+      if (err.response.data.Message) {
+        store.dispatch(setErrorMessage(err.response.data.Message))
+      } else {
+        store.dispatch(setErrorMessage('Server error occured'))
+      }
+      callback()
+    })
+  } else callback()
 }
 
 export const routes = (
@@ -23,11 +54,12 @@ export const routes = (
       <IndexRedirect to ="authorization/login"/>
       <Route path="authorization" component={FormContainer} onChange={reset}>
         <IndexRedirect to="login"/>
-        <Route path="login" component={FormLogin}/>
+        <Route path="login" component={FormLogin} onEnter={queryCheck}/>
         <Route path="register" component={FormRegister}/>
         <Route path="restore-password" component={FormRestorePassword}/>
         <Route path="new-password/:token" component={FormNewPassword}/>
       </Route>
+      <Route name="projects_list" path="project/list" component={ProjectsPage}/>
       <Route path="home-page" component={HomePage}/>
     </Route>
   </div>

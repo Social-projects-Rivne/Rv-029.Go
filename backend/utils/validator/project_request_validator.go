@@ -3,11 +3,12 @@ package validator
 import "net/http"
 
 type ProjectRequestData struct {
+	*baseValidator
 	Name string
 }
 
 func (d *ProjectRequestData) Validate(r *http.Request) error {
-	err := ValidateRequired(d.Name)
+	err := d.ValidateRequired(d.Name)
 	if err != nil {
 		return err
 	}

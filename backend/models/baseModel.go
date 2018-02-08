@@ -117,11 +117,23 @@ func (b *BaseModel) FindIssue() *Issue {
 	return nil
 }
 
-func (b *BaseModel) FindUser() *User {
+//FindUser finds user by any field
+func (b *BaseModel) Select(table string,structure interface{}) interface{} {
 
-	//query := fmt.Sprintf("SELECT * FROM users %v ", b.Condition)
-	q := db.GetInstance().Session.Query(`SELECT * FROM users WHERE email = ?`, "user@gmail.com")
+	query := fmt.Sprintf("SELECT * FROM %v %v ",table, b.Condition)
+
+	q := db.GetInstance().Session.Query(query)
 	c := cqlr.BindQuery(q)
+
+	s := reflect.ValueOf(structure)
+fmt.Println(s)
+	for c.Scan(s) {
+
+		return structure
+	}
+	return nil
+}
+
 
 	user := User{}
 

@@ -31,11 +31,15 @@ class ResponsiveDialog extends React.Component {
 
   handleClose = () => {
     this.setState({ open: false })
+  }
+
+  clearMessage = () => {
     this.props.setNotificationMessage(null)
   }
 
   render() {
     const { fullScreen } = this.props
+    console.log('modalnotification render')
 
     return (
       <div>
@@ -43,6 +47,7 @@ class ResponsiveDialog extends React.Component {
           fullScreen={fullScreen}
           open={this.state.open}
           onClose={this.handleClose}
+          onExited={this.clearMessage}
           aria-labelledby="responsive-dialog-title" >
 
           <DialogTitle id="responsive-dialog-title">{this.props.title}</DialogTitle>

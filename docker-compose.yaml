@@ -12,24 +12,16 @@ services:
       - ${CASSANDRA_CLIENT_PORT}:9042
     volumes:
       - cassandra-storage:/var/lib/cassandra
-    networks: 
-      - backend
 
-  # TODO: api url, react
   react:
-    image: sinet/nginx-node:latest
+    image: node:latest
     volumes:
-      - ./docker/nginx/sites:/etc/nginx/conf.d
       - ./:/var/www/app
     working_dir: /var/www/app
     ports:
       - ${HOST_HTTP_PORT}:80
       - ${HOST_HTTPS_PORT}:443
-    networks: 
-      - frontend
+    command: bash -c "npm install && npm install -g webpack && npm start"
 
 volumes:
   cassandra-storage:
-networks:
-  backend:
-  frontend:

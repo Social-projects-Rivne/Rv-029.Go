@@ -19,26 +19,6 @@ import { withStyles } from 'material-ui/styles'
 
 const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
-  if (ownProps.location.query.token && ownProps.location.query.uuid) {
-    axios.post(API_URL + 'auth/confirm', {
-      token: ownProps.location.query.token,
-      uuid: ownProps.location.query.uuid
-    })
-    .then((res) => {
-      action.setNotificationMessage(res.data.Message)
-      browserHistory.push("/authorization/login")
-    })
-    .catch((err) => {
-      action.setStatus(err.response.data.status)
-
-      if (err.response.data.Message) {
-        action.setErrorMessage(err.response.data.Message)
-      } else {
-        action.setErrorMessage("Server error occured")
-      }
-    })
-  }
-
   const sendUserData = (e) => {
     e.preventDefault()
 
