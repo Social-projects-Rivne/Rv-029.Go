@@ -118,29 +118,29 @@ func (b *BaseModel) FindIssue() *Issue {
 }
 
 //FindUser finds user by any field
-func (b *BaseModel) Select(table string,structure interface{}) interface{} {
+// func (b *BaseModel) Select(table string,structure interface{}) interface{} {
 
-	query := fmt.Sprintf("SELECT * FROM %v %v ",table, b.Condition)
+// 	query := fmt.Sprintf("SELECT * FROM %v %v ",table, b.Condition)
 
-	q := db.GetInstance().Session.Query(query)
-	c := cqlr.BindQuery(q)
+// 	q := db.GetInstance().Session.Query(query)
+// 	c := cqlr.BindQuery(q)
 
-	s := reflect.ValueOf(structure)
-fmt.Println(s)
-	for c.Scan(s) {
+// 	s := reflect.ValueOf(structure)
+// fmt.Println(s)
+// 	for c.Scan(s) {
 
-		return structure
-	}
-	return nil
-}
+// 		return structure
+// 	}
+// 	return nil
+// }
 
 
-	user := User{}
+// 	user := User{}
 
-	for c.Scan(&user) {
-		//log.Println(user.UUID)
-		fmt.Println(user.UUID)
-		return &user
-	}
-	return nil
-}
+// 	for c.Scan(&user) {
+// 		//log.Println(user.UUID)
+// 		fmt.Println(user.UUID)
+// 		return &user
+// 	}
+// 	return nil
+// }

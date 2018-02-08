@@ -8,6 +8,7 @@ import (
 	"github.com/gocql/gocql"
 )
 
+//Role .
 type Role string
 
 const ROLE_ADMIN = "Admin"
@@ -16,7 +17,6 @@ const ROLE_OWNER = "Owner"
 const ROLE_USER = "User"
 
 //User type
-
 type User struct {
 	UUID      gocql.UUID `cql:"id" key:"primery"`
 	Email     string     `cql:"email"`
@@ -43,7 +43,7 @@ func (user *User) Insert() {
 //Update updates user by id
 func (user *User) Update() {
 
-	if err := Session.Query(`Update users SET name = ? ,updated_at = ? WHERE id= ? ;`,
+	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 		fmt.Println(err)
 	}

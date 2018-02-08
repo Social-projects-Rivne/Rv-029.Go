@@ -15,6 +15,7 @@ type Project struct {
 	UpdatedAt time.Time
 
 }
+
 var Session = db.GetInstance().Session
 
 func (project *Project) Insert() {
