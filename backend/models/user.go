@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 )
 
@@ -33,55 +33,55 @@ type User struct {
 //Insert func inserts user object in database
 func (user *User) Insert() {
 
-	if err := db.GetInstance().Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,salt,role,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
+	if err := Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,salt,role,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.Status, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 		fmt.Println(err)
 	}
 
 }
 
-//FindByID func finds user from database
-func (user *User) FindByID(id string) error {
-	return db.GetInstance().Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, created_at, updated_at FROM users WHERE id = ? LIMIT 1`,
-		id).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Salt, &user.Role, &user.Status, &user.CreatedAt, &user.UpdatedAt)
-}
-
-//FindByEmail func finds user from database
-func (user *User) FindByEmail(email string) {
-
-	if err := db.GetInstance().Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, created_at, updated_at FROM users WHERE email = ? LIMIT 1`,
-		email).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password, &user.Salt, &user.Role, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
-		fmt.Println(err)
-	}
-
-}
-
-func (user *User) FindByToken(token string) error {
-	//TODO:
-
-	return nil
-}
-
-//UpdateEmail func updates user's email in database(FIXME: don't touch this shit)
-func (user *User) UpdateEmail() {
-
-	if err := db.GetInstance().Session.Query(`UPDATE example.users 
-		SET email = ?
-		WHERE email id = ?;`,
-		gocql.TimeUUID(), user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
-		fmt.Println(err)
-	}
-
-}
-
-//Update func updates user's email in database(don't touch this shit)
+//Update updates user by id
 func (user *User) Update() {
 
-	//TODO
+	if err := Session.Query(`Update users SET name = ? ,updated_at = ? WHERE id= ? ;`,
+		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
+		fmt.Println(err)
+	}
 
 }
 
-// Return list of claims to generate jwt token
+//Delete removes user by id
+func (user *User) Delete() {
+
+	if err := Session.Query(`DELETE FROM users WHERE id= ? ;`,
+		user.UUID).Exec(); err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+//FindByID finds user by id
+func (user *User) FindByID(id string) error {
+	return Session.Query(`SELECT id, email, first_name, last_name, updated_at, created_at, password, salt, role, status 
+		FROM users WHERE id = ? LIMIT 1`, id).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
+		&user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status)
+}
+
+//FindByEmail finds user by email
+func (user *User) FindByEmail(email string) error {
+	return Session.Query(`SELECT id, email, first_name, last_name, updated_at, created_at, password, salt, role, status 
+		FROM users WHERE email = ? LIMIT 1`, email).Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
+		&user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status)
+}
+
+//GetAll returns all users
+func (user *User) GetAll() ([]map[string]interface{}, error) {
+
+	return Session.Query(`SELECT * FROM users`).Iter().SliceMap()
+
+}
+
+//GetClaims Return list of claims to generate jwt token
 func (user *User) GetClaims() map[string]interface{} {
 	claims := make(map[string]interface{})
 
