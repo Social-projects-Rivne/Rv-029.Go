@@ -33,8 +33,8 @@ const ProjectsPage = (props) => {
           <Grid container className={props.classes.root}>
               <Grid item xs={12}>
                   <Grid container justify="center" spacing={24}>
-                      {projects.map(value => (
-                          <ProjectCard project={value} />
+                      {projects.map((value, index) => (
+                          <ProjectCard key={index} project={value} />
                       ))}
                   </Grid>
               </Grid>

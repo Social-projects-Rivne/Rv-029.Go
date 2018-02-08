@@ -5,6 +5,7 @@ import Card, { CardActions, CardContent } from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
+import { Link, browserHistory } from 'react-router'
 
 function ProjectCard(props) {
     const { classes, project } = props;
@@ -18,8 +19,9 @@ function ProjectCard(props) {
                     <Typography component="p">{project.desc}</Typography>
                 </CardContent>
                 <CardActions>
-                    <Link to="view_project"
-                          params={{ project: project.id }}
+                    <Link
+                          to="view_project"
+                          params={ {id: project.id} }
                           className={classes.link}>
                         <Button
                           size="small"

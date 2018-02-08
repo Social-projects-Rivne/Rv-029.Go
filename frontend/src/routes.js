@@ -17,6 +17,7 @@ import FormNewPassword from './components/FormNewPassword'
 
 import HomePage from './containers/HomePage'
 import ProjectsPage from "./containers/ProjectsPage";
+import ProjectCard from "./components/ProjectCard";
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -60,6 +61,7 @@ export const routes = (
         <Route path="new-password/:token" component={FormNewPassword}/>
       </Route>
       <Route name="projects_list" path="project/list" component={ProjectsPage}/>
+      <Route name="view_project" path="project/:id" component={ProjectCard}/>
       <Route path="home-page" component={HomePage}/>
     </Route>
   </div>
