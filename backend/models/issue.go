@@ -32,7 +32,6 @@ type Issue struct {
 	UserID    gocql.UUID `cql:"user_id"`
 	SprintID  gocql.UUID `cql:"sprint_id"`
 	BoardID   gocql.UUID `cql:"board_id"`
-	ProjectID gocql.UUID `cql:"project_id"`
 	CreatedAt time.Time  `cql:"created_at"`
 	UpdatedAt time.Time  `cql:"updated_at"`
 }
