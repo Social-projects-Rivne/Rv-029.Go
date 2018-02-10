@@ -57,3 +57,46 @@ func StoreBoard(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
 }
+
+func UpdateBoard(w http.ResponseWriter, r *http.Request) {
+	var boardRequestData validator.BoardRequestData
+
+	err := decodeAndValidate(r, &boardRequestData)
+
+	if err != nil {
+		jsonResponse, _ := json.Marshal(errorResponse{
+			false,
+			err.Error(),
+		})
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResponse)
+		return
+	}
+
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["project_id"])
+	if err != nil {
+		log.Fatal("Can't parse uuid ", err)
+	}
+
+	board := models.Board{}
+	board.ID = boardId
+	board.Name = boardRequestData.Name
+	board.Desc = boardRequestData.Desc
+	board.UpdatedAt = time.Now()
+	board.Update()
+
+	jsonResponse, _ := json.Marshal(struct {
+		Status  bool
+		Message string
+	}{
+		true,
+		"Board has updated",
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}

@@ -21,6 +21,13 @@ var Session = db.GetInstance().Session
 func (b *Board) Insert() {
 	if err := Session.Query(`INSERT INTO boards (id, project_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?);`,
 		b.ID, b.ProjectID, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec(); err != nil {
-		log.Fatal(err)
-	}
+			log.Fatal(err)
+		}
+}
+
+func (b *Board) Update() {
+	if err := Session.Query(`Update boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
+		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec(); err != nil {
+			log.Fatal(err)
+		}
 }
