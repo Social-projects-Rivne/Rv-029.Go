@@ -20,6 +20,9 @@ func init()  {
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
 
+	boardRouter := Router.PathPrefix("/board").Subrouter()
+	applyBoardRoutes(boardRouter)
+	boardRouter.Use(middlewares.AuthenticatedMiddleware)
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -37,6 +40,11 @@ func applyAuthRoutes(r *mux.Router)  {
 func applyAuthorizedUserRoutes(r *mux.Router)  {
 	r.HandleFunc("/", controllers.Dashboard)
 	r.HandleFunc("", controllers.Dashboard)
+}
+
+func applyBoardRoutes(r *mux.Router) {
+	r.HandleFunc("/project/{project_id}/board/create/", controllers.StoreBoard).Methods("POST")
+	r.HandleFunc("/project/{project_id}/board/create", controllers.StoreBoard).Methods("POST")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {

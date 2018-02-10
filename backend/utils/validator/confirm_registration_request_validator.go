@@ -2,10 +2,7 @@ package validator
 
 import (
 	"net/http"
-<<<<<<< HEAD
-=======
 	"github.com/gocql/gocql"
->>>>>>> fixes
 )
 
 //ForgotPasswordRequestData ..

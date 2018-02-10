@@ -29,7 +29,7 @@ func main() {
 				AllowedHeaders: []string{"*"},
 			}).Handler(router.Router)
 
-			defer db.Session.Close()
+			defer db.GetInstance().Session.Close()
 			log.Fatal(http.ListenAndServe(":8080", handler ))
 	}
 }

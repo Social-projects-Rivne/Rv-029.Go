@@ -33,7 +33,6 @@ func (b *BaseModel) GetFields(structure interface{}) {
 		}
 	}
 
-
 }
 
 func (b *BaseModel) Insert(table string,structure interface{}) {
@@ -48,7 +47,6 @@ func (b *BaseModel) Insert(table string,structure interface{}) {
 }
 
 func (b *BaseModel) UpdateHelper(structure interface{}) {
-
 
 	s := reflect.ValueOf(structure)
 	typeOfS := s.Type()
@@ -82,28 +80,19 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 	query := fmt.Sprintf("UPDATE %v SET  ", table) + b.Fields + b.Condition
 	fmt.Println(query)
 	bind := cqlr.Bind(query, structure)
-<<<<<<< HEAD
+
 	if err := bind.Exec(db.GetInstance().Session); err != nil {
-=======
-
-	fmt.Println(b.Fields)
-	fmt.Println(b.Condition)
-	fmt.Println(structure)
-
-	if err := bind.Exec(db.Session); err != nil {
->>>>>>> fixes
 		log.Fatal(err)
 		fmt.Println("message")
 	}
-	b.Condition = ""
 
+	b.Condition = ""
 }
 
 func (b *BaseModel) Where( column string, sign string ,value interface{} ) {
 
 	b.Condition = " WHERE " + column + sign
 	b.Condition += fmt.Sprintf("%v",value)
-
 
 }
 
@@ -112,7 +101,5 @@ func (b *BaseModel) AndWhere( column string, sign string ,value interface{} ) {
 	b.Condition += " AND " + column + sign
 	b.Condition += fmt.Sprintf("%v",value)
 
-
 }
-
 
