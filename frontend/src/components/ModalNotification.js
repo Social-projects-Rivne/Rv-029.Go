@@ -39,7 +39,6 @@ class ResponsiveDialog extends React.Component {
 
   render() {
     const { fullScreen } = this.props
-    console.log('modalnotification render')
 
     return (
       <div>

@@ -30,7 +30,7 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
     })
     .then((res) => {
       sessionStorage.setItem('token', res.token)
-      browserHistory.push('/home-page')
+      browserHistory.push('/projects')
     })
     .catch((err) => {
       action.setStatus(err.response.data.status)
