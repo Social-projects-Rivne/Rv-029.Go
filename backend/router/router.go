@@ -22,7 +22,7 @@ func init()  {
 
 	boardRouter := Router
 	applyBoardRoutes(boardRouter)
-	boardRouter.Use(middlewares.AuthenticatedMiddleware)
+	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -49,8 +49,14 @@ func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
 	r.HandleFunc("/project/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
 
-	r.HandleFunc("/project/board/delete/{board_id}/", controllers.UpdateBoard).Methods("PUT")
-	r.HandleFunc("/project/board/delete/{board_id}", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/project/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE")
+	r.HandleFunc("/project/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE")
+
+	r.HandleFunc("/project/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
+	r.HandleFunc("/project/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
+
+	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
+	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {

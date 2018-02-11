@@ -12,8 +12,14 @@ import (
 )
 
 type boardSuccessResponse struct {
-	Status bool
+	Status  bool
 	Message string
+}
+
+func setSuccessResHeaders(w http.ResponseWriter, jsonRes []byte) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonRes)
 }
 
 func StoreBoard(w http.ResponseWriter, r *http.Request) {
@@ -35,6 +41,7 @@ func StoreBoard(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,9 +61,7 @@ func StoreBoard(w http.ResponseWriter, r *http.Request) {
 		true, "Board has created",
 	})
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	setSuccessResHeaders(w, jsonResponse)
 }
 
 func UpdateBoard(w http.ResponseWriter, r *http.Request) {
@@ -93,12 +98,10 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 		true, "Board has updated",
 	})
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	setSuccessResHeaders(w, jsonResponse)
 }
 
-func DeleteBoard(w http.ResponseWriter, r *http.Request)  {
+func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 	if err != nil {
@@ -113,7 +116,32 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request)  {
 		true, "Board has deleted",
 	})
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	setSuccessResHeaders(w, jsonResponse)
+}
+
+func SelectBoard(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := gocql.ParseUUID(vars["board_id"])
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	board := models.Board{}
+	board.ID = id
+	board.FindByID()
+
+	jsonResponse, _ := json.Marshal(board)
+
+	setSuccessResHeaders(w, jsonResponse)
+}
+
+func BoardsList(w http.ResponseWriter, r *http.Request) {
+	board := models.Board{}
+
+	boardsList := board.List()
+
+	jsonResponse, _ := json.Marshal(boardsList)
+
+	setSuccessResHeaders(w, jsonResponse)
 }
