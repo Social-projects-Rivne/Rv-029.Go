@@ -62,9 +62,28 @@ migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations 
 migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations goto v
 ```
 
+# Seeds
+
+Run seeds
+```sh
+go run backend/main.go db:seed
+```
+
+Default admin user email: `user@gmail.com`
+
+Default admin user password: `qwerty1234`
+
+# Run golang web server
+Run server with command. By default port uses :8080
+```sh
+go run backend/main.go
+```
+
 # React app
 ## Developing
 
+### Auto run in localhost:80 with docker entrypoint script. Manage webpack.config.js to change port
+### To run manually 
 run
 ```sh
 $ npm install
@@ -82,7 +101,7 @@ $ go run dev.go
 go to localhost:8080/static/
 
 
-## Get prebuild app
+### Get prebuild app
 
 run
 ```sh
