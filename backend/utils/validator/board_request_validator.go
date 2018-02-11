@@ -11,17 +11,6 @@ type BoardRequestData struct {
 }
 
 func (b *BoardRequestData) Validate(r *http.Request) error {
-	var err error
-
-	err = b.ValidateRequired(b.Name)
-	if err != nil {
-		return err
-	}
-
-	err = b.ValidateRequired(b.Desc)
-	if err != nil {
-		return err
-	}
-
+	// just for Interface implementation
 	return nil
 }

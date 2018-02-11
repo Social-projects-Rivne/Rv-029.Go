@@ -89,8 +89,16 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	board.Name = boardRequestData.Name
-	board.Desc = boardRequestData.Desc
+	board.FindByID()
+
+	if boardRequestData.Name != "" {
+		board.Name = boardRequestData.Name
+	}
+
+	if boardRequestData.Desc != "" {
+		board.Desc = boardRequestData.Desc
+	}
+
 	board.UpdatedAt = time.Now()
 	board.Update()
 
