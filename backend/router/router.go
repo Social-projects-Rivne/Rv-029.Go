@@ -20,7 +20,7 @@ func init()  {
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
 
-	boardRouter := Router.PathPrefix("/board").Subrouter()
+	boardRouter := Router
 	applyBoardRoutes(boardRouter)
 	boardRouter.Use(middlewares.AuthenticatedMiddleware)
 }
@@ -48,7 +48,9 @@ func applyBoardRoutes(r *mux.Router) {
 
 	r.HandleFunc("/project/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
 	r.HandleFunc("/project/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
-	r.HandleFunc("/test", controllers.UpdateBoard)
+
+	r.HandleFunc("/project/board/delete/{board_id}/", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/project/board/delete/{board_id}", controllers.UpdateBoard).Methods("PUT")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {

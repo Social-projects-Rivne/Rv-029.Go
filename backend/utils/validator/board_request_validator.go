@@ -1,12 +1,13 @@
 package validator
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type BoardRequestData struct {
 	*baseValidator
 	Name string `json:"name"`
 	Desc string `json:"desc"`
-	//ProjectId gocql.UUID // todo
 }
 
 func (b *BoardRequestData) Validate(r *http.Request) error {

@@ -26,8 +26,15 @@ func (b *Board) Insert() {
 }
 
 func (b *Board) Update() {
-	if err := Session.Query(`Update boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
+	if err := Session.Query(`UPDATE boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
 		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec(); err != nil {
 			log.Fatal(err)
 		}
+}
+
+func (b *Board) Delete() {
+	if err := Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec();
+	err != nil {
+		log.Fatal(err)
+	}
 }

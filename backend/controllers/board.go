@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+type boardSuccessResponse struct {
+	Status bool
+	Message string
+}
+
 func StoreBoard(w http.ResponseWriter, r *http.Request) {
 	var boardRequestData validator.BoardRequestData
 
@@ -31,7 +36,7 @@ func StoreBoard(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
+		log.Fatal(err)
 	}
 
 	board := models.Board{
@@ -45,12 +50,8 @@ func StoreBoard(w http.ResponseWriter, r *http.Request) {
 
 	board.Insert()
 
-	jsonResponse, _ := json.Marshal(struct {
-		Status  bool
-		Message string
-	}{
-		true,
-		"Board has created",
+	jsonResponse, _ := json.Marshal(boardSuccessResponse{
+		true, "Board has created",
 	})
 
 	w.WriteHeader(http.StatusOK)
@@ -76,9 +77,9 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	boardId, err := gocql.ParseUUID(vars["project_id"])
+	boardId, err := gocql.ParseUUID(vars["board_id"])
 	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
+		log.Fatal(err)
 	}
 
 	board := models.Board{}
@@ -88,12 +89,28 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board.UpdatedAt = time.Now()
 	board.Update()
 
-	jsonResponse, _ := json.Marshal(struct {
-		Status  bool
-		Message string
-	}{
-		true,
-		"Board has updated",
+	jsonResponse, _ := json.Marshal(boardSuccessResponse{
+		true, "Board has updated",
+	})
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}
+
+func DeleteBoard(w http.ResponseWriter, r *http.Request)  {
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	board := models.Board{}
+	board.ID = boardId
+	board.Delete()
+
+	jsonResponse, _ := json.Marshal(boardSuccessResponse{
+		true, "Board has deleted",
 	})
 
 	w.WriteHeader(http.StatusOK)
