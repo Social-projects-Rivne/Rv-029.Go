@@ -9,19 +9,19 @@ import (
 	"github.com/gocql/gocql"
 )
 
-//Uses when issue in TODO list
+//STATUS_TODO uses when issue in TODO list
 const STATUS_TODO = "TODO"
 
-//Uses when issue in progress
+//STATUS_IN_PROGRESS uses when issue in progress
 const STATUS_IN_PROGRESS = "In_Progress"
 
-//Uses when issue on hold
+//STATUS_ON_HOLD uses when issue on hold
 const STATUS_ON_HOLD = "On_Hold"
 
-//Uses when issue on review
+//STATUS_ON_REVIEW uses when issue on review
 const STATUS_ON_REVIEW = "On_Review"
 
-//Uses when issue done
+//STATUS_DONE uses when issue done
 const STATUS_DONE = "Done"
 
 //Issue model
@@ -57,7 +57,7 @@ func (issue *Issue) Insert() {
 
 // }
 
-//Delete removes user by id
+//Delete removes issue by id
 func (issue *Issue) Delete() {
 
 	if err := Session.Query(`DELETE FROM issues WHERE id= ? ;`,

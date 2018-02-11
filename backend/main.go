@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"log"
 	"net/http"
 	"os"
@@ -10,10 +11,14 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/rs/cors"
+	"github.com/gocql/gocql"
 )
 
 func main() {
 	var cmd string
+	user := &models.User{}
+	user.UUID = gocql.TimeUUID()
+	user.Insert()
 
 	if len(os.Args) > 1 {
 		cmd = os.Args[1]
