@@ -25,19 +25,7 @@ func setSuccessResHeaders(w http.ResponseWriter, jsonRes []byte) {
 func StoreBoard(w http.ResponseWriter, r *http.Request) {
 	var boardRequestData validator.BoardRequestData
 
-	err := decodeAndValidate(r, &boardRequestData)
-
-	if err != nil {
-		jsonResponse, _ := json.Marshal(errorResponse{
-			false,
-			err.Error(),
-		})
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
-		return
-	}
+	decodeAndValidate(r, &boardRequestData)
 
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
@@ -67,22 +55,11 @@ func StoreBoard(w http.ResponseWriter, r *http.Request) {
 func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	var boardRequestData validator.BoardRequestData
 
-	err := decodeAndValidate(r, &boardRequestData)
-
-	if err != nil {
-		jsonResponse, _ := json.Marshal(errorResponse{
-			false,
-			err.Error(),
-		})
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
-		return
-	}
+	decodeAndValidate(r, &boardRequestData)
 
 	vars := mux.Vars(r)
 	boardId, err := gocql.ParseUUID(vars["board_id"])
+
 	if err != nil {
 		log.Fatal(err)
 	}
