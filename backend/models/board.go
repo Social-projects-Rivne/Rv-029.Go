@@ -18,39 +18,60 @@ type Board struct {
 
 var Session = db.GetInstance().Session
 
-func (b *Board) Insert() {
-	if err := Session.Query(`INSERT INTO boards (id, project_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?);`,
-		b.ID, b.ProjectID, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec(); err != nil {
-		log.Fatal(err)
+func (b *Board) Insert() error {
+	err := Session.Query(`INSERT INTO boards (id, project_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?);`,
+		b.ID, b.ProjectID, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
+
+	if err != nil {
+		log.Printf("Invalid Insert inside models/board.go: %s\n", err.Error())
+		return err
 	}
+
+	return nil
 }
 
-func (b *Board) Update() {
-	if err := Session.Query(`UPDATE boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
-		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec(); err != nil {
-		log.Fatal(err)
+func (b *Board) Update() error {
+	err := Session.Query(`UPDATE boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
+		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec()
+
+	if err != nil {
+		log.Printf("Invalid Update inside models/board.go: %s\n", err.Error())
+		return err
 	}
+
+	return nil
 }
 
-func (b *Board) Delete() {
-	if err := Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec(); err != nil {
-		log.Fatal(err)
+func (b *Board) Delete() error {
+	err := Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec()
+
+    if err != nil {
+		log.Printf("Invalid Delete inside models/board.go: %s\n", err.Error())
+		return err
 	}
+
+	return nil
 }
 
-func (b *Board) FindByID() {
-	if err := Session.Query(`SELECT id, project_id, name, description, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
-		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.CreatedAt, &b.UpdatedAt); err != nil {
-		log.Fatal(err)
+func (b *Board) FindByID() error {
+	err := Session.Query(`SELECT id, project_id, name, description, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
+		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.CreatedAt, &b.UpdatedAt)
+
+	if err != nil {
+		log.Printf("Invalid FindById inside models/board.go: %s\n", err.Error())
+		return err
 	}
+
+	return nil
 }
 
-func (b *Board) List() []map[string]interface{} {
+func (b *Board) List() ([]map[string]interface{}, error) {
 	boardsList, err := Session.Query(`SELECT * from boards`).Iter().SliceMap()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Invalid List inside models/board.go: %s\n", err.Error())
+		return nil, err
 	}
 
-	return boardsList
+	return boardsList, nil
 }

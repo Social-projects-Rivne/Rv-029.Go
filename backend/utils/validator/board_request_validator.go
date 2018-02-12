@@ -14,3 +14,5 @@ func (b *BoardRequestData) Validate(r *http.Request) error {
 	// just for Interface implementation
 	return nil
 }
+
+// TODO: add method to check if {board_id} exists

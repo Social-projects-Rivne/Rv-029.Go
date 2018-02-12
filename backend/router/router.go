@@ -22,7 +22,7 @@ func init()  {
 
 	boardRouter := Router
 	applyBoardRoutes(boardRouter)
-	boardRouter.Use(middlewares.AuthenticatedMiddleware)
+	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
 }
 
 func applyAuthRoutes(r *mux.Router)  {
