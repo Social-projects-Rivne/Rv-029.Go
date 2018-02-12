@@ -9,6 +9,9 @@ import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import Drawer from 'material-ui/Drawer';
 import {browserHistory} from "react-router";
+import * as topBarActions from '../actions/TopBarActions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 const styles = {
     root: {
@@ -23,8 +26,7 @@ const styles = {
     },
 };
 
-function TopBar(props) {
-    const { classes } = props;
+const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
 
     if (!sessionStorage.getItem('token')) {
         browserHistory.push("/authorization/login")
@@ -35,25 +37,25 @@ function TopBar(props) {
         browserHistory.push("/authorization/login")
     }
 
-    const toggleDrawer = (state) => {
-        return !state
+    const toggleDrawer = () => {
+        action.toggleDrawer(!topBarState.isDrawerOpen)
     }
 
     return (
         <div className={classes.root}>
-            <Drawer open={false} onClose={toggleDrawer()}>
+            <Drawer open={topBarState.isDrawerOpen} onClose={toggleDrawer}>
                 <div
                     tabIndex={0}
                     role="button"
-                    onClick={toggleDrawer()}
-                    onKeyDown={toggleDrawer()}
+                    onClick={toggleDrawer}
+                    onKeyDown={toggleDrawer}
                 >
-                    Something
+                    Some menu should be here
                 </div>
             </Drawer>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={toggleDrawer()}>
+                    <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={toggleDrawer}>
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="title" color="inherit" className={classes.flex}>
@@ -70,4 +72,20 @@ TopBar.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(TopBar);
+
+const mapStateToProps = (state, ownProps) => {
+    return {
+        topBarState: state.topBar,
+        ownProps
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        action: bindActionCreators(topBarActions, dispatch)
+    }
+}
+
+export default withStyles(styles)(
+    connect(mapStateToProps, mapDispatchToProps)(TopBar)
+)
