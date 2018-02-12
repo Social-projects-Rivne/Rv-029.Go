@@ -65,8 +65,10 @@ func (b *Board) FindByID() error {
 	return nil
 }
 
-func (b *Board) List() ([]map[string]interface{}, error) {
-	boardsList, err := Session.Query(`SELECT * from boards`).Iter().SliceMap()
+func (b *Board) List(projectId gocql.UUID) ([]map[string]interface{}, error) {
+
+	// TODO get rid of "*"
+	boardsList, err := Session.Query(`SELECT * FROM boards WHERE project_id = ?;`, projectId).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Invalid List inside models/board.go: %s\n", err.Error())

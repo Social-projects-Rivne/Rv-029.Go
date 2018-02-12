@@ -43,8 +43,8 @@ func applyAuthorizedUserRoutes(r *mux.Router)  {
 }
 
 func applyBoardRoutes(r *mux.Router) {
-	r.HandleFunc("/project/{project_id}/board/create/", controllers.StoreBoard).Methods("POST")
-	r.HandleFunc("/project/{project_id}/board/create", controllers.StoreBoard).Methods("POST")
+	r.HandleFunc("/project/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")
+	r.HandleFunc("/project/{project_id}/board/create", controllers.CreateBoard).Methods("POST")
 
 	r.HandleFunc("/project/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
 	r.HandleFunc("/project/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
