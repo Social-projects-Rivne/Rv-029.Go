@@ -66,7 +66,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := baseResponse{false, "Project ID is not valid"}
+		response := baseResponse{false, "Board ID is not valid"}
 		response.Failed(w)
 		return
 	}
@@ -132,7 +132,13 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = id
-	board.FindByID()
+	err = board.FindByID()
+
+	if err != nil {
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
+		return
+	}
 
 	jsonResponse, _ := json.Marshal(board)
 	w.WriteHeader(http.StatusOK)

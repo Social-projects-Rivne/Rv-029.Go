@@ -68,6 +68,15 @@ func applySprintRoutes(r *mux.Router) {
 	r.HandleFunc("/project/board/{board_id}/sprint/create/", controllers.CreateSprint).Methods("POST")
 	r.HandleFunc("/project/board/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
 
-	r.HandleFunc("/project/board/sprint/update/{sprint_id}/", controllers.UpdateSprint).Methods("POST")
-	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("POST")
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}/", controllers.UpdateSprint).Methods("PUT")
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT")
+
+	r.HandleFunc("/project/board/sprint/show/{sprint_id}/", controllers.SelectSprint).Methods("GET")
+	r.HandleFunc("/project/board/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET")
+
+	r.HandleFunc("/project/board/sprint/delete/{sprint_id}/", controllers.DeleteSprint).Methods("DELETE")
+	r.HandleFunc("/project/board/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE")
+
+	r.HandleFunc("/project/board/{board_id}/sprint/list/", controllers.SprintsList).Methods("GET")
+	r.HandleFunc("/project/board/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
 }

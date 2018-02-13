@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"net/http"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"net/http"
 )
 
 // decodeAndValidate - entry point for deserialization and validation
@@ -37,4 +37,3 @@ func (b *baseResponse) Failed(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
 }
-

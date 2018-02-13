@@ -7,7 +7,10 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"encoding/json"
 )
+
+const DBError = "Error while accessing to database"
 
 func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	var sprintRequestData validator.SprintCreateRequestData
@@ -42,7 +45,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Insert()
 
 	if err != nil {
-		res := baseResponse{false, "Error while accessing to db"}
+		res := baseResponse{false, DBError}
 		res.Failed(w)
 		return
 	}
@@ -67,7 +70,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	//sprint.FindById()
+	sprint.FindById()
 
 	if sprintRequestData.Goal != "" {
 		sprint.Goal = sprintRequestData.Goal
@@ -86,11 +89,89 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Update()
 
 	if err != nil {
-		res := baseResponse{false, "Error while accessing to db"}
+		res := baseResponse{false, DBError}
 		res.Failed(w)
 		return
 	}
 
 	res := baseResponse{true, "Sprint has updated"}
 	res.Success(w)
+}
+
+func DeleteSprint(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
+
+	if err != nil {
+		res := baseResponse{false, "Sprint ID is not valid"}
+		res.Failed(w)
+		return
+	}
+
+	sprint := models.Sprint{}
+	sprint.ID = sprintId
+
+	err = sprint.Delete()
+
+	if err != nil {
+		res := baseResponse{false, DBError}
+		res.Failed(w)
+		return
+	}
+
+	res := baseResponse{true, "Sprint has deleted"}
+	res.Success(w)
+}
+
+func SelectSprint(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
+
+	if err != nil {
+		response := baseResponse{false, "Sprint ID is not valid"}
+		response.Failed(w)
+		return
+	}
+
+	sprint := models.Sprint{}
+	sprint.ID = sprintId
+
+	err = sprint.FindById()
+
+	if err != nil {
+		res := baseResponse{false, DBError}
+		res.Failed(w)
+		return
+	}
+
+	jsonResponse, _ := json.Marshal(sprint)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}
+
+func SprintsList(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+
+	if err != nil {
+		res := baseResponse{false, "Board ID is not valid"}
+		res.Failed(w)
+		return
+	}
+
+	sprint := models.Sprint{}
+
+	sprintsList, err := sprint.List(boardId)
+
+	if err != nil {
+		res := baseResponse{false, DBError}
+		res.Failed(w)
+		return
+	}
+
+	jsonResponse, _ := json.Marshal(sprintsList)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }

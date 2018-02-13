@@ -1,0 +1,5 @@
+CREATE MATERIALIZED VIEW sprintslist AS
+SELECT id FROM sprints
+WHERE board_id IS NOT NULL
+PRIMARY KEY (board_id, id)
+WITH CLUSTERING ORDER BY (score DESC)

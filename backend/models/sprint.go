@@ -30,7 +30,7 @@ func (s *Sprint) Insert() error {
 
 func (s *Sprint) Update() error {
 	err := Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
-		s.Goal, s.Desc, s.Status, s.UpdatedAt).Exec()
+		s.Goal, s.Desc, s.Status, s.UpdatedAt, s.ID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method Update inside models/sprint.go: %q\n", err.Error())
@@ -38,4 +38,39 @@ func (s *Sprint) Update() error {
 	}
 
 	return nil
+}
+
+func (s *Sprint) Delete() error {
+	err := Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
+
+	if err != nil {
+		log.Printf("Error in method Delete inside models/sprint.go: %q\n", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (s *Sprint) FindById() error {
+	err := Session.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
+		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
+
+	if err != nil {
+		log.Printf("Error in method FindById inside models/sprint.go: %q\n", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (s *Sprint) List(boardId gocql.UUID) ([]map[string]interface{}, error) {
+	// FIXME: returns only "id" and "board_id"
+	sprintsList, err := Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
+
+	if err != nil {
+		log.Printf("Error in method List inside models/sprint.go: %q\n", err.Error())
+		return nil, err
+	}
+
+	return sprintsList, nil
 }

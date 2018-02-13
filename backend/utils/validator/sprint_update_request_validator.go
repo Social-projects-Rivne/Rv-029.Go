@@ -27,7 +27,7 @@ func validateSprintId(r *http.Request) error {
 	var sprintName string
 
 	db.GetInstance().Session.
-		Query(`SELECT name FROM sprints where id = ? LIMIT 1;`, sprintId).
+		Query(`SELECT goal FROM sprints where id = ? LIMIT 1;`, sprintId).
 		Consistency(gocql.One).Scan(&sprintName)
 
 	if sprintName == "" {
