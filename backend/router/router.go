@@ -5,6 +5,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"net/http"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 )
 
 var Router *mux.Router
@@ -23,6 +24,7 @@ func init()  {
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
+	projectRouter.Use(middlewares.RoleMiddleware)
 
 
 
