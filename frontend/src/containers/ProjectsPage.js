@@ -1,8 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
+import {withStyles} from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
 import ProjectCard from '../components/ProjectCard';
+import * as topBarActions from "../actions/TopBarActions";
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {API_URL} from "../constants/global";
+import axios from "axios/index";
+
+const pageTitle = "Projects"
 
 const styles = theme => ({
     root: {
@@ -22,52 +29,59 @@ const styles = theme => ({
     }
 });
 
-const ProjectsPage = (props) => {
+const ProjectsPage = ({classes, topBar, action, ownProps, ...decorator}) => {
 
-  const projects = [{
-      id: 1,
-      title: "Test Project 1",
-      author: "SomeBody",
-      desc: "Some Project Description"
-  },{
-      id: 2,
-      title: "Test Project 2",
-      author: "SomeBody",
-      desc: "Some Project Description"
-  },{
-      id: 3,
-      title: "Test Project 3",
-      author: "SomeBody",
-      desc: "Some Project Description"
-  },{
-      id: 4,
-      title: "Test Project 4",
-      author: "SomeBody",
-      desc: "Some Project Description"
-  },{
-      id: 5,
-      title: "Test Project 5",
-      author: "SomeBody",
-      desc: "Some Project Description"
-  }];
+    if (topBar.pageTitle !== pageTitle) {
+        action.changePageTitle(pageTitle)
+    }
+    let projects = [];
 
-  return (
-      <Grid container className={props.classes.root} >
-          <Grid item xs={12}>
-              <Grid container className={props.classes.list} justify="center" spacing={24}>
-                  {projects.map((value, index) => (
-                      <Grid key={index} item>
-                          <ProjectCard project={value} />
-                      </Grid>
-                  ))}
-              </Grid>
-          </Grid>
-      </Grid>
-  )
+    axios.get(API_URL + 'project/list')
+        .then((response) => {
+            projects = response
+        })
+        .catch((response) => {
+            action.setStatus(response.response.data.status)
+            if (response.response.data.Message) {
+                action.setErrorMessage(response.response.data.Message)
+            } else {
+                action.setErrorMessage("Server error occured")
+            }
+        });
+
+
+    return (
+        <Grid container className={classes.root}>
+            <Grid item xs={12}>
+                <Grid container className={classes.list} justify="center" spacing={24}>
+                    {projects.map((value, index) => (
+                        <Grid key={index} item>
+                            <ProjectCard project={value}/>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Grid>
+        </Grid>
+    )
 }
 
 ProjectsPage.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ProjectsPage);
+const mapStateToProps = (state, ownProps) => {
+    return {
+        topBar: state.topBar,
+        ownProps
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        action: bindActionCreators(topBarActions, dispatch)
+    }
+}
+
+export default withStyles(styles)(
+    connect(mapStateToProps, mapDispatchToProps)(ProjectsPage)
+)

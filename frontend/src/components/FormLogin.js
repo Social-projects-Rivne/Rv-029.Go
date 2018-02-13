@@ -29,10 +29,14 @@ const FormLogin = ({ classes, form, topBar, action, topBarAction, ownProps, ...d
       email: form.email,
       password: decorator.MD5Encode(form.password)
     })
-    .then((res) => {
-      sessionStorage.setItem('token', res.token)
-      topBarAction.changePageTitle('Projects')
-      browserHistory.push('/projects')
+    .then((response) => {
+      //TODO: add global function for auth header
+      if (response.data.Status) {
+          sessionStorage.setItem('token', response.data.Token)
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.Token;
+          topBarAction.changePageTitle('Projects')
+          browserHistory.push('/projects')
+      }
     })
     .catch((err) => {
       action.setStatus(err.response.data.status)

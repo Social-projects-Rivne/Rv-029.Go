@@ -50,6 +50,7 @@ const queryCheck = (nextState, replace, callback) => {
   } else callback()
 }
 
+//TODO: add global function to check if authorized
 const isAuthorized = () => {
 
 }

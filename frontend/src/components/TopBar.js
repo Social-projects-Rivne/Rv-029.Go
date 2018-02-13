@@ -17,6 +17,7 @@ import { Link, browserHistory } from 'react-router';
 import * as topBarActions from '../actions/TopBarActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import axios from "axios/index";
 
 const styles = {
     root: {
@@ -44,7 +45,9 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
         browserHistory.push("/authorization/login")
     }
 
+    //TODO: make global logout function
     const logOut = () => {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ';
         sessionStorage.removeItem('token')
         browserHistory.push("/authorization/login")
     }
