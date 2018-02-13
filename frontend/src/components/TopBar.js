@@ -10,14 +10,12 @@ import MenuIcon from 'material-ui-icons/Menu';
 import Drawer from 'material-ui/Drawer';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import InboxIcon from 'material-ui-icons/Inbox';
-import DraftsIcon from 'material-ui-icons/Drafts';
 import Icon from 'material-ui/Icon';
 import { Link, browserHistory } from 'react-router';
 import * as topBarActions from '../actions/TopBarActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import axios from "axios/index";
+import auth from '../services/auth'
 
 const styles = {
     root: {
@@ -42,13 +40,6 @@ const styles = {
 const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
 
     if (!sessionStorage.getItem('token')) {
-        browserHistory.push("/authorization/login")
-    }
-
-    //TODO: make global logout function
-    const logOut = () => {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ';
-        sessionStorage.removeItem('token')
         browserHistory.push("/authorization/login")
     }
 
@@ -94,7 +85,7 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
                         <Divider />
                         <List component="nav">
                             <ListItem button>
-                                <ListItemText primary="Logout" onClick={logOut} />
+                                <ListItemText primary="Logout" onClick={auth.logOut} />
                             </ListItem>
                         </List>
                     </div>
@@ -108,7 +99,7 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
                     <Typography variant="title" color="inherit" className={classes.flex}>
                         {topBarState.pageTitle}
                     </Typography>
-                    <Button color="inherit" onClick={logOut} >Logout</Button>
+                    <Button color="inherit" onClick={auth.logOut} >Logout</Button>
                 </Toolbar>
             </AppBar>
         </div>

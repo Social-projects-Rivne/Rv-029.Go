@@ -17,8 +17,9 @@ import Grid from 'material-ui/Grid'
 import Button from 'material-ui/Button'
 import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
+import auth from '../services/auth'
 
-const FormLogin = ({ classes, form, topBar, action, topBarAction, ownProps, ...decorator }) => {
+const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
   const sendUserData = (e) => {
     e.preventDefault()
@@ -30,19 +31,14 @@ const FormLogin = ({ classes, form, topBar, action, topBarAction, ownProps, ...d
       password: decorator.MD5Encode(form.password)
     })
     .then((response) => {
-      //TODO: add global function for auth header
       if (response.data.Status) {
-          sessionStorage.setItem('token', response.data.Token)
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.Token;
-          topBarAction.changePageTitle('Projects')
+          auth.logIn(response.data.Token)
           browserHistory.push('/projects')
       }
     })
-    .catch((err) => {
-      action.setStatus(err.response.data.status)
-
-      if (err.response.data.Message) {
-        action.setErrorMessage(err.response.data.Message)
+    .catch((error) => {
+      if (error.response && error.response.data.Message) {
+        action.setErrorMessage(error.response.data.Message)
       } else {
         action.setErrorMessage("Server error occured")
       }
@@ -165,7 +161,6 @@ const styles = {
 const mapStateToProps = (state, ownProps) => {
   return {
     form: state.form,
-    topBar: state.topBar,
     ownProps
   }
 }
