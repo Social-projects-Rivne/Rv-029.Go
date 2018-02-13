@@ -23,6 +23,7 @@ const styles = theme => ({
 });
 
 const ProjectsPage = (props) => {
+
   const projects = [{
       id: 1,
       title: "Test Project 1",

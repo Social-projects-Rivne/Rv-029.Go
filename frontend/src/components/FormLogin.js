@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
+import * as topBarActions from '../actions/TopBarActions';
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
 import ModalNotification from './ModalNotification'
@@ -17,7 +18,7 @@ import Button from 'material-ui/Button'
 import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
 
-const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
+const FormLogin = ({ classes, form, topBar, action, topBarAction, ownProps, ...decorator }) => {
 
   const sendUserData = (e) => {
     e.preventDefault()
@@ -30,6 +31,7 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
     })
     .then((res) => {
       sessionStorage.setItem('token', res.token)
+      topBarAction.changePageTitle('Projects')
       browserHistory.push('/projects')
     })
     .catch((err) => {
@@ -159,13 +161,15 @@ const styles = {
 const mapStateToProps = (state, ownProps) => {
   return {
     form: state.form,
+    topBar: state.topBar,
     ownProps
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    action: bindActionCreators(formActions, dispatch)
+    action: bindActionCreators(formActions, dispatch),
+    topBarAction: bindActionCreators(topBarActions, dispatch)
   }
 }
 

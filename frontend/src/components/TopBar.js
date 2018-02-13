@@ -8,10 +8,15 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import Drawer from 'material-ui/Drawer';
-import {browserHistory} from "react-router";
-import * as topBarActions from '../actions/TopBarActions'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import Divider from 'material-ui/Divider';
+import InboxIcon from 'material-ui-icons/Inbox';
+import DraftsIcon from 'material-ui-icons/Drafts';
+import Icon from 'material-ui/Icon';
+import { Link, browserHistory } from 'react-router';
+import * as topBarActions from '../actions/TopBarActions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 const styles = {
     root: {
@@ -24,6 +29,13 @@ const styles = {
         marginLeft: -12,
         marginRight: 20,
     },
+    listWrapper: {
+        minWidth: 250,
+        maxWidth: 360,
+    },
+    link: {
+        textDecoration: 'none'
+    }
 };
 
 const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
@@ -41,6 +53,17 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
         action.toggleDrawer(!topBarState.isDrawerOpen)
     }
 
+    let projectBoardsList = null
+    if (topBarState.currentProject !== null) {
+        projectBoardsList = <List component="nav">
+            {topBarState.currentBoardProjects.map((value, index) => (
+                <ListItem button key={value.id}>
+                    <ListItemText primary={value.name} />
+                </ListItem>
+            ))}
+        </List>
+    }
+
     return (
         <div className={classes.root}>
             <Drawer open={topBarState.isDrawerOpen} onClose={toggleDrawer}>
@@ -50,7 +73,28 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
                     onClick={toggleDrawer}
                     onKeyDown={toggleDrawer}
                 >
-                    Some menu should be here
+                    <div className={classes.listWrapper}>
+                        <List component="nav">
+                            <Link
+                                to="projects"
+                                className={classes.link}>
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <Icon color="primary">dashboard</Icon>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Projects" />
+                                </ListItem>
+                            </Link>
+                        </List>
+                        <Divider />
+                        {projectBoardsList}
+                        <Divider />
+                        <List component="nav">
+                            <ListItem button>
+                                <ListItemText primary="Logout" onClick={logOut} />
+                            </ListItem>
+                        </List>
+                    </div>
                 </div>
             </Drawer>
             <AppBar position="static">
@@ -59,7 +103,7 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="title" color="inherit" className={classes.flex}>
-                        Title
+                        {topBarState.pageTitle}
                     </Typography>
                     <Button color="inherit" onClick={logOut} >Logout</Button>
                 </Toolbar>
