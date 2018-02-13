@@ -92,10 +92,17 @@ func (issue *Issue) FindByID() error {
 	return nil
 }
 
-//GetAll returns all users
-func (issue *Issue) GetAll() ([]map[string]interface{}, error) {
+//GetBoardIssueList returns all issues by board_id
+func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 
-	return db.GetInstance().Session.Query(`SELECT * FROM issues`).Iter().SliceMap()
+	return db.GetInstance().Session.Query("SELECT id,name,status,user_id,sprint_id,board_id,created_at,updated_at from issues WHERE board_id = ?",issue.BoardID).PageState(nil).PageSize(2).Iter().SliceMap()
+
+}
+
+//GetSprintIssueList returns all issues by board_id
+func (issue *Issue) GetSprintIssueList() ([]map[string]interface{}, error) {
+
+	return db.GetInstance().Session.Query("SELECT id,name,status,user_id,sprint_id,board_id,created_at,updated_at from issues WHERE sprint_id = ?",issue.SprintID).PageState(nil).PageSize(2).Iter().SliceMap()
 
 }
 

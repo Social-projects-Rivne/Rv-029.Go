@@ -59,7 +59,25 @@ func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
-func applyIssueRoutes(r *mux.Route) {
+func applyIssueRoutes(r *mux.Router) {
+	r.HandleFunc("project/board/{board_id}/issue/create/", controllers.StoreIssue).Methods("POST")
+	r.HandleFunc("project/board/{board_id}/issue/create", controllers.StoreIssue).Methods("POST")
+
+	r.HandleFunc("project/board/issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT")
+	r.HandleFunc("project/board/issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT")
+
+	r.HandleFunc("project/board/issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE")
+	r.HandleFunc("project/board/issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE")
+
+	r.HandleFunc("project/board/{board_id}/issue/list/", controllers.BoardIssuesList).Methods("GET")
+	r.HandleFunc("project/board/{board_id}/issue/list", controllers.BoardIssuesList).Methods("GET")
+
+	r.HandleFunc("project/board/sprint/{sprint_id}/issue/list/", controllers.SprintIssuesList).Methods("GET")
+	r.HandleFunc("project/board/sprint/{sprint_id}/issue/list", controllers.SprintIssuesList).Methods("GET")
+
+	r.HandleFunc("project/board/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
+	r.HandleFunc("project/board/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
+
 	
 }
 
