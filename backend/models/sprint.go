@@ -21,7 +21,19 @@ func (s *Sprint) Insert() error {
 		s.ID, s.BoardId, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Insert inside models/sprint.go: %s\n", err.Error())
+		log.Printf("Error in method Insert inside models/sprint.go: %q\n", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (s *Sprint) Update() error {
+	err := Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
+		s.Goal, s.Desc, s.Status, s.UpdatedAt).Exec()
+
+	if err != nil {
+		log.Printf("Error in method Update inside models/sprint.go: %q\n", err.Error())
 		return err
 	}
 

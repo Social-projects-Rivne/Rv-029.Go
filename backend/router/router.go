@@ -68,4 +68,6 @@ func applySprintRoutes(r *mux.Router) {
 	r.HandleFunc("/project/board/{board_id}/sprint/create/", controllers.CreateSprint).Methods("POST")
 	r.HandleFunc("/project/board/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
 
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}/", controllers.UpdateSprint).Methods("POST")
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("POST")
 }
