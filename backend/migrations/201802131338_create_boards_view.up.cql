@@ -1,0 +1,5 @@
+CREATE MATERIALIZED VIEW boardslist AS
+SELECT id FROM boards
+WHERE project_id IS NOT NULL
+PRIMARY KEY (project_id, id)
+WITH CLUSTERING ORDER BY (score DESC)

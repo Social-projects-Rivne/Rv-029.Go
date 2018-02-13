@@ -61,11 +61,8 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 
 	issue.Insert()
 
-	jsonResponse, _ := json.Marshal(boardSuccessResponse{
-		true, "Issue has created",
-	})
-
-	setSuccessResHeaders(w, jsonResponse)
+	response := baseResponse{true, "Issue has created"}
+	response.Success(w)
 }
 
 //UpdateIssue .
@@ -80,7 +77,7 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 			err.Error(),
 		})
 
-		log.Printf("Error occured in controller.UpdateIssue while validating: %v", err)		
+		log.Printf("Error occured in controller.UpdateIssue while validating: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonResponse)
@@ -117,11 +114,9 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UpdatedAt = time.Now()
 	issue.Update()
 
-	jsonResponse, _ := json.Marshal(boardSuccessResponse{
-		true, "Issue has updated",
-	})
+	response := baseResponse{true, "Issue has updated"}
+	response.Success(w)
 
-	setSuccessResHeaders(w, jsonResponse)
 }
 
 func DeleteIssue(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +130,7 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 			err.Error(),
 		})
 
-		log.Printf("Error occured in controller.DeleteIssue while validating: %v", err)		
+		log.Printf("Error occured in controller.DeleteIssue while validating: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonResponse)
@@ -146,18 +141,25 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	issueID, err := gocql.ParseUUID(vars["issue_id"])
 
 	if err != nil {
-		log.Printf("Error occured in controller.DeleteIssue while parsing id variable: %v", err)
+		response := baseResponse{false, "Issue ID is not valid"}
+		response.Failed(w)
+		log.Printf("Issue ID is not valid: %v", err)
+		return
 	}
 
 	issue := &models.Issue{}
 	issue.UUID = issueID
-	issue.Delete()
 
-	jsonResponse, _ := json.Marshal(boardSuccessResponse{
-		true, "Issue has deleted",
-	})
+	if err := issue.Delete(); err != nil {
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
+		log.Printf("Error while accessing to database: %v", err)
+		return
+	}
 
-	setSuccessResHeaders(w, jsonResponse)
+	response := baseResponse{true, "Issue has deleted"}
+	response.Success(w)
+
 }
 
 //BoardIssueslist returns list of issues order by board_id
@@ -167,17 +169,29 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 	id, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		log.Printf("Error occured in controller.BoardIssuesList while parsing id variable: %v", err)
+		response := baseResponse{false, "Board ID is not valid"}
+		response.Failed(w)
+		log.Printf("Board ID is not valid: %v", err)
+		return
 	}
 
 	issue := models.Issue{}
 	issue.BoardID = id
 
-	boardIssueList := issue.GetBoardIssueList()
+	boardIssueList, err := issue.GetBoardIssueList()
+
+	if err != nil {
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
+		log.Printf("Error while accessing to database: %v", err)
+		return
+	}
 
 	jsonResponse, _ := json.Marshal(boardIssueList)
 
-	setSuccessResHeaders(w, jsonResponse)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }
 
 //SprintIssueslist returns list of issues order by sprint_id
@@ -187,15 +201,53 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 	id, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		log.Printf("Error occured in controller.SprintIssueslist while parsing id variable: %v", err)
+		response := baseResponse{false, "Sprint ID is not valid"}
+		response.Failed(w)
+		log.Printf("Error occured in controller.SprintIssues while parsing id variable: %v", err)
+		return
 	}
 
 	issue := models.Issue{}
 	issue.SprintID = id
 
-	boardIssueList := issue.GetSprintIssueList()
+	sprintIssueList, err := issue.GetSprintIssueList()
 
-	jsonResponse, _ := json.Marshal(boardIssueList)
+	if err != nil {
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
+		log.Printf("Error while accessing to database: %v", err)
+		return
+	}
 
-	setSuccessResHeaders(w, jsonResponse)
+	jsonResponse, _ := json.Marshal(sprintIssueList)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}
+
+//ShowIssue send issue obj
+func ShowIssue(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := gocql.ParseUUID(vars["issue_id"])
+
+	if err != nil {
+		response := baseResponse{false, "Issue ID is not valid"}
+		response.Failed(w)
+		return
+	}
+
+	issue := &models.Issue{}
+	issue.UUID = id
+	if err := issue.FindByID(); err != nil {
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
+		log.Printf("Error while accessing to database: %v", err)
+		return
+	}
+
+	jsonResponse, _ := json.Marshal(issue)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }
