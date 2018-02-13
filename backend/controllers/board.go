@@ -6,7 +6,6 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"time"
 )
@@ -23,9 +22,7 @@ func (b *boardResponse) sendSuccess(w http.ResponseWriter) {
 	w.Write(jsonResponse)
 }
 
-func (b *boardResponse) sendFailed(w http.ResponseWriter, err error) {
-	log.Printf("%v: %q", b.Message, err.Error())
-
+func (b *boardResponse) sendFailed(w http.ResponseWriter) {
 	jsonResponse, _ := json.Marshal(b)
 	w.WriteHeader(http.StatusBadRequest)
 	w.Header().Set("Content-Type", "application/json")
@@ -39,7 +36,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, err.Error()}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -48,7 +45,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -65,7 +62,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -80,7 +77,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, err.Error()}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -89,7 +86,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -110,7 +107,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -124,7 +121,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -134,7 +131,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -148,7 +145,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Board ID is not valid"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -168,7 +165,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
@@ -178,7 +175,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w, err)
+		response.sendFailed(w)
 		return
 	}
 
