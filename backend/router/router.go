@@ -23,6 +23,11 @@ func init()  {
 	boardRouter := Router
 	applyBoardRoutes(boardRouter)
 	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
+
+	sprintRouter := Router
+	applySprintRoutes(sprintRouter)
+	//sprintRouter.Use(middlewares.AuthenticatedMiddleware)
+
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -59,6 +64,8 @@ func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
-//func applyAdminRoutes(r *mux.Router)  {
-//	r.HandleFunc("/users", controllers.Users)
-//}
+func applySprintRoutes(r *mux.Router) {
+	r.HandleFunc("/project/board/{board_id}/sprint/create/", controllers.CreateSprint).Methods("POST")
+	r.HandleFunc("/project/board/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
+
+}

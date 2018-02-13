@@ -10,33 +10,14 @@ import (
 	"time"
 )
 
-type boardResponse struct {
-	Status  bool
-	Message string
-}
-
-func (b *boardResponse) sendSuccess(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}
-
-func (b *boardResponse) sendFailed(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
-	w.WriteHeader(http.StatusBadRequest)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}
-
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	var boardRequestData validator.BoardCreateRequestData
 
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
-		response := boardResponse{false, err.Error()}
-		response.sendFailed(w)
+		response := baseResponse{false, err.Error()}
+		response.Failed(w)
 		return
 	}
 
@@ -44,8 +25,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	if err != nil {
-		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Project ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
@@ -61,13 +42,13 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Insert()
 
 	if err != nil {
-		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	response := boardResponse{true, "Board has created"}
-	response.sendSuccess(w)
+	response := baseResponse{true, "Board has created"}
+	response.Success(w)
 }
 
 func UpdateBoard(w http.ResponseWriter, r *http.Request) {
@@ -76,8 +57,8 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
-		response := boardResponse{false, err.Error()}
-		response.sendFailed(w)
+		response := baseResponse{false, err.Error()}
+		response.Failed(w)
 		return
 	}
 
@@ -85,8 +66,8 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Project ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
@@ -106,13 +87,13 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Update()
 
 	if err != nil {
-		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	response := boardResponse{true, "Board has updated"}
-	response.sendSuccess(w)
+	response := baseResponse{true, "Board has updated"}
+	response.Success(w)
 }
 
 func DeleteBoard(w http.ResponseWriter, r *http.Request) {
@@ -120,8 +101,8 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Project ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
@@ -130,13 +111,13 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Delete()
 
 	if err != nil {
-		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	response := boardResponse{true, "Board has deleted"}
-	response.sendSuccess(w)
+	response := baseResponse{true, "Board has deleted"}
+	response.Success(w)
 }
 
 func SelectBoard(w http.ResponseWriter, r *http.Request) {
@@ -144,8 +125,8 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 	id, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := boardResponse{false, "Board ID is not valid"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Board ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
@@ -164,8 +145,8 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	if err != nil {
-		response := boardResponse{false, "Project ID is not valid"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Project ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
@@ -174,8 +155,8 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	boardsList, err := board.List(projectId)
 
 	if err != nil {
-		response := boardResponse{false, "Error while accessing to database"}
-		response.sendFailed(w)
+		response := baseResponse{false, "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 

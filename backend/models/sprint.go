@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/gocql/gocql"
+	"log"
 	"time"
 )
 
@@ -9,8 +10,20 @@ type Sprint struct {
 	ID        gocql.UUID `cql:"id" key:"primary"`
 	BoardId   gocql.UUID `cql:"board_id"`
 	Goal      string     `cql:"goal"`
-	Name      string     `cql:"name"`
 	Desc      string     `cql:"description"`
+	Status    string     `cql:"status"`
 	CreatedAt time.Time  `cql:"created_at"`
 	UpdatedAt time.Time  `cql:"updated_at"`
+}
+
+func (s *Sprint) Insert() error {
+	err := Session.Query(`INSERT INTO sprints (id, board_id, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?);`,
+		s.ID, s.BoardId, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
+
+	if err != nil {
+		log.Printf("Error in method Insert inside models/sprint.go: %s\n", err.Error())
+		return err
+	}
+
+	return nil
 }
