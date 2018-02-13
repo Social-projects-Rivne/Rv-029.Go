@@ -1,0 +1,4 @@
+CREATE MATERIALIZED VIEW boardslist AS 
+SELECT id FROM boards 
+PRIMARY KEY (board_id, id)
+WITH CLUSTERING

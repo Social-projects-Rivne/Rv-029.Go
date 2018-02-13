@@ -74,7 +74,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateBoard(w http.ResponseWriter, r *http.Request) {
-	var boardRequestData validator.BoardBaseRequestData
+	var boardRequestData validator.BoardUpdateRequestData
 
 	err := decodeAndValidate(r, &boardRequestData)
 
