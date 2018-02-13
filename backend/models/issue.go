@@ -1,11 +1,12 @@
 package models
 
 import (
+	"log"
 	"time"
 	//"fmt"
 	//"log"
 
-	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 )
 
@@ -37,46 +38,64 @@ type Issue struct {
 }
 
 //Insert func inserts user object in database
-func (issue *Issue) Insert() {
+func (issue *Issue) Insert() error {
 
-	if err := Session.Query(`INSERT INTO issues (id,name,status,user_id,
+	if err := db.GetInstance().Session.Query(`INSERT INTO issues (id,name,status,user_id,
 		sprint_id,board_id,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?);`,
 		issue.UUID, issue.Name, issue.Status, issue.UserID, issue.SprintID, issue.BoardID,
 		issue.CreatedAt, issue.UpdatedAt).Exec(); err != nil {
-	}
 
+		log.Printf("Error occured while inserting issue: %v", err)
+		return err
+	}
+	return nil
 }
 
-//Update updates user by id
-// func (user *User) Update() {
+//Update updates issue by UUID
+func (issue *Issue) Update() error {
 
-// 	if err := Session.Query(`Update issues SET name = ? ,updated_at = ? WHERE id= ? ;`,
-// 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
-// 		fmt.Println(err)
-// 	}
+	if err := db.GetInstance().Session.Query(`Update issues SET name = ?, status= ?, user_id = ?,
+		 sprint_id = ?, board_id = ?,updated_at = ? WHERE id= ? ;`,
 
-// }
+		issue.Name, issue.Status, issue.UserID, issue.SprintID,
+		issue.BoardID, issue.UpdatedAt, issue.UUID).Exec(); err != nil {
+
+		log.Printf("Error occured while updating issue: %v", err)
+		return err
+	}
+	return nil
+}
 
 //Delete removes issue by id
-func (issue *Issue) Delete() {
+func (issue *Issue) Delete() error {
 
-	if err := Session.Query(`DELETE FROM issues WHERE id= ? ;`,
+	if err := db.GetInstance().Session.Query(`DELETE FROM issues WHERE id= ? ;`,
 		issue.UUID).Exec(); err != nil {
+		log.Printf("Error occured while deleting issue: %v", err)
+		return err
 	}
-
+	return nil
 }
 
 //FindByID finds issue by id
-func (issue *Issue) FindByID(id string) error {
-	return Session.Query(`SELECT id, name, status, user_id, sprint_id, board_id, created_at	
-		FROM issues WHERE id = ? LIMIT 1`, id).Consistency(gocql.One).Scan(&issue.UUID,&issue.Name,&issue.Status,&issue.UserID,
-			&issue.SprintID,&issue.BoardID,&issue.CreatedAt)
+func (issue *Issue) FindByID() error {
+
+	if err := db.GetInstance().Session.Query(`SELECT id, name, status, user_id, sprint_id, board_id, created_at	
+		FROM issues WHERE id = ? LIMIT 1`,
+
+		issue.UUID).Consistency(gocql.One).Scan(&issue.UUID, &issue.Name, &issue.Status, &issue.UserID,
+		&issue.SprintID, &issue.BoardID, &issue.CreatedAt); err != nil {
+
+		log.Printf("Error occured while finding issue by ID: %v", err)
+		return err
+	}
+	return nil
 }
 
 //GetAll returns all users
 func (issue *Issue) GetAll() ([]map[string]interface{}, error) {
 
-	return Session.Query(`SELECT * FROM issues`).Iter().SliceMap()
+	return db.GetInstance().Session.Query(`SELECT * FROM issues`).Iter().SliceMap()
 
 }
 

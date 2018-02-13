@@ -1,0 +1,5 @@
+2018/02/13 16:39:07 This is a test log entry
+2018/02/13 16:39:11 This is a test log entry
+2018/02/13 16:44:39 LogFile is opened
+2018/02/13 16:45:19 LogFile is opened
+2018/02/13 16:46:27 Error occured while finding issue by ID: line 2:26 no viable alternative at input 'LIMIT' (...FROM issues WHERE id =  [LIMIT]...)

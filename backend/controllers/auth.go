@@ -182,7 +182,6 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := &models.User{}
-
 	user.FindByEmail(forgotRequestData.Email)
 
 	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/authorization/new-password/%s\">LINK</a>\n", user.FirstName, user.Password)

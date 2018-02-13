@@ -59,6 +59,10 @@ func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
+func applyIssueRoutes(r *mux.Route) {
+	
+}
+
 //func applyAdminRoutes(r *mux.Router)  {
 //	r.HandleFunc("/users", controllers.Users)
 //}
