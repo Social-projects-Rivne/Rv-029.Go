@@ -20,12 +20,9 @@ func init()  {
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
 
-	projectRouter := Router.PathPrefix("/project").Subrouter()
-	applyProjectsRoutes(projectRouter)
-	projectRouter.Use(middlewares.AuthenticatedMiddleware)
-
-
-
+	boardRouter := Router
+	applyBoardRoutes(boardRouter)
+	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -45,22 +42,21 @@ func applyAuthorizedUserRoutes(r *mux.Router)  {
 	r.HandleFunc("", controllers.Dashboard)
 }
 
-func applyProjectsRoutes(r *mux.Router)  {
+func applyBoardRoutes(r *mux.Router) {
+	r.HandleFunc("/project/{project_id}/board/create/", controllers.StoreBoard).Methods("POST")
+	r.HandleFunc("/project/{project_id}/board/create", controllers.StoreBoard).Methods("POST")
 
-	r.HandleFunc("/create/", controllers.StoreProject).Methods("POST")
-	r.HandleFunc("/create", controllers.StoreProject).Methods("POST")
+	r.HandleFunc("/project/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/project/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
 
-	r.HandleFunc("/update/{id}/", controllers.UpdateProject).Methods("PUT")
-	r.HandleFunc("/update/{id}", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/project/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE")
+	r.HandleFunc("/project/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE")
 
-	r.HandleFunc("/delete/{id}/", controllers.DeleteProject).Methods("DELETE")
-	r.HandleFunc("/delete/{id}", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/project/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
+	r.HandleFunc("/project/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
 
-	r.HandleFunc("/show/{id}/", controllers.ShowProjects).Methods("GET")
-	r.HandleFunc("/show/{id}", controllers.ShowProjects).Methods("GET")
-
-	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
-	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
+	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {

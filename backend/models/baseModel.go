@@ -82,8 +82,8 @@ func (b *BaseModel) Update(table string, structure interface{}) {
 	if err := bind.Exec(db.GetInstance().Session); err != nil {
 		log.Fatal(err)
 	}
-	b.Condition = ""
 
+	b.Condition = ""
 }
 
 func (b *BaseModel) Where(column string, sign string, value interface{}) {

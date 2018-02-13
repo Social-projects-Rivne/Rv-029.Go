@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
@@ -13,10 +13,13 @@ type Role string
 
 //ROLE_ADMIN .
 const ROLE_ADMIN = "Admin"
+
 //ROLE_STAFF .
 const ROLE_STAFF = "Staff"
+
 //ROLE_OWNER .
 const ROLE_OWNER = "Owner"
+
 //ROLE_USER .
 const ROLE_USER = "User"
 
@@ -34,46 +37,48 @@ type User struct {
 	UpdatedAt time.Time  `cql:"updated_at"`
 }
 
-
 //Userer is interface for user struct
-type Userer interface{
-	Insert()
-	Update()
-	Delete()
+type Userer interface {
+	Insert() error
+	Update() error
+	Delete() error
 	FindByEmail(string) error
-	FindByID(string) error	
+	FindByID(string) error
 }
 
 //Insert func inserts user object in database
-func (user *User) Insert() {
+func (user *User) Insert() error {
 
 	if err := Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,
 		salt,role,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
 		user.Salt, user.Role, user.Status, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
-		fmt.Println(err)
+		log.Printf("Error occured while inserting %v", err)
+		return err
 	}
-
+	return nil
 }
 
 //Update updates user by id
-func (user *User) Update() {
+func (user *User) Update() error {
 
 	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
-		fmt.Println(err)
+		log.Printf("Error occured while updating %v", err)
+		return err
 	}
-
+	return nil
 }
 
 //Delete removes user by id
-func (user *User) Delete() {
+func (user *User) Delete() error {
 
 	if err := Session.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
-		fmt.Println(err)
+		log.Printf("Error occured while deleting %v", err)
+		return err
 	}
-
+	return nil
 }
 
 //FindByID finds user by id
