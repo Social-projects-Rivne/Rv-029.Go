@@ -64,7 +64,7 @@ func (s *Sprint) FindById() error {
 }
 
 func (s *Sprint) List(boardId gocql.UUID) ([]map[string]interface{}, error) {
-	// FIXME: returns only "id" and "board_id"
+
 	sprintsList, err := Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
 
 	if err != nil {
