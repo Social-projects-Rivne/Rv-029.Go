@@ -1,21 +1,21 @@
 package validator
 
 import (
+	"context"
 	"fmt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"context"
 )
 
 type SprintCreateRequestData struct {
 	*baseValidator
-	Goal        string `json:"goal"`
-	Desc        string `json:"desc"`
-	Status      string `json:"status"`
+	Goal   string `json:"goal"`
+	Desc   string `json:"desc"`
+	Status string `json:"status"`
 }
 
 func (s *SprintCreateRequestData) Validate(r *http.Request) error {
@@ -36,7 +36,12 @@ func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 	}
 
 	vars := mux.Vars(r)
-	boardId, _ := gocql.ParseUUID(vars["board_id"])
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+
+	if err != nil {
+		log.Printf("Invalid Board ID: %v\n", err.Error())
+		return err
+	}
 
 	board := models.Board{}
 	board.ID = boardId
@@ -46,14 +51,8 @@ func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 		return err
 	}
 
-	// todo: add project
 	ctx := context.WithValue(r.Context(), "board", board)
 	r.WithContext(ctx)
-
-
-
-
-
 
 	return nil
 }

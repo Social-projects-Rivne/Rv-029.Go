@@ -7,18 +7,21 @@ import (
 )
 
 type Sprint struct {
-	ID        gocql.UUID `cql:"id" key:"primary"`
-	BoardId   gocql.UUID `cql:"board_id"`
-	Goal      string     `cql:"goal"`
-	Desc      string     `cql:"description"`
-	Status    string     `cql:"status"`
-	CreatedAt time.Time  `cql:"created_at"`
-	UpdatedAt time.Time  `cql:"updated_at"`
+	ID          gocql.UUID `cql:"id" key:"primary"`
+	ProjectId   gocql.UUID `cql:"project_id"`
+	ProjectName string     `cql:"project_name"`
+	BoardId     gocql.UUID `cql:"board_id"`
+	BoardName   string     `cql:"board_name"`
+	Goal        string     `cql:"goal"`
+	Desc        string     `cql:"description"`
+	Status      string     `cql:"status"`
+	CreatedAt   time.Time  `cql:"created_at"`
+	UpdatedAt   time.Time  `cql:"updated_at"`
 }
 
 func (s *Sprint) Insert() error {
-	err := Session.Query(`INSERT INTO sprints (id, board_id, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?);`,
-		s.ID, s.BoardId, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
+	err := Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
 		log.Printf("Error in method Insert inside models/sprint.go: %q\n", err.Error())

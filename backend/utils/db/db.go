@@ -2,18 +2,18 @@ package db
 
 import (
 	"github.com/gocql/gocql"
-	"path/filepath"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-	"gopkg.in/yaml.v2"
+	"path/filepath"
 	"sync"
 )
 
 type dbConfig struct {
-	Hosts 			[]string
-	Port 			int
-	Keyspace 		string
-	Authenticator 	gocql.PasswordAuthenticator
+	Hosts         []string
+	Port          int
+	Keyspace      string
+	Authenticator gocql.PasswordAuthenticator
 }
 
 type DB struct {
@@ -31,7 +31,6 @@ func GetInstance() *DB {
 
 	return instance
 }
-
 
 func (db *DB) init() {
 	filename, _ := filepath.Abs("./backend/config/db.yml")

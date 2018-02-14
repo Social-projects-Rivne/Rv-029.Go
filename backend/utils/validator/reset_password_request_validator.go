@@ -3,11 +3,11 @@ package validator
 import "net/http"
 
 //ForgotPasswordRequestData ..
-type ResetPasswordRequestData struct{
+type ResetPasswordRequestData struct {
 	*baseValidator
-	Email 		string
-	Password 	string
-	Token 		string
+	Email    string
+	Password string
+	Token    string
 }
 
 //Validate ..

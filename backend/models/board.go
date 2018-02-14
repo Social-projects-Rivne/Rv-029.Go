@@ -8,19 +8,20 @@ import (
 )
 
 type Board struct {
-	ID        gocql.UUID `cql:"id" key:"primary"`
-	ProjectID gocql.UUID `cql:"project_id"`
-	Name      string     `cql:"name"`
-	Desc      string     `cql:"description"`
-	CreatedAt time.Time  `cql:"created_at"`
-	UpdatedAt time.Time  `cql:"updated_at"`
+	ID          gocql.UUID `cql:"id" key:"primary"`
+	ProjectID   gocql.UUID `cql:"project_id"`
+	ProjectName string     `cql:"project_name"`
+	Name        string     `cql:"name"`
+	Desc        string     `cql:"description"`
+	CreatedAt   time.Time  `cql:"created_at"`
+	UpdatedAt   time.Time  `cql:"updated_at"`
 }
 
 var Session = db.GetInstance().Session
 
 func (b *Board) Insert() error {
-	err := Session.Query(`INSERT INTO boards (id, project_id, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?);`,
-		b.ID, b.ProjectID, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
+	err := Session.Query(`INSERT INTO boards (id, project_id, project_name, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+		b.ID, b.ProjectID, b.ProjectName, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
 
 	if err != nil {
 		log.Printf("Error in method Insert inside models/board.go: %s\n", err.Error())
@@ -45,7 +46,7 @@ func (b *Board) Update() error {
 func (b *Board) Delete() error {
 	err := Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec()
 
-    if err != nil {
+	if err != nil {
 		log.Printf("Error in method Delete inside models/board.go: %s\n", err.Error())
 		return err
 	}

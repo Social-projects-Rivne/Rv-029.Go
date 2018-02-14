@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"net/http"
-	"github.com/gorilla/mux"
-	"github.com/gocql/gocql"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"encoding/json"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"github.com/gocql/gocql"
+	"github.com/gorilla/mux"
+	"net/http"
+	"time"
 )
 
 const DBError = "Error while accessing to database"
@@ -23,18 +23,14 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	boardId, err := gocql.ParseUUID(vars["board_id"])
-
-	if err != nil {
-		res := failedResponse{false, "Invalid Board ID"}
-		res.send(w)
-		return
-	}
+	board := r.Context().Value("board")
 
 	sprint := models.Sprint{
 		gocql.TimeUUID(),
-		boardId,
+		board.projectID,
+		board.projectName,
+		board.ID,
+		board.Name,
 		sprintRequestData.Goal,
 		sprintRequestData.Desc,
 		sprintRequestData.Status,

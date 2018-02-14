@@ -17,19 +17,17 @@ const ROLE_USER = "User"
 
 //User type
 
-
 type User struct {
-	UUID      gocql.UUID	`cql:"id" key:"primery"` 
-	Email     string		`cql:"email"`
-	FirstName string		`cql:"first_name"`
-	LastName  string		`cql:"last_name"`
-	Password  string		`cql:"password"`
-	Salt      string		`cql:"salt"`
-	Role      string		`cql:"role"`
-	Status    int			`cql:"status"`
-	CreatedAt time.Time		`cql:"created_at"`
-	UpdatedAt time.Time		`cql:"updated_at"`
-
+	UUID      gocql.UUID `cql:"id" key:"primery"`
+	Email     string     `cql:"email"`
+	FirstName string     `cql:"first_name"`
+	LastName  string     `cql:"last_name"`
+	Password  string     `cql:"password"`
+	Salt      string     `cql:"salt"`
+	Role      string     `cql:"role"`
+	Status    int        `cql:"status"`
+	CreatedAt time.Time  `cql:"created_at"`
+	UpdatedAt time.Time  `cql:"updated_at"`
 }
 
 //Insert func inserts user object in database
@@ -58,7 +56,7 @@ func (user *User) FindByEmail(email string) {
 
 }
 
-func (user *User) FindByToken (token string) error {
+func (user *User) FindByToken(token string) error {
 	//TODO:
 
 	return nil
