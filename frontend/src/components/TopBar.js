@@ -11,8 +11,10 @@ import Drawer from 'material-ui/Drawer';
 import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import Icon from 'material-ui/Icon';
+import SnackBar from './SnackBar'
+import ModalNotification from './ModalNotification'
 import { Link, browserHistory } from 'react-router';
-import * as topBarActions from '../actions/TopBarActions';
+import * as defaultAction from '../actions/DefaultPageActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import auth from '../services/auth'
@@ -37,20 +39,20 @@ const styles = {
     }
 };
 
-const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
+const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, ...decorator }) => {
 
     if (!sessionStorage.getItem('token')) {
         browserHistory.push("/authorization/login")
     }
 
     const toggleDrawer = () => {
-        action.toggleDrawer(!topBarState.isDrawerOpen)
+        defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
     }
 
     let projectBoardsList = null
-    if (topBarState.currentProject !== null) {
+    if (projects.currentProject !== null) {
         projectBoardsList = <List component="nav">
-            {topBarState.currentBoardProjects.map((value, index) => (
+            {projects.currentProjectBoards.map((value, index) => (
                 <ListItem button key={value.id}>
                     <ListItemText primary={value.name} />
                 </ListItem>
@@ -60,7 +62,7 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
 
     return (
         <div className={classes.root}>
-            <Drawer open={topBarState.isDrawerOpen} onClose={toggleDrawer}>
+            <Drawer open={defaultPage.isDrawerOpen} onClose={toggleDrawer}>
                 <div
                     tabIndex={0}
                     role="button"
@@ -97,11 +99,19 @@ const TopBar = ({ classes, topBarState, action, ownProps, ...decorator }) => {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="title" color="inherit" className={classes.flex}>
-                        {topBarState.pageTitle}
+                        {defaultPage.pageTitle}
                     </Typography>
                     <Button color="inherit" onClick={auth.logOut} >Logout</Button>
                 </Toolbar>
             </AppBar>
+            <SnackBar
+                errorMessage={defaultPage.errorMessage}
+                setErrorMessage={defaultPageActions.setErrorMessage}/>
+
+            <ModalNotification
+                title='Notification'
+                content={defaultPage.notificationMessage}
+                setNotificationMessage={defaultPageActions.setNotificationMessage}/>
         </div>
     );
 }
@@ -113,14 +123,15 @@ TopBar.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
     return {
-        topBarState: state.topBar,
+        defaultPage: state.defaultPage,
+        projects: state.projects,
         ownProps
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        action: bindActionCreators(topBarActions, dispatch)
+        defaultPageActions: bindActionCreators(defaultAction, dispatch),
     }
 }
 

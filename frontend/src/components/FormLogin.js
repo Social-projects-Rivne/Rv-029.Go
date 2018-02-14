@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
-import * as topBarActions from '../actions/TopBarActions';
+import * as topBarActions from '../actions/ProjectsActions';
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
 import ModalNotification from './ModalNotification'
