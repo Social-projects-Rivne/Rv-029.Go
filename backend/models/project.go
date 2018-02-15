@@ -25,7 +25,7 @@ const GET_PROJECTS = "SELECT id,name,created_at,updated_at from projects"
 
 func (project *Project) Insert() {
 
-	if err := db.GetInstance().Session.Query(INSERT_PROJECT,gocql.TimeUUID(), project.Name,  project.CreatedAt, project.UpdatedAt).Exec(); err != nil {
+	if err := db.GetInstance().Session.Query(INSERT_PROJECT,project.UUID, project.Name,  project.CreatedAt, project.UpdatedAt).Exec(); err != nil {
 		fmt.Println(err)
 	}
 
@@ -54,6 +54,6 @@ func (project *Project) FindByID() error {
 
 func (project *Project) GetAll() ([]map[string]interface{}, error) {
 
-	return db.GetInstance().Session.Query(GET_PROJECTS).PageState(nil).PageSize(2).Iter().SliceMap()
+	return db.GetInstance().Session.Query(GET_PROJECTS).PageState(nil).PageSize(4).Iter().SliceMap()
 
 }
