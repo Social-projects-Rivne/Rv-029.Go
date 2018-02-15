@@ -1,18 +1,11 @@
 package router
 
 import (
-<<<<<<< HEAD
 	"net/http"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
-=======
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
-	"github.com/gorilla/mux"
-	"net/http"
->>>>>>> origin/f52
 )
 
 var Router *mux.Router

@@ -24,10 +24,6 @@ const ROLE_OWNER = "Owner"
 const ROLE_USER = "User"
 
 //User type
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/f52
 type User struct {
 	UUID      gocql.UUID `cql:"id" key:"primery"`
 	Email     string     `cql:"email"`
@@ -39,7 +35,6 @@ type User struct {
 	Status    int        `cql:"status"`
 	CreatedAt time.Time  `cql:"created_at"`
 	UpdatedAt time.Time  `cql:"updated_at"`
-<<<<<<< HEAD
 }
 
 //Userer is interface for user struct
@@ -49,8 +44,6 @@ type Userer interface {
 	Delete() error
 	FindByEmail(string) error
 	FindByID(string) error
-=======
->>>>>>> origin/f52
 }
 
 //Insert func inserts user object in database
@@ -67,7 +60,7 @@ func (user *User) Insert() error {
 	return nil
 }
 
-//Update updates user by id
+//UpdateByID updates user by his id
 func (user *User) UpdateByID() error {
 
 	if err := db.GetInstance().Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
@@ -79,18 +72,13 @@ func (user *User) UpdateByID() error {
 	return nil
 }
 
-<<<<<<< HEAD
-//Delete removes user by id
+//Delete removes user by his id
 func (user *User) Delete() error {
-=======
-func (user *User) FindByToken(token string) error {
-	//TODO:
->>>>>>> origin/f52
 
 	if err := db.GetInstance().Session.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 			
-		log.Printf("Error occured while deleting user %v", err)
+			log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -103,7 +91,7 @@ func (user *User) FindByID() error {
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
 		&user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
 
-		log.Printf("Error occured while finding user by ID %v", err)
+		log.Printf("Error occured in models/user.go, method: FindByID, error: %v", err)
 		return err
 	}
 	return nil
@@ -116,7 +104,7 @@ func (user *User) FindByEmail() error {
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password,
 		&user.Salt, &user.Role, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
 
-		log.Printf("Error occured while deleting %v", err)
+		log.Printf("Error occured in models/user.go, method: FindByEmail, error: %v", err)
 		return err
 	}
 	return nil

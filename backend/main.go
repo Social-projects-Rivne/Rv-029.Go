@@ -1,7 +1,6 @@
 package main
 
 import (
-<<<<<<< HEAD
 	"fmt"
 	"log"
 	"net/http"
@@ -13,23 +12,20 @@ import (
 	//"time"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-=======
->>>>>>> origin/f52
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/rs/cors"
-<<<<<<< HEAD
-	//"github.com/gocql/gocql"
-=======
-	"log"
-	"net/http"
-	"os"
->>>>>>> origin/f52
 )
 
 func main() {
 	var cmd string
+	board := &models.Board{}
+	board.ID = gocql.TimeUUID()
+	board.ProjectID = gocql.ParseUUID("4aa8434e-1177-11e8-ba8e-c85b76da292c")
+	board.ProjectName = "project number two"
+	board.Name = "board"
+
 
 	f, err := os.OpenFile("log_file", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {

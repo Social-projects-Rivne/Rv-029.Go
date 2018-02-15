@@ -48,7 +48,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := models.User{}
-	user.FindByEmail(loginRequestData.Email)
+	user.Email = loginRequestData.Email
+	user.FindByEmail()
 
 	if user.Password != password.EncodePassword(loginRequestData.Password, user.Salt) {
 		jsonResponse, _ := json.Marshal(errorResponse{
@@ -182,7 +183,8 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := &models.User{}
-	user.FindByEmail(forgotRequestData.Email)
+	user.Email = forgotRequestData.Email
+	user.FindByEmail()
 
 	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/authorization/new-password/%s\">LINK</a>\n", user.FirstName, user.Password)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
@@ -217,8 +219,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := models.User{}
-
-	user.FindByEmail(resetRequestData.Email)
+	user.Email = resetRequestData.Email
+	user.FindByEmail()
 
 	// FIXME doesn't work properly
 	if user.Password != resetRequestData.Token {

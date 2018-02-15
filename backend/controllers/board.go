@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"log"
+	//"log"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
@@ -22,28 +22,13 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-<<<<<<< HEAD
-	vars := mux.Vars(r)
-	projectID, err := gocql.ParseUUID(vars["project_id"])
-
-	if err != nil {
-		response := baseResponse{false, "Project ID is not valid"}
-		response.Failed(w)
-		return
-	}
-
-	board := models.Board{
-		gocql.TimeUUID(),
-		projectID,
-=======
 	// Getting project data from request from "Validation"
-	project := r.Context().Value("project")
+	project := r.Context().Value("project").(models.Project)
 
 	board := models.Board{
 		gocql.TimeUUID(),
-		project.ID,
+		project.UUID,
 		project.Name,
->>>>>>> origin/f52
 		boardRequestData.Name,
 		boardRequestData.Desc,
 		time.Now(),
@@ -53,14 +38,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Insert()
 
 	if err != nil {
-<<<<<<< HEAD
-		response := baseResponse{false, "Error while accessing to database"}
-		response.Failed(w)
-		log.Printf("Error while accessing to database: %v",err)
-=======
 		response := failedResponse{false, "Error while accessing to database"}
 		response.send(w)
->>>>>>> origin/f52
 		return
 	}
 

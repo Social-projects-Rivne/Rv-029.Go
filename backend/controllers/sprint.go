@@ -23,12 +23,12 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	board := r.Context().Value("board")
+	board := r.Context().Value("board").(models.Board)
 
 	sprint := models.Sprint{
 		gocql.TimeUUID(),
-		board.projectID,
-		board.projectName,
+		board.ProjectID,
+		board.ProjectName,
 		board.ID,
 		board.Name,
 		sprintRequestData.Goal,

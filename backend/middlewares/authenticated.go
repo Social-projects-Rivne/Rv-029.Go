@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/gocql/gocql"
 	"context"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
@@ -35,7 +36,8 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 			claims := userContext.(*jwt.Token).Claims.(jwt.MapClaims)
 
 			currentUser := models.User{}
-			err := currentUser.FindByID(claims["UUID"].(string))
+			currentUser.UUID = claims["UUID"].(gocql.UUID)
+			err := currentUser.FindByID()
 			if err != nil {
 				response := struct {
 					Status  bool

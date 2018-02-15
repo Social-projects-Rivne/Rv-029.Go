@@ -2,9 +2,8 @@ package validator
 
 import (
 	"context"
-	"fmt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"log"
@@ -42,7 +41,7 @@ func (b *BoardCreateRequestData) Validate(r *http.Request) error {
 
 	project := models.Project{}
 	project.UUID = projectId
-	err = project.findByID()
+	err = project.FindByID()
 
 	if err != nil {
 		return err
