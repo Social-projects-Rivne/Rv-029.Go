@@ -20,6 +20,8 @@ import HomePage from './containers/HomePage'
 import DefaultPage from './containers/DefaultPage'
 import ProjectsPage from "./containers/ProjectsPage";
 
+import auth from './services/auth'
+
 // TODO move these out of here
 // e.g. routeEvents.js
 const reset = () => {
@@ -50,8 +52,12 @@ const queryCheck = (nextState, replace, callback) => {
   } else callback()
 }
 
-const isAuthorized = () => {
+const authorizedMiddleware = (nextState, replace, callback) => {
+    if (!auth.injectAuthHeader()) {
+       replace('/authorization/login')
+    }
 
+    callback()
 }
 
 export const routes = (
@@ -65,7 +71,8 @@ export const routes = (
         <Route name="restore-password" path="restore-password" component={FormRestorePassword}/>
         <Route name="reset-password" path="new-password/:token" component={FormNewPassword}/>
       </Route>
-      <Route component={DefaultPage} onEnter={isAuthorized}>
+
+      <Route component={DefaultPage} onEnter={authorizedMiddleware}>
         <Route name="projects_list" path="projects" component={ProjectsPage}/>
         <Route name="view_project" path="project/:id" component={ProjectCard}/>
       </Route>

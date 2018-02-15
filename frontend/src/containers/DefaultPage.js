@@ -11,7 +11,6 @@ const DefaultPage = ({ classes, children }) => {
       alignItems={'center'}
       justify={'center'} >
       <TopBar />
-
       { children }
     </Grid>
   )

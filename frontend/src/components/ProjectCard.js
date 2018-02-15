@@ -14,8 +14,8 @@ function ProjectCard(props) {
         <div>
             <Card className={classes.card}>
                 <CardContent>
-                    <Typography className={classes.title}>{project.author}</Typography>
-                    <Typography variant="headline" component="h2">{project.title}</Typography>
+                    <Typography className={classes.title}>{project.user_name}</Typography>
+                    <Typography variant="headline" component="h2">{project.name}</Typography>
                     <Typography component="p">{project.desc}</Typography>
                 </CardContent>
                 <CardActions>
