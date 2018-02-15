@@ -19,6 +19,11 @@ func (UsersTableSeeder) Run() {
 	if err != nil {
 		log.Fatal("Can't parse uuid ",err)
 	}
+	uuid, err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
+	if err != nil {
+		log.Fatalf("Invalid gocql.UUID inputed during user seeding. Error: %s", err.Error())
+	}
+	projects := map[gocql.UUID]string{uuid: "project number one"}
 
 	salt := password.GenerateSalt(8)
 	user := models.User{
@@ -29,7 +34,8 @@ func (UsersTableSeeder) Run() {
 		Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
 		Salt:      salt,
 		Role:      models.ROLE_USER,
-		Status:		1,
+		Status:	   1,
+		Projects:  projects,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -46,6 +52,7 @@ func (UsersTableSeeder) Run() {
 		Status:		1,
 		Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
 		Role:      models.ROLE_OWNER,
+		Projects:  projects,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

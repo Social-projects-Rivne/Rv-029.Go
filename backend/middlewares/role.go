@@ -13,6 +13,7 @@ func RoleMiddleware(next http.Handler) http.Handler {
 		if user.Role == models.ROLE_OWNER {
 			next.ServeHTTP(w,r)
 		} else {
+			//TODO: check if there are any project where user assigned
 			// return error response
 			response := struct {
 				Status bool
