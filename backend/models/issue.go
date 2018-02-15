@@ -27,25 +27,33 @@ const STATUS_DONE = "Done"
 
 //Issue model
 type Issue struct {
-	UUID      gocql.UUID `cql:"id" key:"primery"`
-	Name      string     `cql:"name"`
-	Status    string     `cql:"status"`
-	UserID    gocql.UUID `cql:"user_id"`
-	SprintID  gocql.UUID `cql:"sprint_id"`
-	BoardID   gocql.UUID `cql:"board_id"`
-	CreatedAt time.Time  `cql:"created_at"`
-	UpdatedAt time.Time  `cql:"updated_at"`
+	UUID          gocql.UUID
+	Name          string
+	Status        string
+	UserID        gocql.UUID
+	UserFirstName string
+	UserLastName  string
+	SprintID      gocql.UUID
+	BoardID       gocql.UUID
+	BoardName     string
+	ProjectID     gocql.UUID
+	ProjectName   string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 //Insert func inserts user object in database
 func (issue *Issue) Insert() error {
 
 	if err := db.GetInstance().Session.Query(`INSERT INTO issues (id,name,status,user_id,
-		sprint_id,board_id,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?);`,
-		issue.UUID, issue.Name, issue.Status, issue.UserID, issue.SprintID, issue.BoardID,
+		user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,
+		project_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?);`,
+
+		issue.UUID, issue.Name, issue.Status, issue.UserID, issue.UserFirstName, issue.UserLastName,
+		issue.SprintID, issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName,
 		issue.CreatedAt, issue.UpdatedAt).Exec(); err != nil {
 
-		log.Printf("Error occured inside models/issue.go: %v", err)
+		log.Printf("Error occured inside models/issue.go, method:Insert, error: %v", err)
 		return err
 	}
 	return nil
@@ -55,12 +63,13 @@ func (issue *Issue) Insert() error {
 func (issue *Issue) Update() error {
 
 	if err := db.GetInstance().Session.Query(`Update issues SET name = ?, status= ?, user_id = ?,
-		 sprint_id = ?, board_id = ?,updated_at = ? WHERE id= ? ;`,
+		user_first_name = ?,user_last_name = ?,sprint_id = ?, board_id = ?,board_name = ?,
+		  project_id = ?, project_name = ?,updated_at = ? WHERE id= ? ;`,
 
-		issue.Name, issue.Status, issue.UserID, issue.SprintID,
-		issue.BoardID, issue.UpdatedAt, issue.UUID).Exec(); err != nil {
+		issue.Name, issue.Status, issue.UserID, issue.UserFirstName, issue.UserLastName, issue.SprintID,
+		issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName, issue.UpdatedAt, issue.UUID).Exec(); err != nil {
 
-		log.Printf("Error occured inside models/issue.go: %v", err)
+		log.Printf("Error occured inside models/issue.go, method: Update, error: %v", err)
 		return err
 	}
 	return nil
@@ -71,7 +80,7 @@ func (issue *Issue) Delete() error {
 
 	if err := db.GetInstance().Session.Query(`DELETE FROM issues WHERE id= ? ;`,
 		issue.UUID).Exec(); err != nil {
-		log.Printf("Error occured inside models/issue.go: %v", err)
+		log.Printf("Error occured inside models/issue.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -80,13 +89,16 @@ func (issue *Issue) Delete() error {
 //FindByID finds issue by id
 func (issue *Issue) FindByID() error {
 
-	if err := db.GetInstance().Session.Query(`SELECT id, name, status, user_id, sprint_id, board_id, created_at	
+	if err := db.GetInstance().Session.Query(`SELECT id, name, status, user_id,
+		user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,
+		project_name, created_at, updated_at
 		FROM issues WHERE id = ? LIMIT 1`,
 
 		issue.UUID).Consistency(gocql.One).Scan(&issue.UUID, &issue.Name, &issue.Status, &issue.UserID,
-		&issue.SprintID, &issue.BoardID, &issue.CreatedAt); err != nil {
+		&issue.UserFirstName, &issue.UserLastName, &issue.SprintID, &issue.BoardID, &issue.BoardName,
+		 &issue.ProjectID, &issue.ProjectName, &issue.CreatedAt); err != nil {
 
-		log.Printf("Error occured inside models/issue.go: %v", err)
+		log.Printf("Error occured inside models/issue.go, method:FindByID, error: %v", err)
 		return err
 	}
 	return nil
@@ -95,10 +107,10 @@ func (issue *Issue) FindByID() error {
 //GetBoardIssueList returns all issues by board_id
 func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 
-	issueList, err := Session.Query("SELECT id,name,status,user_id,sprint_id,board_id,created_at,updated_at from issues WHERE board_id = ?", issue.BoardID).Iter().SliceMap()
+	issueList, err := Session.Query("SELECT SELECT id, name, status, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE board_id = ?", issue.BoardID).Iter().SliceMap()
 
 	if err != nil {
-		log.Printf("Error in method GetBoardIssueList inside models/issue.go: %s\n", err.Error())
+		log.Printf("Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: %s\n", err.Error())
 		return nil, err
 	}
 
@@ -109,7 +121,7 @@ func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 //GetSprintIssueList returns all issues by board_id
 func (issue *Issue) GetSprintIssueList() ([]map[string]interface{}, error) {
 
-	issueList, err := Session.Query("SELECT id,name,status,user_id,sprint_id,board_id,created_at,updated_at from issues WHERE sprint_id = ?", issue.SprintID).Iter().SliceMap()
+	issueList, err := Session.Query("SELECT SELECT id, name, status, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ?", issue.SprintID).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Error in method GetSprintIssueList inside models/issue.go: %s\n", err.Error())

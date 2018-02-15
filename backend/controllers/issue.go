@@ -12,9 +12,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//StoreIssue .
+//StoreIssue creates issue in database
 func StoreIssue(w http.ResponseWriter, r *http.Request) {
-	var issueRequestData validator.IssueRequestData
+	var issueRequestData validator.CreateIssueRequestData
 
 	err := decodeAndValidate(r, &issueRequestData)
 
@@ -39,23 +39,31 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	}
 
 	issue := &models.Issue{}
-	issue.BoardID = boardID
-	if issueRequestData.Name != "" {
-		issue.Name = issueRequestData.Name
-	}
-	if issueRequestData.Status != "" {
-		issue.Status = issueRequestData.Status
-	}
-	if issueRequestData.UserID.String() != "" {
-		issue.UserID = issueRequestData.UserID
-	}
-	if issueRequestData.SprintID.String() != "" {
-		issue.SprintID = issueRequestData.SprintID
-	}
-	if issueRequestData.BoardID.String() != "" {
-		issue.BoardID = issueRequestData.BoardID
-	}
 	issue.UUID = gocql.TimeUUID()
+	issue.Name = issueRequestData.Name
+	issue.Status = issueRequestData.Status
+	issue.UserID = issueRequestData.UserID
+
+	user := &models.User{}
+	user.UUID = issue.UserID
+	user.FindByID()
+
+	issue.UserFirstName = user.FirstName
+	issue.UserLastName = user.LastName
+	issue.BoardID = boardID
+	
+	board := &models.Board{}
+	board.ID = issue.BoardID
+	board.FindByID()
+
+	issue.BoardName = board.Name
+
+	project := &models.Project{}
+	project.UUID = board.ProjectID
+	project.FindByID()
+
+	issue.ProjectID = project.UUID
+	issue.ProjectName = project.Name
 	issue.CreatedAt = time.Now()
 	issue.UpdatedAt = time.Now()
 
@@ -65,9 +73,9 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 }
 
-//UpdateIssue .
+//UpdateIssue controller updates issue in database
 func UpdateIssue(w http.ResponseWriter, r *http.Request) {
-	var issueRequestData validator.IssueRequestData
+	var issueRequestData validator.CreateIssueRequestData
 
 	err := decodeAndValidate(r, &issueRequestData)
 
@@ -77,7 +85,7 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 			err.Error(),
 		})
 
-		log.Printf("Error occured in controller.UpdateIssue while validating: %v", err)
+		log.Printf("Error occured in controllers/UpdateIssue while validating method: UpdateIssue error: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(jsonResponse)
@@ -88,30 +96,18 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	issueID, err := gocql.ParseUUID(vars["issue_id"])
 
 	if err != nil {
-		log.Printf("Error occured in controller.UpdateIssue while parsing id variable: %v", err)
+		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: UpdateIssue, error: %v", err)
 	}
 
 	issue := &models.Issue{}
 	issue.UUID = issueID
 	issue.FindByID()
 
-	if issueRequestData.Name != "" {
-		issue.Name = issueRequestData.Name
-	}
-	if issueRequestData.Status != "" {
-		issue.Status = issueRequestData.Status
-	}
-	if issueRequestData.UserID.String() != "" {
-		issue.UserID = issueRequestData.UserID
-	}
-	if issueRequestData.SprintID.String() != "" {
-		issue.SprintID = issueRequestData.SprintID
-	}
-	if issueRequestData.BoardID.String() != "" {
-		issue.BoardID = issueRequestData.BoardID
-	}
-
+	issue.Name = issueRequestData.Name
+	issue.Status = issueRequestData.Status
+	issue.UserID = issueRequestData.UserID
 	issue.UpdatedAt = time.Now()
+
 	issue.Update()
 
 	response := baseResponse{true, "Issue has updated"}
@@ -119,8 +115,9 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//DeleteIssue controller deletes issue from database
 func DeleteIssue(w http.ResponseWriter, r *http.Request) {
-	var issueRequestData validator.IssueRequestData
+	var issueRequestData validator.CreateIssueRequestData
 
 	err := decodeAndValidate(r, &issueRequestData)
 
@@ -153,7 +150,7 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	if err := issue.Delete(); err != nil {
 		response := baseResponse{false, "Error while accessing to database"}
 		response.Failed(w)
-		log.Printf("Error while accessing to database: %v", err)
+		log.Printf("Error while accessing to database in controllers/issue.go, method: DeleteIssue, error: %v", err)
 		return
 	}
 
@@ -183,7 +180,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		response := baseResponse{false, "Error while accessing to database"}
 		response.Failed(w)
-		log.Printf("Error while accessing to database: %v", err)
+		log.Printf("Error while accessing to database in controllers/issue.go, method: BoardIssueList, error: %v", err)
 		return
 	}
 

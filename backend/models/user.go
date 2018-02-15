@@ -85,9 +85,9 @@ func (user *User) Delete() error {
 }
 
 //FindByID finds user by id
-func (user *User) FindByID(id string) error {
+func (user *User) FindByID() error {
 	if err := db.GetInstance().Session.Query(`SELECT id, email, first_name, last_name,
-		 updated_at, created_at, password, salt, role, status FROM users WHERE id = ? LIMIT 1`, id).
+		 updated_at, created_at, password, salt, role, status FROM users WHERE id = ? LIMIT 1`, user.UUID).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
 		&user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
 
@@ -98,9 +98,9 @@ func (user *User) FindByID(id string) error {
 }
 
 //FindByEmail finds user by email
-func (user *User) FindByEmail(email string) error {
+func (user *User) FindByEmail() error {
 	if err := db.GetInstance().Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, 
-		created_at, updated_at FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`, email).
+		created_at, updated_at FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`, user.Email).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password,
 		&user.Salt, &user.Role, &user.Status, &user.CreatedAt, &user.UpdatedAt); err != nil {
 
