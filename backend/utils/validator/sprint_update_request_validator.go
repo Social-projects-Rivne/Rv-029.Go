@@ -1,12 +1,12 @@
 package validator
 
 import (
-	"net/http"
-	"log"
-	"github.com/gorilla/mux"
-	"github.com/gocql/gocql"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"fmt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/gocql/gocql"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 )
 
 type SprintUpdateRequestData struct {
@@ -27,7 +27,7 @@ func validateSprintId(r *http.Request) error {
 	var sprintName string
 
 	db.GetInstance().Session.
-		Query(`SELECT name FROM sprints where id = ? LIMIT 1;`, sprintId).
+		Query(`SELECT goal FROM sprints where id = ? LIMIT 1;`, sprintId).
 		Consistency(gocql.One).Scan(&sprintName)
 
 	if sprintName == "" {

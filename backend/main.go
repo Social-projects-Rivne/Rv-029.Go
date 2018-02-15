@@ -1,6 +1,7 @@
 package main
 
 import (
+<<<<<<< HEAD
 	"fmt"
 	"log"
 	"net/http"
@@ -12,11 +13,19 @@ import (
 	//"time"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+=======
+>>>>>>> origin/f52
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/rs/cors"
+<<<<<<< HEAD
 	//"github.com/gocql/gocql"
+=======
+	"log"
+	"net/http"
+	"os"
+>>>>>>> origin/f52
 )
 
 func main() {
@@ -49,8 +58,14 @@ func main() {
 			AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},
 			AllowedHeaders: []string{"*"},
 		}).Handler(router.Router)
+<<<<<<< HEAD
 		defer db.GetInstance().Session.Close()
 		log.Fatal(http.ListenAndServe(":8080", handler))
 
+=======
+
+		defer db.GetInstance().Session.Close()
+		log.Fatal(http.ListenAndServe(":8080", handler))
+>>>>>>> origin/f52
 	}
 }

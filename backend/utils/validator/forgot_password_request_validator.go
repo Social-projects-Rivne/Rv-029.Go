@@ -3,7 +3,7 @@ package validator
 import "net/http"
 
 //ForgotPasswordRequestData ..
-type ForgotPasswordRequestData struct{
+type ForgotPasswordRequestData struct {
 	*baseValidator
 	Email string
 }

@@ -1,14 +1,14 @@
 package middlewares
 
 import (
-	"net/http"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"testing"
-	"github.com/gocql/gocql"
-	"net/http/httptest"
 	"fmt"
-	"io/ioutil"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
+	"github.com/gocql/gocql"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 type authorithedHandler struct {
@@ -28,7 +28,7 @@ func TestAuthenticatedMiddleware(t *testing.T) {
 		},
 	}
 
-	user := &models.User{UUID:gocql.TimeUUID()}
+	user := &models.User{UUID: gocql.TimeUUID()}
 
 	jwtToken, err := jwt.GenerateToken(user)
 	if err != nil {

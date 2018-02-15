@@ -99,6 +99,7 @@ func (b *BaseModel) AndWhere(column string, sign string, value interface{}) {
 	b.Condition += fmt.Sprintf("%v", value)
 
 }
+<<<<<<< HEAD
 
 //FindIssue finds issue by any field
 func (b *BaseModel) FindIssue() *Issue {
@@ -144,3 +145,5 @@ func (b *BaseModel) FindIssue() *Issue {
 // 	}
 // 	return nil
 // }
+=======
+>>>>>>> origin/f52

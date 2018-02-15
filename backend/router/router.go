@@ -1,11 +1,18 @@
 package router
 
 import (
+<<<<<<< HEAD
 	"net/http"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
+=======
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
+	"github.com/gorilla/mux"
+	"net/http"
+>>>>>>> origin/f52
 )
 
 var Router *mux.Router
@@ -90,8 +97,17 @@ func applySprintRoutes(r *mux.Router) {
 	r.HandleFunc("/project/board/{board_id}/sprint/create/", controllers.CreateSprint).Methods("POST")
 	r.HandleFunc("/project/board/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
 
-	r.HandleFunc("/project/board/sprint/update/{sprint_id}/", controllers.UpdateSprint).Methods("POST")
-	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("POST")
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}/", controllers.UpdateSprint).Methods("PUT")
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT")
+
+	r.HandleFunc("/project/board/sprint/show/{sprint_id}/", controllers.SelectSprint).Methods("GET")
+	r.HandleFunc("/project/board/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET")
+
+	r.HandleFunc("/project/board/sprint/delete/{sprint_id}/", controllers.DeleteSprint).Methods("DELETE")
+	r.HandleFunc("/project/board/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE")
+
+	r.HandleFunc("/project/board/{board_id}/sprint/list/", controllers.SprintsList).Methods("GET")
+	r.HandleFunc("/project/board/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {

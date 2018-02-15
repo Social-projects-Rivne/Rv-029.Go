@@ -1,7 +1,9 @@
 package validator
 
 import (
+	"context"
 	"fmt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
@@ -30,24 +32,25 @@ func (b *BoardCreateRequestData) Validate(r *http.Request) error {
 		return err
 	}
 
-	return validateProjectId(r)
-}
-
-func validateProjectId(r *http.Request) error {
 	vars := mux.Vars(r)
-	projectId, _ := gocql.ParseUUID(vars["project_id"])
+	projectId, err := gocql.ParseUUID(vars["project_id"])
 
-	var projectName string
-
-	db.GetInstance().Session.
-		Query(`SELECT name FROM projects where id = ? LIMIT 1;`, projectId).
-		Consistency(gocql.One).Scan(&projectName)
-
-	if projectName == "" {
-		err := fmt.Errorf("There is no project with ID %v", projectId)
-		log.Printf(err.Error())
+	if err != nil {
+		log.Printf("Invalid Project ID: %v\n", err.Error())
 		return err
 	}
+
+	project := models.Project{}
+	project.UUID = projectId
+	err = project.findByID()
+
+	if err != nil {
+		return err
+	}
+
+	// Adding project data to request
+	ctx := context.WithValue(r.Context(), "project", project)
+	r.WithContext(ctx)
 
 	return nil
 }

@@ -6,5 +6,9 @@ import (
 
 func Run() {
 	seeders.Call(UsersTableSeeder{})
+<<<<<<< HEAD:backend/seeder/seeders/database_seeder.go
 	seeders.Call(ProjectTableSeeder{})
 }
+=======
+}
+>>>>>>> origin/f52:backend/seeder/seeders/DatabaseSeeder.go

@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"net/http"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"net/http"
 )
 
 // decodeAndValidate - entry point for deserialization and validation
@@ -19,22 +19,27 @@ func decodeAndValidate(r *http.Request, v validator.InputValidation) error {
 	return v.Validate(r)
 }
 
-type baseResponse struct {
+type failedResponse struct {
 	Status  bool
 	Message string
 }
 
-func (b *baseResponse) Success(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}
-
-func (b *baseResponse) Failed(w http.ResponseWriter) {
+func (b *failedResponse) send(w http.ResponseWriter) {
 	jsonResponse, _ := json.Marshal(b)
 	w.WriteHeader(http.StatusBadRequest)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
 }
 
+type successResponse struct {
+	Status  bool
+	Message string
+	Data    interface{}
+}
+
+func (b *successResponse) send(w http.ResponseWriter) {
+	jsonResponse, _ := json.Marshal(b)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}

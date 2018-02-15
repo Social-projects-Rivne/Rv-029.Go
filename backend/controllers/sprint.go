@@ -1,13 +1,16 @@
 package controllers
 
 import (
-	"net/http"
-	"github.com/gorilla/mux"
-	"github.com/gocql/gocql"
+	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"github.com/gocql/gocql"
+	"github.com/gorilla/mux"
+	"net/http"
+	"time"
 )
+
+const DBError = "Error while accessing to database"
 
 func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	var sprintRequestData validator.SprintCreateRequestData
@@ -15,23 +18,19 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		res := baseResponse{false, err.Error()}
-		res.Failed(w)
+		res := failedResponse{false, err.Error()}
+		res.send(w)
 		return
 	}
 
-	vars := mux.Vars(r)
-	boardId, err := gocql.ParseUUID(vars["board_id"])
-
-	if err != nil {
-		res := baseResponse{false, "Invalid Board ID"}
-		res.Failed(w)
-		return
-	}
+	board := r.Context().Value("board")
 
 	sprint := models.Sprint{
 		gocql.TimeUUID(),
-		boardId,
+		board.projectID,
+		board.projectName,
+		board.ID,
+		board.Name,
 		sprintRequestData.Goal,
 		sprintRequestData.Desc,
 		sprintRequestData.Status,
@@ -42,13 +41,13 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Insert()
 
 	if err != nil {
-		res := baseResponse{false, "Error while accessing to db"}
-		res.Failed(w)
+		res := failedResponse{false, DBError}
+		res.send(w)
 		return
 	}
 
-	res := baseResponse{true, "Sprint has created"}
-	res.Success(w)
+	res := successResponse{true, "Sprint has created", nil}
+	res.send(w)
 }
 
 func UpdateSprint(w http.ResponseWriter, r *http.Request) {
@@ -57,8 +56,8 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		res := baseResponse{false, err.Error()}
-		res.Failed(w)
+		res := failedResponse{false, err.Error()}
+		res.send(w)
 		return
 	}
 
@@ -67,7 +66,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	//sprint.FindById()
+	sprint.FindById()
 
 	if sprintRequestData.Goal != "" {
 		sprint.Goal = sprintRequestData.Goal
@@ -86,11 +85,89 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Update()
 
 	if err != nil {
-		res := baseResponse{false, "Error while accessing to db"}
-		res.Failed(w)
+		res := failedResponse{false, DBError}
+		res.send(w)
 		return
 	}
 
-	res := baseResponse{true, "Sprint has updated"}
-	res.Success(w)
+	res := successResponse{true, "Sprint has updated", nil}
+	res.send(w)
+}
+
+func DeleteSprint(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
+
+	if err != nil {
+		res := failedResponse{false, "Sprint ID is not valid"}
+		res.send(w)
+		return
+	}
+
+	sprint := models.Sprint{}
+	sprint.ID = sprintId
+
+	err = sprint.Delete()
+
+	if err != nil {
+		res := failedResponse{false, DBError}
+		res.send(w)
+		return
+	}
+
+	res := successResponse{true, "Sprint has deleted", nil}
+	res.send(w)
+}
+
+func SelectSprint(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
+
+	if err != nil {
+		response := failedResponse{false, "Sprint ID is not valid"}
+		response.send(w)
+		return
+	}
+
+	sprint := models.Sprint{}
+	sprint.ID = sprintId
+
+	err = sprint.FindById()
+
+	if err != nil {
+		res := failedResponse{false, DBError}
+		res.send(w)
+		return
+	}
+
+	jsonResponse, _ := json.Marshal(sprint)
+
+	res := successResponse{true, "Done", jsonResponse}
+	res.send(w)
+}
+
+func SprintsList(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+
+	if err != nil {
+		res := failedResponse{false, "Board ID is not valid"}
+		res.send(w)
+		return
+	}
+
+	sprint := models.Sprint{}
+
+	sprintsList, err := sprint.List(boardId)
+
+	if err != nil {
+		res := failedResponse{false, DBError}
+		res.send(w)
+		return
+	}
+
+	jsonResponse, _ := json.Marshal(sprintsList)
+
+	res := successResponse{true, "Done", jsonResponse}
+	res.send(w)
 }
