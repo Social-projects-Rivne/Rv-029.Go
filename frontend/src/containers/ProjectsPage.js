@@ -72,7 +72,6 @@ class ProjectsPage extends Component {
                          ))}
                     </Grid>
                 </Grid>
-                <button onClick={this.test}>Some TEST</button>
             </Grid>
         )
     }

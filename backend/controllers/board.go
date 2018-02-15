@@ -22,11 +22,11 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Getting project data from request from "Validation"
-	project := r.Context().Value("project")
+	project := r.Context().Value("project").(models.Project)
 
 	board := models.Board{
 		gocql.TimeUUID(),
-		project.ID,
+		project.UUID,
 		project.Name,
 		boardRequestData.Name,
 		boardRequestData.Desc,

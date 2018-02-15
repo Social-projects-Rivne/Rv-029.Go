@@ -10,12 +10,10 @@ import (
 )
 
 type UsersTableSeeder struct {
+
 }
 
 func (UsersTableSeeder) Run() {
-
-
-
 
 	id , err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
 	if err != nil {
