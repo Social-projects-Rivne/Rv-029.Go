@@ -10,7 +10,7 @@ import {
   NOTIFICATION_MESSAGE,
   HANDLE_NAME_INPUT,
   HANDLE_SURNAME_INPUT,
-  CLEAR_STATE
+  CLEAR_INPUT_STATE
 } from '../constants/form'
 
 export const handleEmail = (email) => {
@@ -90,9 +90,9 @@ export const setNotificationMessage = (message) => {
   }
 }
 
-export const clearState = () => {
+export const clearInputState = () => {
   return {
-    type: CLEAR_STATE
+    type: CLEAR_INPUT_STATE
   }
 }
 

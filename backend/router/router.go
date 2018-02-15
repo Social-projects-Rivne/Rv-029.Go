@@ -20,6 +20,9 @@ func init()  {
 	applyAuthorizedUserRoutes(authorizedUserRouter)
 	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
 
+	boardRouter := Router
+	applyBoardRoutes(boardRouter)
+	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
 }
 
 func applyAuthRoutes(r *mux.Router)  {
@@ -31,12 +34,29 @@ func applyAuthRoutes(r *mux.Router)  {
 
 	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
-	r.HandleFunc("/reset-password", controllers.ResetPassword)
+	r.HandleFunc("/new-password", controllers.ResetPassword)
 }
 
 func applyAuthorizedUserRoutes(r *mux.Router)  {
 	r.HandleFunc("/", controllers.Dashboard)
 	r.HandleFunc("", controllers.Dashboard)
+}
+
+func applyBoardRoutes(r *mux.Router) {
+	r.HandleFunc("/project/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")
+	r.HandleFunc("/project/{project_id}/board/create", controllers.CreateBoard).Methods("POST")
+
+	r.HandleFunc("/project/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/project/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
+
+	r.HandleFunc("/project/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE")
+	r.HandleFunc("/project/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE")
+
+	r.HandleFunc("/project/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
+	r.HandleFunc("/project/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
+
+	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
+	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {
