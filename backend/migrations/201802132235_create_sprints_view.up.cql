@@ -1,0 +1,5 @@
+CREATE MATERIALIZED VIEW sprintslist AS
+SELECT * FROM sprints
+WHERE board_id IS NOT NULL
+AND id IS NOT NULL
+PRIMARY KEY (board_id, id)

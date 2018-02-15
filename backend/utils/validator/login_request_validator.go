@@ -4,7 +4,7 @@ import "net/http"
 
 type LoginRequestData struct {
 	*baseValidator
-	Email string
+	Email    string
 	Password string
 }
 
