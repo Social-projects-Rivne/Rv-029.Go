@@ -34,8 +34,8 @@ type User struct {
 //Insert func inserts user object in database
 func (user *User) Insert() {
 
-	if err := db.GetInstance().Session.Query(`INSERT INTO users (id, email, first_name, last_name, password, salt, role, status, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
-		user.UUID, user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.Status, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+	if err := db.GetInstance().Session.Query(`INSERT INTO users (id, email, first_name, last_name, password, salt, role, status, projects, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?);	`,
+		user.UUID, user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.Status, user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 		fmt.Println(err)
 	}
 

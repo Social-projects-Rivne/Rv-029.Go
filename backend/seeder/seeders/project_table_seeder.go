@@ -14,15 +14,19 @@ type ProjectTableSeeder struct {
 func (ProjectTableSeeder) Run() {
 
 
-	id , err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
+	id1 , err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
+	if err != nil {
+		log.Fatal("Can't parse uuid ",err)
+	}
+
+	id2 , err := gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
 	if err != nil {
 		log.Fatal("Can't parse uuid ",err)
 	}
 
 	project := models.Project{
-		UUID:      gocql.TimeUUID(),
+		UUID:      id1,
 		Name:      "project number one",
-		UserId:    id,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -30,9 +34,8 @@ func (ProjectTableSeeder) Run() {
 	project.Insert()
 
 	project = models.Project{
-		UUID:      gocql.TimeUUID(),
+		UUID:      id2,
 		Name:      "project number two",
-		UserId:    id,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

@@ -15,19 +15,28 @@ type UsersTableSeeder struct {
 
 func (UsersTableSeeder) Run() {
 
-	id , err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
+	projectId1 , err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
 	if err != nil {
 		log.Fatal("Can't parse uuid ",err)
 	}
-	uuid, err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
+	projectId2 , err := gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
+	if err != nil {
+		log.Fatal("Can't parse uuid ",err)
+	}
+
+	userId1 , err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
+	if err != nil {
+		log.Fatal("Can't parse uuid ",err)
+	}
+	userId2, err := gocql.ParseUUID("9646324a-0aa2-11e8-ba15-b06ebf83499f")
 	if err != nil {
 		log.Fatalf("Invalid gocql.UUID inputed during user seeding. Error: %s", err.Error())
 	}
-	projects := map[gocql.UUID]string{uuid: "project number one"}
+	projects := map[gocql.UUID]string{projectId1: "project number one", projectId2:"project number two"}
 
 	salt := password.GenerateSalt(8)
 	user := models.User{
-		UUID:      gocql.TimeUUID(),
+		UUID:      userId1,
 		Email:     "user@gmail.com",
 		FirstName: "Jon",
 		LastName:  "Jones",
@@ -44,7 +53,7 @@ func (UsersTableSeeder) Run() {
 
 	salt = password.GenerateSalt(8)
 	user = models.User{
-		UUID:      id,
+		UUID:      userId2,
 		Email:     "owner@gmail.com",
 		FirstName: "Daniel",
 		LastName:  "Rigs",
