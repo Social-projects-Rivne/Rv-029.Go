@@ -1,11 +1,11 @@
 package validator
 
 import (
-	"testing"
-	"net/http/httptest"
 	"encoding/json"
-	"strings"
 	"errors"
+	"net/http/httptest"
+	"strings"
+	"testing"
 	//"fmt"
 )
 
@@ -37,7 +37,7 @@ func TestConfirmRegistrationRequestData_Validate_Error(t *testing.T) {
 	input := &struct {
 		Token string
 	}{
-		//Token: nil,
+	//Token: nil,
 	}
 	jsonInput, _ := json.Marshal(input)
 

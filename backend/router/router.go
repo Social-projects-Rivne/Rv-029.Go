@@ -1,15 +1,15 @@
 package router
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
-	"net/http"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
+	"github.com/gorilla/mux"
+	"net/http"
 )
 
 var Router *mux.Router
 
-func init()  {
+func init() {
 	Router = mux.NewRouter()
 	Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/public"))))
 
@@ -23,9 +23,14 @@ func init()  {
 	boardRouter := Router
 	applyBoardRoutes(boardRouter)
 	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
+
+	sprintRouter := Router
+	applySprintRoutes(sprintRouter)
+	//sprintRouter.Use(middlewares.AuthenticatedMiddleware)
+
 }
 
-func applyAuthRoutes(r *mux.Router)  {
+func applyAuthRoutes(r *mux.Router) {
 	r.HandleFunc("/login/", controllers.Login)
 	r.HandleFunc("/login", controllers.Login)
 
@@ -37,7 +42,7 @@ func applyAuthRoutes(r *mux.Router)  {
 	r.HandleFunc("/new-password", controllers.ResetPassword)
 }
 
-func applyAuthorizedUserRoutes(r *mux.Router)  {
+func applyAuthorizedUserRoutes(r *mux.Router) {
 	r.HandleFunc("/", controllers.Dashboard)
 	r.HandleFunc("", controllers.Dashboard)
 }
@@ -59,6 +64,19 @@ func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
-//func applyAdminRoutes(r *mux.Router)  {
-//	r.HandleFunc("/users", controllers.Users)
-//}
+func applySprintRoutes(r *mux.Router) {
+	r.HandleFunc("/project/board/{board_id}/sprint/create/", controllers.CreateSprint).Methods("POST")
+	r.HandleFunc("/project/board/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
+
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}/", controllers.UpdateSprint).Methods("PUT")
+	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT")
+
+	r.HandleFunc("/project/board/sprint/show/{sprint_id}/", controllers.SelectSprint).Methods("GET")
+	r.HandleFunc("/project/board/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET")
+
+	r.HandleFunc("/project/board/sprint/delete/{sprint_id}/", controllers.DeleteSprint).Methods("DELETE")
+	r.HandleFunc("/project/board/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE")
+
+	r.HandleFunc("/project/board/{board_id}/sprint/list/", controllers.SprintsList).Methods("GET")
+	r.HandleFunc("/project/board/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
+}

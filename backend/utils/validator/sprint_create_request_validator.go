@@ -11,45 +11,47 @@ import (
 	"net/http"
 )
 
-type BoardCreateRequestData struct {
+type SprintCreateRequestData struct {
 	*baseValidator
-	Name string `json:"name"`
-	Desc string `json:"desc"`
+	Goal   string `json:"goal"`
+	Desc   string `json:"desc"`
+	Status string `json:"status"`
 }
 
-func (b *BoardCreateRequestData) Validate(r *http.Request) error {
+func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 	var err error
 
-	err = b.ValidateRequired(b.Name)
+	err = s.ValidateRequired(s.Goal)
+
 	if err != nil {
 		log.Printf(err.Error())
 		return err
 	}
 
-	err = b.ValidateRequired(b.Desc)
+	err = s.ValidateRequired(s.Desc)
+
 	if err != nil {
 		log.Printf(err.Error())
 		return err
 	}
 
 	vars := mux.Vars(r)
-	projectId, err := gocql.ParseUUID(vars["project_id"])
+	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		log.Printf("Invalid Project ID: %v\n", err.Error())
+		log.Printf("Invalid Board ID: %v\n", err.Error())
 		return err
 	}
 
-	project := models.Project{}
-	project.UUID = projectId
-	err = project.findByID()
+	board := models.Board{}
+	board.ID = boardId
+	err = board.FindByID()
 
 	if err != nil {
 		return err
 	}
 
-	// Adding project data to request
-	ctx := context.WithValue(r.Context(), "project", project)
+	ctx := context.WithValue(r.Context(), "board", board)
 	r.WithContext(ctx)
 
 	return nil

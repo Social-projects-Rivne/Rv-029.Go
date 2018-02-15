@@ -1,39 +1,39 @@
 package mail
 
 import (
-	"net/smtp"
+	"crypto/tls"
+	"fmt"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"net/mail"
+	"net/smtp"
 	"path/filepath"
-	"io/ioutil"
-	"gopkg.in/yaml.v2"
-	"fmt"
-	"crypto/tls"
 )
 
-type mailer interface{
+type mailer interface {
 	Send(address []mail.Address, subject string, msg string) error
 }
 
 type smtpMailer struct {
 	Connection struct {
-		Host string
-		Port int
+		Host     string
+		Port     int
 		Username string
 		Password string
-		Auth string
-		Tls bool
+		Auth     string
+		Tls      bool
 	}
-	auth smtp.Auth
+	auth   smtp.Auth
 	Sender struct {
-		Name string
+		Name  string
 		Email string
 	}
 }
 
 var Mailer *smtpMailer
 
-func init()  {
+func init() {
 	filename, _ := filepath.Abs("./backend/config/mail.yml")
 	yamlFile, err := ioutil.ReadFile(filename)
 
@@ -71,7 +71,7 @@ func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 
 	// Setup message
 	message := ""
-	for k,v := range headers {
+	for k, v := range headers {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + msg
@@ -86,9 +86,9 @@ func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 
 	if m.Connection.Tls {
 		// TLS config
-		tlsconfig := &tls.Config {
+		tlsconfig := &tls.Config{
 			InsecureSkipVerify: true,
-			ServerName: m.Connection.Host,
+			ServerName:         m.Connection.Host,
 		}
 
 		c.StartTLS(tlsconfig)
@@ -126,5 +126,5 @@ func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 
 	c.Quit()
 
-	return  nil
+	return nil
 }

@@ -22,14 +22,12 @@ func (UsersTableSeeder) Run() {
 		FirstName: "User",
 		LastName:  "Goodqwe",
 		Salt:      salt,
-		Status:		1,
+		Status:    1,
 		Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
 		Role:      models.ROLE_USER,
 		CreatedAt: time.Now(),
 	}
 
-	
-	b.Insert("users",user)
-
+	b.Insert("users", user)
 
 }

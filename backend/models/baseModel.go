@@ -1,25 +1,24 @@
 package models
 
 import (
-	"reflect"
 	"fmt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/relops/cqlr"
 	"log"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"reflect"
 	"strings"
 	"time"
 )
 
-const PRIMERY  = "primery"
+const PRIMERY = "primery"
 
-type BaseModel struct{
-	Fields string
-	Pointers string
+type BaseModel struct {
+	Fields    string
+	Pointers  string
 	Condition string
 }
 
 func (b *BaseModel) GetFields(structure interface{}) {
-
 
 	s := reflect.ValueOf(structure).Type()
 
@@ -35,9 +34,9 @@ func (b *BaseModel) GetFields(structure interface{}) {
 
 }
 
-func (b *BaseModel) Insert(table string,structure interface{}) {
+func (b *BaseModel) Insert(table string, structure interface{}) {
 	b.GetFields(structure)
-	query := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v)",table,b.Fields,b.Pointers)
+	query := fmt.Sprintf("INSERT INTO %v (%v) VALUES (%v)", table, b.Fields, b.Pointers)
 
 	bind := cqlr.Bind(query, structure)
 	if err := bind.Exec(db.GetInstance().Session); err != nil {
@@ -57,23 +56,22 @@ func (b *BaseModel) UpdateHelper(structure interface{}) {
 
 	for i := 0; i < s.NumField(); i++ {
 
-		if strings.ToLower(typeOfS.Field(i).Tag.Get("key")) == PRIMERY || s.Field(i).Interface() == emptyTime || s.Field(i).Interface() == 0  || s.Field(i).Interface() == ""{
+		if strings.ToLower(typeOfS.Field(i).Tag.Get("key")) == PRIMERY || s.Field(i).Interface() == emptyTime || s.Field(i).Interface() == 0 || s.Field(i).Interface() == "" {
 			continue
 		}
 
 		fields = append(fields, fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql")))
 		// if i == s.NumField() - 1 {
-			// b.Fields += fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql"))
+		// b.Fields += fmt.Sprintf("%s = ? ", typeOfS.Field(i).Tag.Get("cql"))
 		// } else {
-			// b.Fields += fmt.Sprintf("%s = ? , ", typeOfS.Field(i).Tag.Get("cql"))
+		// b.Fields += fmt.Sprintf("%s = ? , ", typeOfS.Field(i).Tag.Get("cql"))
 		// }
 	}
 
 	b.Fields += strings.Join(fields, ", ")
 }
 
-
-func (b *BaseModel) Update(table string,structure interface{}) {
+func (b *BaseModel) Update(table string, structure interface{}) {
 
 	b.UpdateHelper(structure)
 
@@ -89,17 +87,16 @@ func (b *BaseModel) Update(table string,structure interface{}) {
 	b.Condition = ""
 }
 
-func (b *BaseModel) Where( column string, sign string ,value interface{} ) {
+func (b *BaseModel) Where(column string, sign string, value interface{}) {
 
 	b.Condition = " WHERE " + column + sign
-	b.Condition += fmt.Sprintf("%v",value)
+	b.Condition += fmt.Sprintf("%v", value)
 
 }
 
-func (b *BaseModel) AndWhere( column string, sign string ,value interface{} ) {
+func (b *BaseModel) AndWhere(column string, sign string, value interface{}) {
 
 	b.Condition += " AND " + column + sign
-	b.Condition += fmt.Sprintf("%v",value)
+	b.Condition += fmt.Sprintf("%v", value)
 
 }
-
