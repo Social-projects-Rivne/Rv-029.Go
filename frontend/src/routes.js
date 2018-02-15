@@ -14,11 +14,11 @@ import FormLogin from './components/FormLogin'
 import FormRegister from './components/FormRegister'
 import FormRestorePassword from './components/FormRestorePassword'
 import FormNewPassword from './components/FormNewPassword'
-import ProjectCard from "./components/ProjectCard";
 
 import HomePage from './containers/HomePage'
 import DefaultPage from './containers/DefaultPage'
 import ProjectsPage from "./containers/ProjectsPage";
+import CreateProjectsPage from "./containers/CreateProjectsPage";
 
 import auth from './services/auth'
 
@@ -66,15 +66,16 @@ export const routes = (
       <IndexRedirect to ="authorization/login"/>
       <Route path="authorization" component={FormContainer} onChange={reset}>
         <IndexRedirect to="login"/>
-        <Route name="login" path="login" component={FormLogin} onEnter={queryCheck}/>
-        <Route name="registration" path="register" component={FormRegister}/>
-        <Route name="restore-password" path="restore-password" component={FormRestorePassword}/>
-        <Route name="reset-password" path="new-password/:token" component={FormNewPassword}/>
+        <Route path="login" component={FormLogin} onEnter={queryCheck}/>
+        <Route path="register" component={FormRegister}/>
+        <Route path="restore-password" component={FormRestorePassword}/>
+        <Route path="new-password/:token" component={FormNewPassword}/>
       </Route>
 
       <Route component={DefaultPage} onEnter={authorizedMiddleware}>
-        <Route name="projects_list" path="projects" component={ProjectsPage}/>
-        <Route name="view_project" path="project/:id" component={ProjectCard}/>
+        <Route path="projects" component={ProjectsPage}/>
+        <Route path="project/create" component={CreateProjectsPage}/>
+        {/*<Route path="project/:id" component={ViewProjectPage}/>*/}
       </Route>
 
       <Route path="home-page" component={HomePage}/>
