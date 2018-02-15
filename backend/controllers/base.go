@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"net/http"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
+	"net/http"
 )
 
-// decodeAndValidate - entrypoint for deserialization and validation
+// decodeAndValidate - entry point for deserialization and validation
 // of the submission input
 func decodeAndValidate(r *http.Request, v validator.InputValidation) error {
 	// json decode the payload - obviously this could be abstracted
@@ -15,6 +15,31 @@ func decodeAndValidate(r *http.Request, v validator.InputValidation) error {
 		return err
 	}
 	defer r.Body.Close()
-	// peform validation on the InputValidation implementation
+	// perform validation on the InputValidation implementation
 	return v.Validate(r)
+}
+
+type failedResponse struct {
+	Status  bool
+	Message string
+}
+
+func (b *failedResponse) send(w http.ResponseWriter) {
+	jsonResponse, _ := json.Marshal(b)
+	w.WriteHeader(http.StatusBadRequest)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+}
+
+type successResponse struct {
+	Status  bool
+	Message string
+	Data    interface{}
+}
+
+func (b *successResponse) send(w http.ResponseWriter) {
+	jsonResponse, _ := json.Marshal(b)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }

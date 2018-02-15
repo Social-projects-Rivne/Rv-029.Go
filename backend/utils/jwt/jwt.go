@@ -1,11 +1,11 @@
 package jwt
 
 import (
+	gojwt "github.com/dgrijalva/jwt-go"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"path/filepath"
-	gojwt "github.com/dgrijalva/jwt-go"
-	"gopkg.in/yaml.v2"
 )
 
 type JWTConfig struct {

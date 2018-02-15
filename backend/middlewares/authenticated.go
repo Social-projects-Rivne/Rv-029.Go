@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"net/http"
-	"github.com/auth0/go-jwt-middleware"
-	"github.com/dgrijalva/jwt-go"
-	jwt2 "github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
+	"context"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"context"
+	jwt2 "github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
+	"github.com/auth0/go-jwt-middleware"
+	"github.com/dgrijalva/jwt-go"
+	"net/http"
 )
 
 // Check if user authenticated
@@ -18,10 +18,10 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 		if err != nil {
 			// return error response
 			response := struct {
-				Status bool
+				Status  bool
 				Message string
 			}{
-				Status: false,
+				Status:  false,
 				Message: "You are not authorized.",
 			}
 			jsonResponse, _ := json.Marshal(response)
@@ -38,10 +38,10 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 			err := currentUser.FindByID(claims["UUID"].(string))
 			if err != nil {
 				response := struct {
-					Status bool
+					Status  bool
 					Message string
 				}{
-					Status: false,
+					Status:  false,
 					Message: "You are not authorized.",
 				}
 				jsonResponse, _ := json.Marshal(response)
