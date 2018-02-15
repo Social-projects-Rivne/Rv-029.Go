@@ -10,9 +10,11 @@ import (
 	"github.com/gocql/gocql"
 )
 
+//BoardTableSeeder model
 type BoardTableSeeder struct {
 }
 
+//Run .
 func (BoardTableSeeder) Run() {
 
 	id, err := gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")
@@ -21,7 +23,7 @@ func (BoardTableSeeder) Run() {
 		return
 	}
 
-	projectID, err := gocql.ParseUUID("4aa8434e-1177-11e8-ba8e-c85b76da292c")
+	projectID, err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
 	if err != nil {
 		log.Fatal("Can't parse uuid ", err)
 		return
@@ -51,7 +53,7 @@ func (BoardTableSeeder) Run() {
 		return
 	}
 
-	projectID, err = gocql.ParseUUID("78c0071e-1179-11e8-b672-c85b76da292c")
+	projectID, err = gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
 	if err != nil {
 		log.Fatal("Can't parse uuid ", err)
 		return

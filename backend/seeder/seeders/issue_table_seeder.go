@@ -10,9 +10,11 @@ import (
 	"github.com/gocql/gocql"
 )
 
+//IssueTableSeeder model
 type IssueTableSeeder struct {
 }
 
+//Run .
 func (IssueTableSeeder) Run() {
 
 	id, err := gocql.ParseUUID("9228322a-1ca2-33e8-ba28-c06e22a3322c")
@@ -21,7 +23,7 @@ func (IssueTableSeeder) Run() {
 		return
 	}
 
-	projectID, err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
+	projectID, err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
 	if err != nil {
 		log.Fatal("Can't parse uuid ", err)
 		return
@@ -31,6 +33,17 @@ func (IssueTableSeeder) Run() {
 		log.Fatal("Can't parse uuid ", err)
 		return
 	}
+	sprintID, err := gocql.ParseUUID("152ac2c0-129b-11e8-b642-0ed5f89f718b")
+	if err != nil {
+		log.Fatal("Can't parse uuid ", err)
+		return
+	}
+	boardID, err :=gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")
+	if err != nil {
+		log.Fatal("Can't parse uuid ", err)
+		return
+	}
+
 
 	issue := &models.Issue{
 		UUID: id,         
@@ -40,17 +53,17 @@ func (IssueTableSeeder) Run() {
 		Estimate: 3,	  
 		UserID: userID,     
 		UserFirstName: "Jon",
-		UserLastName: "Jones" 
-		SprintID:      
-		BoardID      
-		BoardName    
-		ProjectID    
-		ProjectName  
-		CreatedAt    
-		UpdatedAt    
+		UserLastName: "Jones", 
+		SprintID: sprintID,     
+		BoardID: boardID,      
+		BoardName: "Seeder board 1",   
+		ProjectID: projectID,  
+		ProjectName: "project number one",
+		CreatedAt: time.Now(),    
+		UpdatedAt: time.Now(),    
 	}
 
-	if err := board.Insert(); err != nil {
+	if err := issue.Insert(); err != nil {
 		log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 		return
 	}
@@ -63,24 +76,46 @@ func (IssueTableSeeder) Run() {
 		log.Fatal("Can't parse uuid ", err)
 		return
 	}
-
-	projectID, err = gocql.ParseUUID("78c0071e-1179-11e8-b672-c85b76da292c")
+	projectID, err = gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
+	if err != nil {
+		log.Fatal("Can't parse uuid ", err)
+		return
+	}
+	userID, err = gocql.ParseUUID("9646324a-0aa2-11e8-ba15-b06ebf83499f")
+	if err != nil {
+		log.Fatal("Can't parse uuid ", err)
+		return
+	}
+	sprintID, err = gocql.ParseUUID("152ac54a-129b-11e8-b642-0ed5f89f718b")
+	if err != nil {
+		log.Fatal("Can't parse uuid ", err)
+		return
+	}
+	boardID, err = gocql.ParseUUID("93ab624a-1cb2-228a-ba34-c06ebf83322c")
 	if err != nil {
 		log.Fatal("Can't parse uuid ", err)
 		return
 	}
 
-	board = &models.Board{
-		ID:          id,
-		ProjectID:   projectID,
+	issue = &models.Issue{
+		UUID: id,         
+		Name: "Seeder issue 2",         
+		Status: models.STATUS_DONE,
+		Description: "Seeder description 2",	 
+		Estimate: 5,	  
+		UserID: userID,     
+		UserFirstName: "Nigga",
+		UserLastName: "Shit", 
+		SprintID: sprintID,     
+		BoardID: boardID,      
+		BoardName: "Seeder board 2",   
+		ProjectID: projectID,  
 		ProjectName: "project number two",
-		Name:        "Seeder board 2",
-		Desc:        "Some description 2",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		CreatedAt: time.Now(),    
+		UpdatedAt: time.Now(), 
 	}
 
-	if err := board.Insert(); err != nil {
+	if err := issue.Insert(); err != nil {
 		log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 		return
 	}
