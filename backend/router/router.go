@@ -9,7 +9,7 @@ import (
 
 var Router *mux.Router
 
-func init() {
+func init()  {
 	Router = mux.NewRouter()
 	Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/public"))))
 
@@ -31,6 +31,7 @@ func init() {
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
+	projectRouter.Use(middlewares.RoleMiddleware)
 
 
 
@@ -74,6 +75,7 @@ func applyProjectsRoutes(r *mux.Router)  {
 //func applyAdminRoutes(r *mux.Router)  {
 //	r.HandleFunc("/users", controllers.Users)
 //}
+
 func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")
 	r.HandleFunc("/project/{project_id}/board/create", controllers.CreateBoard).Methods("POST")
