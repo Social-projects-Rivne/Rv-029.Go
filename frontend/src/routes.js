@@ -21,6 +21,7 @@ import DefaultPage from './containers/DefaultPage'
 import ProjectsPage from "./containers/ProjectsPage";
 
 import auth from './services/auth'
+import ViewProjectPage from './components/ViewProjectPage'
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -74,7 +75,7 @@ export const routes = (
 
       <Route component={DefaultPage} onEnter={authorizedMiddleware}>
         <Route name="projects_list" path="projects" component={ProjectsPage}/>
-        <Route name="view_project" path="project/:id" component={ProjectCard}/>
+        <Route name="view_project" path="project/:id" component={ViewProjectPage}/>
       </Route>
 
       <Route path="home-page" component={HomePage}/>
