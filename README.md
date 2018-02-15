@@ -106,8 +106,8 @@ go run backend/main.go
 | Delete Sprint | project/board/sprint/delete/:sprint_id | - | Delete | YES |
 | Spints list | project/board/:board_id/sprint/list | - | GET | YES |
 | Show Sprint | project/board/sprint/show/:sprint_id | - | GET | YES |
-| Create Issue | project/board/:board_id/issue/create | JSON{ name, desc, assigned?, estimate?, status?, sprint_id? } | POST | YES |
-| Update Issue | project/board/issue/update/:issue_id | JSON{ name, desc, assigned?, estimate?, status?, sprint_id? ...fields } | PUT | YES |
+| Create Issue | project/board/:board_id/issue/create | JSON{ name, description, user_id?, estimate?, status?, sprint_id? } | POST | YES |
+| Update Issue | project/board/issue/update/:issue_id | JSON{ name, description, user_id?, estimate?, status?, sprint_id? ...fields } | PUT | YES |
 | Delete Issue | project/board/issue/delete/:issue_id | - | Delete | YES |
 | Board Issues list | project/board/:board_id/issue/list | - | GET | YES |
 | Sprint Issues list | project/board/sprint/:sprint_id/issue/list | - | GET | YES |
