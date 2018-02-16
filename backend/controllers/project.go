@@ -47,7 +47,10 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 	project.UUID = id
 	project.FindByID()
 
-	projectJsonResponse, _ := json.Marshal(project)
+	projectJsonResponse, err := json.Marshal(project)
+	if err != nil{
+		log.Println("Fail encode json in ShowProject method ",err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -78,10 +81,13 @@ func StoreProject(w http.ResponseWriter, r *http.Request)  {
 
 	project.Insert()
 
-	jsonResponse, _ := json.Marshal(projectResponse{
+	jsonResponse, err := json.Marshal(projectResponse{
 		Status:  true,
 		Message: "Your project created",
 	})
+	if err != nil{
+		log.Println("Fail encode json in StoreProject method ",err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -120,10 +126,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	project.Update()
 
-	jsonResponse, _ := json.Marshal(projectResponse{
+	jsonResponse, err := json.Marshal(projectResponse{
 		Status:  true,
 		Message: "Your project updated",
 	})
+	if err != nil{
+		log.Println("Fail encode json in UpdateProject method ",err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -144,10 +153,13 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	project.UUID = id
 	project.Delete()
 
-	jsonResponse, _ := json.Marshal(projectResponse{
+	jsonResponse, err := json.Marshal(projectResponse{
 		Status:  true,
 		Message: "Your project deleted",
 	})
+	if err != nil{
+		log.Println("Fail encode json in DeleteProject method ",err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")

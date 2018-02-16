@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
+import * as topBarActions from '../actions/ProjectsActions';
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
 import ModalNotification from './ModalNotification'
@@ -16,6 +17,7 @@ import Grid from 'material-ui/Grid'
 import Button from 'material-ui/Button'
 import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
+import auth from '../services/auth'
 
 const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
 
@@ -28,15 +30,15 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
       email: form.email,
       password: decorator.MD5Encode(form.password)
     })
-    .then((res) => {
-      sessionStorage.setItem('token', res.token)
-      browserHistory.push('/home-page')
+    .then((response) => {
+      if (response.data.Status) {
+          auth.logIn(response.data.Token)
+          browserHistory.push('/projects')
+      }
     })
-    .catch((err) => {
-      action.setStatus(err.response.data.status)
-
-      if (err.response.data.Message) {
-        action.setErrorMessage(err.response.data.Message)
+    .catch((error) => {
+      if (error.response && error.response.data.Message) {
+        action.setErrorMessage(error.response.data.Message)
       } else {
         action.setErrorMessage("Server error occured")
       }
@@ -165,7 +167,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    action: bindActionCreators(formActions, dispatch)
+    action: bindActionCreators(formActions, dispatch),
+    topBarAction: bindActionCreators(topBarActions, dispatch)
   }
 }
 

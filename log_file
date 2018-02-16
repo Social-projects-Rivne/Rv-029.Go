@@ -4,3 +4,9 @@
 2018/02/13 16:45:19 LogFile is opened
 2018/02/13 16:46:27 Error occured while finding issue by ID: line 2:26 no viable alternative at input 'LIMIT' (...FROM issues WHERE id =  [LIMIT]...)
 2018/02/14 13:23:24 Error occured inside models/issue.go: not found
+2018/02/16 12:18:09 Error in method Insert inside models/board.go: Undefined column name project_name
+2018/02/16 12:18:09 Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: Undefined column name project_name
+2018/02/16 12:18:09 Error in method Insert inside models/sprint.go: "Undefined column name project_id"
+2018/02/16 12:18:09 Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.sprint error: Undefined column name project_id
+2018/02/16 12:18:09 Error occured inside models/issue.go, method:Insert, error: Unmatched column names/values
+2018/02/16 12:18:09 Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: Unmatched column names/values

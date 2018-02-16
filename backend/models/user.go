@@ -33,6 +33,7 @@ type User struct {
 	Salt      string     `cql:"salt"`
 	Role      string     `cql:"role"`
 	Status    int        `cql:"status"`
+	Projects  map[gocql.UUID] string       `cql:"status"`
 	CreatedAt time.Time  `cql:"created_at"`
 	UpdatedAt time.Time  `cql:"updated_at"`
 }
@@ -49,19 +50,16 @@ type Userer interface {
 //Insert func inserts user object in database
 func (user *User) Insert() error {
 
-	if err := db.GetInstance().Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,
-		salt,role,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
-		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
-		user.Salt, user.Role, user.Status, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
-
+	if err := db.GetInstance().Session.Query(`INSERT INTO users (id, email, first_name, last_name, password, salt, role, status, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
+		user.UUID, user.Email, user.FirstName, user.LastName, user.Password, user.Salt, user.Role, user.Status, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 		log.Printf("Error occured while inserting user %v", err)
 		return err
 	}
 	return nil
 }
 
-//UpdateByID updates user by his id
-func (user *User) UpdateByID() error {
+//Update func finds user from database
+func (user *User) Update() error {
 
 	if err := db.GetInstance().Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {

@@ -3,7 +3,6 @@ package validator
 import (
 	"context"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"log"

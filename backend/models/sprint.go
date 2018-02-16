@@ -4,6 +4,7 @@ import (
 	"github.com/gocql/gocql"
 	"log"
 	"time"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 )
 
 type Sprint struct {
@@ -20,7 +21,7 @@ type Sprint struct {
 }
 
 func (s *Sprint) Insert() error {
-	err := Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+	err := db.GetInstance().Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
 		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
@@ -32,7 +33,7 @@ func (s *Sprint) Insert() error {
 }
 
 func (s *Sprint) Update() error {
-	err := Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
+	err := db.GetInstance().Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
 		s.Goal, s.Desc, s.Status, s.UpdatedAt, s.ID).Exec()
 
 	if err != nil {
@@ -44,7 +45,7 @@ func (s *Sprint) Update() error {
 }
 
 func (s *Sprint) Delete() error {
-	err := Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
+	err := db.GetInstance().Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method Delete inside models/sprint.go: %q\n", err.Error())
@@ -55,7 +56,7 @@ func (s *Sprint) Delete() error {
 }
 
 func (s *Sprint) FindById() error {
-	err := Session.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
+	err := db.GetInstance().Session.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
 		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
 
 	if err != nil {
@@ -68,7 +69,7 @@ func (s *Sprint) FindById() error {
 
 func (s *Sprint) List(boardId gocql.UUID) ([]map[string]interface{}, error) {
 
-	sprintsList, err := Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
+	sprintsList, err := db.GetInstance().Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Error in method List inside models/sprint.go: %q\n", err.Error())
