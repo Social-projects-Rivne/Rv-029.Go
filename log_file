@@ -10,3 +10,5 @@
 2018/02/16 12:18:09 Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.sprint error: Undefined column name project_id
 2018/02/16 12:18:09 Error occured inside models/issue.go, method:Insert, error: Unmatched column names/values
 2018/02/16 12:18:09 Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: Unmatched column names/values
+2018/02/16 22:06:38 Error occured inside models/issue.go, method:Insert, error: Unmatched column names/values
+2018/02/16 22:06:38 Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: Unmatched column names/values

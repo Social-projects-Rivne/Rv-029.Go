@@ -75,9 +75,7 @@ func StoreProject(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	user := r.Context().Value("user").(models.User)
-
-	project := models.Project{gocql.TimeUUID(),user.UUID,projectRequestData.Name,time.Now(),time.Now()}
+	project := models.Project{gocql.TimeUUID(),projectRequestData.Name,time.Now(),time.Now()}
 
 	project.Insert()
 

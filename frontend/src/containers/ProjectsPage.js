@@ -15,7 +15,7 @@ const pageTitle = "Projects"
 
 const styles = theme => ({
     root: {
-        flexGrow: 1,
+        // flexGrow: 1,
         minHeight: '100vh',
         backgroundColor: '#2B2D42',
     },
@@ -43,6 +43,7 @@ class ProjectsPage extends Component {
     componentDidMount() {
         axios.get(API_URL + 'project/list')
             .then((response) => {
+                console.log(response.data)
                 this.props.projectsActions.setProjects(response.data)
             })
             .catch((error) => {
@@ -61,10 +62,11 @@ class ProjectsPage extends Component {
     render () {
         const {classes, projects, } = this.props
 
+
         return (
-            <Grid container className={classes.root}>
+            <Grid className={classes.root}>
                 <Grid item xs={12}>
-                    <Grid container className={classes.list} justify="center" spacing={24}>
+                    <Grid container className={classes.list}>
                         {projects.currentProjects.map((value, index) => (
                             <Grid key={index} item>
                                <ProjectCard project={value}/>
