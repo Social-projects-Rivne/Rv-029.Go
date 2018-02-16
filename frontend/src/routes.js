@@ -21,6 +21,7 @@ import ProjectsPage from "./containers/ProjectsPage";
 import CreateProjectsPage from "./containers/CreateProjectsPage";
 
 import auth from './services/auth'
+import ViewProjectPage from './components/ViewProjectPage'
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -73,9 +74,10 @@ export const routes = (
       </Route>
 
       <Route component={DefaultPage} onEnter={authorizedMiddleware}>
+
         <Route path="projects" component={ProjectsPage}/>
         <Route path="project/create" component={CreateProjectsPage}/>
-        {/*<Route path="project/:id" component={ViewProjectPage}/>*/}
+        <Route path="project/:id" component={ViewProjectPage}/>
       </Route>
 
       <Route path="home-page" component={HomePage}/>

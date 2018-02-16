@@ -20,7 +20,7 @@ function ProjectCard(props) {
                 </CardContent>
                 <CardActions>
                     <Link
-                          to={"project/" + project.id}
+                          to={`project/${project.id}`}
                           className={classes.link}>
                         <Button
                           size="small"
