@@ -5,6 +5,7 @@ import (
 	"github.com/gocql/gocql"
 	"fmt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"log"
 )
 
 type Project struct {
@@ -12,7 +13,6 @@ type Project struct {
 	Name 	  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-
 }
 
 const INSERT_PROJECT = "INSERT INTO projects (id,name,created_at,updated_at) VALUES (?,?,?,?);"
@@ -52,8 +52,32 @@ func (project *Project) FindByID() error {
 	return db.GetInstance().Session.Query(FIND_PROJECT,project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
 }
 
-func (project *Project) GetAll() ([]map[string]interface{}, error) {
+func (project *Project) GetAll() ([]Project, error) {
+	var projects []Project
+	var row map[string]interface{}
 
-	return db.GetInstance().Session.Query(GET_PROJECTS).PageState(nil).PageSize(4).Iter().SliceMap()
+	iterator := db.GetInstance().Session.Query(GET_PROJECTS).Consistency(gocql.One).Iter()
 
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			projects = append(projects, Project{
+				UUID: 		row["id"].(gocql.UUID),
+				Name: 		row["name"].(string),
+				CreatedAt: 	row["created_at"].(time.Time),
+				UpdatedAt: 	row["updated_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
+		log.Printf("Can`t fetch all projects from DB. Error: %s", err.Error())
+	}
+
+	return projects, nil
 }

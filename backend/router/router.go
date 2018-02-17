@@ -68,7 +68,7 @@ func applyProjectsRoutes(r *mux.Router)  {
 	r.HandleFunc("/show/{id}/", controllers.ShowProjects).Methods("GET")
 	r.HandleFunc("/show/{id}", controllers.ShowProjects).Methods("GET")
 
-	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 }
 

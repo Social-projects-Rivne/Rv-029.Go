@@ -27,7 +27,9 @@ const styles = theme => ({
         padding: theme.spacing.unit * 2,
     },
     list: {
-        paddingTop: 20
+        paddingTop: 20,
+        paddingLeft: 80,
+        paddingRight: 80,
     }
 });
 
@@ -43,7 +45,6 @@ class ProjectsPage extends Component {
     componentDidMount() {
         axios.get(API_URL + 'project/list')
             .then((response) => {
-                console.log(response.data)
                 this.props.projectsActions.setProjects(response.data)
             })
             .catch((error) => {
