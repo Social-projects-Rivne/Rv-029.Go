@@ -21,7 +21,7 @@ import auth from '../services/auth'
 
 const styles = {
     root: {
-        width: '100%',
+        width: '100%'
     },
     flex: {
         flex: 1,

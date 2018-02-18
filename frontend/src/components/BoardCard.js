@@ -19,7 +19,7 @@ function ProjectCard(props) {
         </CardContent>
         <CardActions>
           <Link
-            // to="view_board"
+            to={`board/${board.id}`}
             className={classes.link}>
             <Button
               size="small"

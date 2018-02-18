@@ -5,11 +5,8 @@ import TopBar from '../components/TopBar';
 
 const DefaultPage = ({ classes, children }) => {
   return (
-    <Grid container
-      className={classes.root}
-      spacing={0}
-      // alignItems={'center'}
-      justify={'center'} >
+    <Grid
+      className={classes.root} >
       <TopBar />
       { children }
     </Grid>
@@ -19,7 +16,7 @@ const DefaultPage = ({ classes, children }) => {
 const styles = {
   root: {
     minHeight: '100vh',
-    backgroundColor: '#2B2D42',
+    backgroundColor: '#2B2D42'
   }
 }
 
