@@ -3,95 +3,71 @@ package controllers
 import (
 	"net/http"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
-	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"time"
 	"github.com/gorilla/mux"
 	"log"
+	"fmt"
 )
-
-
-type projectResponse struct {
-	Status  bool
-	Message string
-}
 
 
 func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	project := models.Project{}
 
-	projects , err := project.GetAll()
+	projects , err := project.GetProjectList()
 	if err != nil{
-		log.Fatal("Can't get all projects ",err)
+		log.Printf("Error in controllers/project.go . Can't get projects list, method: ProjectsList where: %s", err.Error())
+		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
+		response.send(w)
+		return
 	}
 
-	projectJsonResponse, _ := json.Marshal(projects)
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(projectJsonResponse)
+	response := successResponse{true,"Projects list",projects}
+	response.send(w)
 }
 
 func ShowProjects(w http.ResponseWriter, r *http.Request) {
-
-
 	vars := mux.Vars(r)
 
-	id , err := gocql.ParseUUID(vars["id"])
+	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
+		log.Printf("Error in controllers/project.go . Can't parse uuid, method: ShowProjects where: %s", err.Error())
+		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
+		response.send(w)
+		return
 	}
-	project := models.Project{}
 
-	project.UUID = id
+	project := models.Project{}
+	project.UUID = projectId
 	project.FindByID()
 
-	projectJsonResponse, err := json.Marshal(project)
-	if err != nil{
-		log.Println("Fail encode json in ShowProject method ",err)
-	}
+	response := successResponse{true,"Projects list",project}
+	response.send(w)
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(projectJsonResponse)
 }
 
 
-func StoreProject(w http.ResponseWriter, r *http.Request)  {
+func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
 	var projectRequestData validator.ProjectRequestData
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		jsonResponse, _ := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := failedResponse{false, err.Error()}
+		response.send(w)
 		return
 	}
 
 	user := r.Context().Value("user").(models.User)
 
-	project := models.Project{gocql.TimeUUID(),user.UUID,projectRequestData.Name,time.Now(),time.Now()}
-
+	project := models.Project{gocql.TimeUUID(),projectRequestData.Name,time.Now(),time.Now()}
 	project.Insert()
 
-	jsonResponse, err := json.Marshal(projectResponse{
-		Status:  true,
-		Message: "Your project created",
-	})
-	if err != nil{
-		log.Println("Fail encode json in StoreProject method ",err)
-	}
+	user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := successResponse{true, "Project has created",nil}
+	response.send(w)
 
 }
 
@@ -101,42 +77,31 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		jsonResponse, _ := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := failedResponse{false, err.Error()}
+		response.send(w)
 		return
 	}
 
 	vars := mux.Vars(r)
 
-	id , err := gocql.ParseUUID(vars["id"])
+	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
+		log.Printf("Error in controllers/project.go . Can't parse uuid, method: UpdateProject where: %s", err.Error())
+		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
+		response.send(w)
+		return
 	}
+
 	project := models.Project{}
 
-	project.UUID = id
+	project.UUID = projectId
 	project.Name = projectRequestData.Name
 	project.UpdatedAt = time.Now()
 
 	project.Update()
 
-	jsonResponse, err := json.Marshal(projectResponse{
-		Status:  true,
-		Message: "Your project updated",
-	})
-	if err != nil{
-		log.Println("Fail encode json in UpdateProject method ",err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := successResponse{true, "Project has updated",nil}
+	response.send(w)
 
 }
 
@@ -144,25 +109,22 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 
 	vars := mux.Vars(r)
 
-	id , err := gocql.ParseUUID(vars["id"])
+	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
+		log.Printf("Error in controllers/project.go . Can't parse uuid, method: DeleteProject where: %s", err.Error())
+		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
+		response.send(w)
+		return
 	}
 	project := models.Project{}
+	project.UUID = projectId
 
-	project.UUID = id
+	user := r.Context().Value("user").(models.User)
+	user.DeleteProject(project.UUID)
+
 	project.Delete()
 
-	jsonResponse, err := json.Marshal(projectResponse{
-		Status:  true,
-		Message: "Your project deleted",
-	})
-	if err != nil{
-		log.Println("Fail encode json in DeleteProject method ",err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := successResponse{true, "Project has deleted",nil}
+	response.send(w)
 }
 
