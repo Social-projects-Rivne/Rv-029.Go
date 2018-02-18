@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+//Project type
 type Project struct {
 	UUID      gocql.UUID
 	Name 	  string
@@ -23,6 +24,7 @@ const GET_PROJECTS = "SELECT id,name,created_at,updated_at from projects"
 
 
 
+//Insert func inserts project obj into table
 func (project *Project) Insert() {
 
 	if err := db.GetInstance().Session.Query(INSERT_PROJECT,project.UUID, project.Name,  project.CreatedAt, project.UpdatedAt).Exec(); err != nil {
@@ -31,6 +33,7 @@ func (project *Project) Insert() {
 
 }
 
+//Update func updates name of the project by id
 func (project *Project) Update() {
 
 	if err := db.GetInstance().Session.Query(UPDATE_PROJECT,
@@ -40,6 +43,7 @@ func (project *Project) Update() {
 
 }
 
+//Delete func deletes project by id
 func (project *Project) Delete() {
 
 	if err := db.GetInstance().Session.Query(DELETE_PROJECT,	project.UUID).Exec(); err != nil {
@@ -48,10 +52,12 @@ func (project *Project) Delete() {
 
 }
 
+//FindByID func finds project by id
 func (project *Project) FindByID() error {
 	return db.GetInstance().Session.Query(FIND_PROJECT,project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
 }
 
+//GetAll func gets all projects from
 func (project *Project) GetAll() ([]Project, error) {
 	var projects []Project
 	var row map[string]interface{}

@@ -1,10 +1,11 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 var Router *mux.Router
@@ -91,6 +92,27 @@ func applyBoardRoutes(r *mux.Router) {
 
 	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
+}
+
+func applyIssueRoutes(r *mux.Router) {
+	r.HandleFunc("project/board/{board_id}/issue/create/", controllers.StoreIssue).Methods("POST")
+	r.HandleFunc("project/board/{board_id}/issue/create", controllers.StoreIssue).Methods("POST")
+
+	r.HandleFunc("project/board/issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT")
+	r.HandleFunc("project/board/issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT")
+
+	r.HandleFunc("project/board/issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE")
+	r.HandleFunc("project/board/issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE")
+
+	r.HandleFunc("project/board/{board_id}/issue/list/", controllers.BoardIssueslist).Methods("GET")
+	r.HandleFunc("project/board/{board_id}/issue/list", controllers.BoardIssueslist).Methods("GET")
+
+	r.HandleFunc("project/board/sprint/{sprint_id}/issue/list/", controllers.SprintIssueslist).Methods("GET")
+	r.HandleFunc("project/board/sprint/{sprint_id}/issue/list", controllers.SprintIssueslist).Methods("GET")
+
+	r.HandleFunc("project/board/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
+	r.HandleFunc("project/board/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
+
 }
 
 func applySprintRoutes(r *mux.Router) {

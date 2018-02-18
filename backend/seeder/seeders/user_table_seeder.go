@@ -9,10 +9,12 @@ import (
 	"log"
 )
 
+//UsersTableSeeder model
 type UsersTableSeeder struct {
 
 }
 
+//Run .
 func (UsersTableSeeder) Run() {
 
 	projectId1 , err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")

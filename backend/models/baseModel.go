@@ -2,12 +2,13 @@ package models
 
 import (
 	"fmt"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
-	"github.com/relops/cqlr"
 	"log"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/relops/cqlr"
 )
 
 const PRIMERY = "primery"

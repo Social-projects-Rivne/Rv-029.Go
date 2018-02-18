@@ -1,17 +1,27 @@
 package main
 
 import (
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"fmt"
 	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 )
 
 func main() {
 	var cmd string
+
+	f, err := os.OpenFile(fmt.Sprint("./logs/", time.Now().Format("2006_01_02"), "_task_manager.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
 
 	if len(os.Args) > 1 {
 		cmd = os.Args[1]
