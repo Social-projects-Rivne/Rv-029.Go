@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { browserHistory } from 'react-router';
 
 export default {
     'isAuthorized': () => {
@@ -8,6 +9,8 @@ export default {
         sessionStorage.removeItem('token')
 
         delete axios.defaults.headers.common['Authorization']
+
+        browserHistory.push('/authorization/login')
     },
     'logIn': (token) => {
         sessionStorage.setItem('token', token)

@@ -56,9 +56,9 @@ const queryCheck = (nextState, replace, callback) => {
 const authorizedMiddleware = (nextState, replace, callback) => {
     if (!auth.injectAuthHeader()) {
        replace('/authorization/login')
-    } else {
-        callback()
     }
+
+    callback()
 }
 
 export const routes = (
