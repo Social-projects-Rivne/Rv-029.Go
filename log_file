@@ -12,3 +12,1122 @@
 2018/02/16 12:18:09 Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: Unmatched column names/values
 2018/02/16 22:06:38 Error occured inside models/issue.go, method:Insert, error: Unmatched column names/values
 2018/02/16 22:06:38 Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: Unmatched column names/values
+2018/02/16 22:48:30 http: panic serving [::1]:49616: runtime error: invalid memory address or nil pointer dereference
+goroutine 19 [running]:
+net/http.(*conn).serve.func1(0xc4201f8000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5300)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/gocql/gocql.(*Session).Query(0x0, 0x7fb7fd, 0x93, 0xc42021e290, 0x1, 0x1, 0xc420101a70)
+	/home/mike/go/src/github.com/gocql/gocql/session.go:314 +0x26
+github.com/gocql/gocql.(*Query).Consistency(...)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/user.go:100
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*User).FindByEmail(0xc420228160, 0xc420228160, 0xc420212120)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/user.go:102 +0xe4
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.Login(0x99bac0, 0xc420220000, 0xc420244300)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/auth.go:52 +0xce
+net/http.HandlerFunc.ServeHTTP(0x7ffdc8, 0x99bac0, 0xc420220000, 0xc420244300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201075e0, 0x99bac0, 0xc420220000, 0xc420244300)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420220000, 0xc4201fe100)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc42016b4a0, 0x99bac0, 0xc420220000, 0xc4201fe100)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4201ea000, 0x99bac0, 0xc420220000, 0xc4201fe100)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201f8000, 0x99c000, 0xc4201e40c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/16 22:48:30 http: panic serving [::1]:49618: runtime error: invalid memory address or nil pointer dereference
+goroutine 11 [running]:
+net/http.(*conn).serve.func1(0xc4201a4500)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5300)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/gocql/gocql.(*Session).Query(0x0, 0x7fb7fd, 0x93, 0xc42021e550, 0x1, 0x1, 0xc420101a70)
+	/home/mike/go/src/github.com/gocql/gocql/session.go:314 +0x26
+github.com/gocql/gocql.(*Query).Consistency(...)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/user.go:100
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*User).FindByEmail(0xc420228210, 0xc420228210, 0xc420212480)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/user.go:102 +0xe4
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.Login(0x99bac0, 0xc4202200e0, 0xc420244600)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/auth.go:52 +0xce
+net/http.HandlerFunc.ServeHTTP(0x7ffdc8, 0x99bac0, 0xc4202200e0, 0xc420244600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201075e0, 0x99bac0, 0xc4202200e0, 0xc420244600)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202200e0, 0xc420124a00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc42016b4a0, 0x99bac0, 0xc4202200e0, 0xc420124a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4201ea000, 0x99bac0, 0xc4202200e0, 0xc420124a00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201a4500, 0x99c000, 0xc420061600)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/16 22:49:26 http: panic serving [::1]:50092: interface conversion: interface {} is string, not gocql.UUID
+goroutine 61 [running]:
+net/http.(*conn).serve.func1(0xc420280000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420060400)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4202940e0, 0xc4202b2600)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc42000c640, 0x99bac0, 0xc4202940e0, 0xc4202b2600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4202940e0, 0xc4202b2600)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202940e0, 0xc420258500)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc42017d480, 0x99bac0, 0xc4202940e0, 0xc420258500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420266000, 0x99bac0, 0xc4202940e0, 0xc420258500)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc420280000, 0x99c000, 0xc420202540)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/16 22:49:26 http: panic serving [::1]:50094: interface conversion: interface {} is string, not gocql.UUID
+goroutine 63 [running]:
+net/http.(*conn).serve.func1(0xc420280140)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420060500)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4202941c0, 0xc4202b2900)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc42000c840, 0x99bac0, 0xc4202941c0, 0xc4202b2900)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4202941c0, 0xc4202b2900)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202941c0, 0xc42022e200)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc42017d480, 0x99bac0, 0xc4202941c0, 0xc42022e200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420266000, 0x99bac0, 0xc4202941c0, 0xc42022e200)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc420280140, 0x99c000, 0xc420202700)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/16 23:07:24 Error occured in controllers/issue.go while decoding JSON, method: StoreIssue where: json: cannot unmarshal string into Go struct field CreateIssueRequestData.estimate of type int
+2018/02/16 23:07:48 Error occured inside models/issue.go, method:Insert, error: Unmatched column names/values
+2018/02/16 23:07:48 Error occured in controllers/issue.go, method:StoreIssue, where: issue.Insert, error: Unmatched column names/values
+2018/02/16 23:08:53 Error occured inside models/issue.go, method:Insert, error: Unmatched column names/values
+2018/02/16 23:08:55 Error occured in controllers/issue.go, method:StoreIssue, where: issue.Insert, error: Unmatched column names/values
+2018/02/16 23:12:30 Error occured inside models/issue.go, method:FindByID, error: gocql: not enough columns to scan into: have 14 want 15
+2018/02/16 23:12:30 Error occured in controllers/issue.go method: UpdateIssue, where: issue.FindByID, error: gocql: not enough columns to scan into: have 14 want 15
+2018/02/16 23:14:43 Error occured inside models/issue.go, method:FindByID, error: can not unmarshal into non-pointer time.Time
+2018/02/16 23:14:43 Error occured in controllers/issue.go method: UpdateIssue, where: issue.FindByID, error: can not unmarshal into non-pointer time.Time
+2018/02/16 23:26:18 Error occured in controllers/issue.go while decoding JSON, method: DeleteIssue where: EOF
+2018/02/16 23:56:25 Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: line 1:7 no viable alternative at input 'SELECT' (SELECT [SELECT]...)
+2018/02/16 23:56:25 Error occured in controllers/issue.go method: BoardIssueslist, where: issue.GetBoardIssueslist, error: line 1:7 no viable alternative at input 'SELECT' (SELECT [SELECT]...)
+2018/02/16 23:59:03 Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: line 1:7 no viable alternative at input 'SELECT' (SELECT [SELECT]...)
+2018/02/16 23:59:03 Error occured in controllers/issue.go method: BoardIssueslist, where: issue.GetBoardIssueslist, error: line 1:7 no viable alternative at input 'SELECT' (SELECT [SELECT]...)
+2018/02/17 00:03:36 Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING
+2018/02/17 00:03:36 Error occured in controllers/issue.go method: BoardIssueslist, where: issue.GetBoardIssueslist, error: Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING
+2018/02/17 18:30:55 http: panic serving [::1]:46978: interface conversion: interface {} is string, not gocql.UUID
+goroutine 57 [running]:
+net/http.(*conn).serve.func1(0xc42029c0a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420060d00)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4202642a0, 0xc420232400)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc42000cc80, 0x99bac0, 0xc4202642a0, 0xc420232400)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc42011d5e0, 0x99bac0, 0xc4202642a0, 0xc420232400)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202642a0, 0xc42013ac00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ee080, 0x99bac0, 0xc4202642a0, 0xc42013ac00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420272000, 0x99bac0, 0xc4202642a0, 0xc42013ac00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42029c0a0, 0x99c000, 0xc4201fef80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 18:30:56 http: panic serving [::1]:46982: interface conversion: interface {} is string, not gocql.UUID
+goroutine 83 [running]:
+net/http.(*conn).serve.func1(0xc4202aa320)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4202b8340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4202bc0e0, 0xc4202e2700)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4202b62e0, 0x99bac0, 0xc4202bc0e0, 0xc4202e2700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc42011d5e0, 0x99bac0, 0xc4202bc0e0, 0xc4202e2700)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202bc0e0, 0xc4202e2500)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ee080, 0x99bac0, 0xc4202bc0e0, 0xc4202e2500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420272000, 0x99bac0, 0xc4202bc0e0, 0xc4202e2500)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202aa320, 0x99c000, 0xc4202b81c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 18:48:08 Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING
+2018/02/17 18:48:08 Error occured in controllers/issue.go method: BoardIssueslist, where: issue.GetBoardIssueslist, error: Cannot execute this query as it might involve data filtering and thus may have unpredictable performance. If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING
+2018/02/17 19:52:49 Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: gocql: no response received from cassandra within timeout period
+2018/02/17 19:52:49 Error occured in controllers/issue.go method: BoardIssueslist, where: issue.GetBoardIssueslist, error: gocql: no response received from cassandra within timeout period
+2018/02/17 19:54:47 http: panic serving [::1]:48230: interface conversion: interface {} is string, not gocql.UUID
+goroutine 14 [running]:
+net/http.(*conn).serve.func1(0xc4201c2460)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420218dc0)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025c2a0, 0xc420260500)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420224520, 0x99bac0, 0xc42025c2a0, 0xc420260500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025c2a0, 0xc420260500)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025c2a0, 0xc420116c00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0c0, 0x99bac0, 0xc42025c2a0, 0xc420116c00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202264e0, 0x99bac0, 0xc42025c2a0, 0xc420116c00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201c2460, 0x99c000, 0xc420061d40)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 19:54:47 http: panic serving [::1]:48232: interface conversion: interface {} is string, not gocql.UUID
+goroutine 25 [running]:
+net/http.(*conn).serve.func1(0xc4202f2000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4201ea540)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4201e81c0, 0xc420264300)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4202061c0, 0x99bac0, 0xc4201e81c0, 0xc420264300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4201e81c0, 0xc420264300)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201e81c0, 0xc420264100)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0c0, 0x99bac0, 0xc4201e81c0, 0xc420264100)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202264e0, 0x99bac0, 0xc4201e81c0, 0xc420264100)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202f2000, 0x99c000, 0xc4201ea3c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 19:55:40 http: multiple response.WriteHeader calls
+2018/02/17 19:55:53 http: panic serving [::1]:48734: interface conversion: interface {} is string, not gocql.UUID
+goroutine 16 [running]:
+net/http.(*conn).serve.func1(0xc4201c25a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420219200)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025c460, 0xc420260d00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420224c00, 0x99bac0, 0xc42025c460, 0xc420260d00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025c460, 0xc420260d00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025c460, 0xc420264800)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0c0, 0x99bac0, 0xc42025c460, 0xc420264800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202264e0, 0x99bac0, 0xc42025c460, 0xc420264800)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201c25a0, 0x99c000, 0xc420332000)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 19:55:53 http: panic serving [::1]:48736: interface conversion: interface {} is string, not gocql.UUID
+goroutine 84 [running]:
+net/http.(*conn).serve.func1(0xc42036c320)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4202192c0)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025c540, 0xc420261000)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420224dc0, 0x99bac0, 0xc42025c540, 0xc420261000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025c540, 0xc420261000)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025c540, 0xc420360600)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0c0, 0x99bac0, 0xc42025c540, 0xc420360600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202264e0, 0x99bac0, 0xc42025c540, 0xc420360600)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42036c320, 0x99c000, 0xc420354180)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 19:56:53 http: panic serving [::1]:49080: interface conversion: interface {} is string, not gocql.UUID
+goroutine 32 [running]:
+net/http.(*conn).serve.func1(0xc4202f2320)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420219400)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025c620, 0xc420261300)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4202250c0, 0x99bac0, 0xc42025c620, 0xc420261300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025c620, 0xc420261300)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025c620, 0xc420360c00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0c0, 0x99bac0, 0xc42025c620, 0xc420360c00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202264e0, 0x99bac0, 0xc42025c620, 0xc420360c00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202f2320, 0x99c000, 0xc420332100)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 19:56:53 http: panic serving [::1]:49082: interface conversion: interface {} is string, not gocql.UUID
+goroutine 33 [running]:
+net/http.(*conn).serve.func1(0xc4202f23c0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4202194c0)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025c700, 0xc420261600)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420225280, 0x99bac0, 0xc42025c700, 0xc420261600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025c700, 0xc420261600)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025c700, 0xc420264b00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0c0, 0x99bac0, 0xc42025c700, 0xc420264b00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202264e0, 0x99bac0, 0xc42025c700, 0xc420264b00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202f23c0, 0x99c000, 0xc4201ead80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:09:44 Error occured inside models/issue.go, method:FindByID, error: not found
+2018/02/17 20:09:44 Error occured in controllers/issue.go method: ShowIssue, where: issue.FindByID, error: not found
+2018/02/17 20:31:18 http: panic serving [::1]:50148: runtime error: index out of range
+goroutine 21 [running]:
+net/http.(*conn).serve.func1(0xc420254000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201e6a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc420260000, 0xc420212400)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc420260000, 0xc420212400)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc420260000, 0xc420212400)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420260000, 0xc420212200)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc420260000, 0xc420212200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc420260000, 0xc420212200)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc420254000, 0x99c000, 0xc4201fa3c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:20 http: panic serving [::1]:50150: runtime error: index out of range
+goroutine 66 [running]:
+net/http.(*conn).serve.func1(0xc4202ee000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420246a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe000, 0xc4202f4200)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe000, 0xc4202f4200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe000, 0xc4202f4200)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe000, 0xc4202f4000)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe000, 0xc4202f4000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe000, 0xc4202f4000)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ee000, 0x99c000, 0xc4202d6080)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:21 http: panic serving [::1]:50154: runtime error: index out of range
+goroutine 68 [running]:
+net/http.(*conn).serve.func1(0xc4202ee0a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420246a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe0e0, 0xc4202f4500)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe0e0, 0xc4202f4500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe0e0, 0xc4202f4500)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe0e0, 0xc4202f4300)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe0e0, 0xc4202f4300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe0e0, 0xc4202f4300)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ee0a0, 0x99c000, 0xc4202d6280)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:21 http: panic serving [::1]:50156: runtime error: index out of range
+goroutine 52 [running]:
+net/http.(*conn).serve.func1(0xc4201c4320)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201e8a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe1c0, 0xc4202f4700)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe1c0, 0xc4202f4700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe1c0, 0xc4202f4700)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe1c0, 0xc420116c00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe1c0, 0xc420116c00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe1c0, 0xc420116c00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201c4320, 0x99c000, 0xc42022e6c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:34 http: panic serving [::1]:50160: runtime error: index out of range
+goroutine 71 [running]:
+net/http.(*conn).serve.func1(0xc4202ee140)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201e8a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe2a0, 0xc4202f4a00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe2a0, 0xc4202f4a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe2a0, 0xc4202f4a00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe2a0, 0xc4202f4800)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe2a0, 0xc4202f4800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe2a0, 0xc4202f4800)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ee140, 0x99c000, 0xc4202d6580)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:44 http: panic serving [::1]:50176: interface conversion: interface {} is string, not gocql.UUID
+goroutine 23 [running]:
+net/http.(*conn).serve.func1(0xc4202540a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc42022e800)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4201ce620, 0xc420116e00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4201cb340, 0x99bac0, 0xc4201ce620, 0xc420116e00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4201ce620, 0xc420116e00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201ce620, 0xc420212700)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4201ce620, 0xc420212700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4201ce620, 0xc420212700)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202540a0, 0x99c000, 0xc4201fa680)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:44 http: panic serving [::1]:50178: interface conversion: interface {} is string, not gocql.UUID
+goroutine 25 [running]:
+net/http.(*conn).serve.func1(0xc4202541e0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc42022e8c0)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4201ce700, 0xc420117100)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4201cb520, 0x99bac0, 0xc4201ce700, 0xc420117100)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4201ce700, 0xc420117100)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201ce700, 0xc420212800)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4201ce700, 0xc420212800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4201ce700, 0xc420212800)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202541e0, 0x99c000, 0xc4201fa800)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:31:54 http: panic serving [::1]:50240: runtime error: index out of range
+goroutine 55 [running]:
+net/http.(*conn).serve.func1(0xc4201c43c0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420041a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4201ce7e0, 0xc420117500)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4201ce7e0, 0xc420117500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4201ce7e0, 0xc420117500)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201ce7e0, 0xc420117300)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4201ce7e0, 0xc420117300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4201ce7e0, 0xc420117300)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201c43c0, 0x99c000, 0xc42022e900)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:10 http: panic serving [::1]:50378: runtime error: index out of range
+goroutine 57 [running]:
+net/http.(*conn).serve.func1(0xc4201c4460)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420041a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202601c0, 0xc420212a00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202601c0, 0xc420212a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202601c0, 0xc420212a00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202601c0, 0xc420117600)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202601c0, 0xc420117600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202601c0, 0xc420117600)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201c4460, 0x99c000, 0xc42022ea80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:25 http: panic serving [::1]:50500: runtime error: index out of range
+goroutine 58 [running]:
+net/http.(*conn).serve.func1(0xc4201c4500)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201e6a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe380, 0xc4202f4c00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe380, 0xc4202f4c00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe380, 0xc4202f4c00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe380, 0xc420117700)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe380, 0xc420117700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe380, 0xc420117700)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201c4500, 0x99c000, 0xc42022eb40)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:38 http: panic serving [::1]:50570: interface conversion: interface {} is string, not gocql.UUID
+goroutine 76 [running]:
+net/http.(*conn).serve.func1(0xc4202ee320)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4201fad80)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc420260380, 0xc420212e00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4201ff0a0, 0x99bac0, 0xc420260380, 0xc420212e00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc420260380, 0xc420212e00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420260380, 0xc4202f5600)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc420260380, 0xc4202f5600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc420260380, 0xc4202f5600)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ee320, 0x99c000, 0xc4202d6900)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:38 http: panic serving [::1]:50572: interface conversion: interface {} is string, not gocql.UUID
+goroutine 79 [running]:
+net/http.(*conn).serve.func1(0xc4202ee780)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4201fae40)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc420260460, 0xc420213100)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4201ff260, 0x99bac0, 0xc420260460, 0xc420213100)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc420260460, 0xc420213100)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420260460, 0xc4202f5700)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc420260460, 0xc4202f5700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc420260460, 0xc4202f5700)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ee780, 0x99c000, 0xc4202d6b40)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:45 http: panic serving [::1]:50574: runtime error: index out of range
+goroutine 30 [running]:
+net/http.(*conn).serve.func1(0xc420254320)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420246a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc420440000, 0xc420448100)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc420440000, 0xc420448100)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc420440000, 0xc420448100)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420440000, 0xc420213300)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc420440000, 0xc420213300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc420440000, 0xc420213300)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc420254320, 0x99c000, 0xc4201faec0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:46 http: panic serving [::1]:50576: runtime error: index out of range
+goroutine 80 [running]:
+net/http.(*conn).serve.func1(0xc4202ee820)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420247a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe620, 0xc4202f5a00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe620, 0xc4202f5a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe620, 0xc4202f5a00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe620, 0xc4202f5800)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe620, 0xc4202f5800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe620, 0xc4202f5800)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ee820, 0x99c000, 0xc4202d6c80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:46 http: panic serving [::1]:50578: runtime error: index out of range
+goroutine 59 [running]:
+net/http.(*conn).serve.func1(0xc42007c0a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201eda68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe000, 0xc4202f4200)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe000, 0xc4202f4200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe000, 0xc4202f4200)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe000, 0xc4202f4000)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe000, 0xc4202f4000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe000, 0xc4202f4000)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42007c0a0, 0x99c000, 0xc420060040)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:47 http: panic serving [::1]:50580: runtime error: index out of range
+goroutine 84 [running]:
+net/http.(*conn).serve.func1(0xc4201400a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420248a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4201ce0e0, 0xc420116200)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4201ce0e0, 0xc420116200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4201ce0e0, 0xc420116200)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201ce0e0, 0xc420116000)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4201ce0e0, 0xc420116000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4201ce0e0, 0xc420116000)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201400a0, 0x99c000, 0xc4202d6040)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:47 http: panic serving [::1]:50582: runtime error: index out of range
+goroutine 86 [running]:
+net/http.(*conn).serve.func1(0xc4201401e0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420248a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202fe0e0, 0xc4202f4400)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202fe0e0, 0xc4202f4400)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4202fe0e0, 0xc4202f4400)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202fe0e0, 0xc420116300)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4202fe0e0, 0xc420116300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4202fe0e0, 0xc420116300)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201401e0, 0x99c000, 0xc4202d6300)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:32:47 http: panic serving [::1]:50584: runtime error: index out of range
+goroutine 62 [running]:
+net/http.(*conn).serve.func1(0xc42007c780)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420248a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:136 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4201ce620, 0xc420116500)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4201ce620, 0xc420116500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc4201ce620, 0xc420116500)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201ce620, 0xc4202f4500)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc4201ce620, 0xc4202f4500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420079e10, 0x99bac0, 0xc4201ce620, 0xc4202f4500)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42007c780, 0x99c000, 0xc420060340)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:35:49 http: panic serving [::1]:50762: interface conversion: interface {} is string, not gocql.UUID
+goroutine 4 [running]:
+net/http.(*conn).serve.func1(0xc4202ae000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420236a00)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc420234380, 0xc42026e200)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420246960, 0x99bac0, 0xc420234380, 0xc42026e200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201255e0, 0x99bac0, 0xc420234380, 0xc42026e200)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420234380, 0xc4202a8500)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201f6080, 0x99bac0, 0xc420234380, 0xc4202a8500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202524e0, 0x99bac0, 0xc420234380, 0xc4202a8500)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ae000, 0x99c000, 0xc420060240)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:35:49 http: panic serving [::1]:50764: interface conversion: interface {} is string, not gocql.UUID
+goroutine 6 [running]:
+net/http.(*conn).serve.func1(0xc4202ae3c0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420236b00)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc420234460, 0xc42026e500)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420246b40, 0x99bac0, 0xc420234460, 0xc42026e500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201255e0, 0x99bac0, 0xc420234460, 0xc42026e500)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420234460, 0xc4202b2600)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201f6080, 0x99bac0, 0xc420234460, 0xc4202b2600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202524e0, 0x99bac0, 0xc420234460, 0xc4202b2600)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ae3c0, 0x99c000, 0xc420060500)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:36:21 http: panic serving [::1]:50768: runtime error: index out of range
+goroutine 39 [running]:
+net/http.(*conn).serve.func1(0xc42029a1e0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4202a0a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202be1c0, 0xc4202a8800)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202be1c0, 0xc4202a8800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201255e0, 0x99bac0, 0xc4202be1c0, 0xc4202a8800)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202be1c0, 0xc4202a8600)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201f6080, 0x99bac0, 0xc4202be1c0, 0xc4202a8600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202524e0, 0x99bac0, 0xc4202be1c0, 0xc4202a8600)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42029a1e0, 0x99c000, 0xc420244600)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:37:24 http: panic serving [::1]:50784: runtime error: index out of range
+goroutine 7 [running]:
+net/http.(*conn).serve.func1(0xc4202ae460)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420046a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202be2a0, 0xc4202a8a00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202be2a0, 0xc4202a8a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201255e0, 0x99bac0, 0xc4202be2a0, 0xc4202a8a00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202be2a0, 0xc4202b2800)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201f6080, 0x99bac0, 0xc4202be2a0, 0xc4202b2800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202524e0, 0x99bac0, 0xc4202be2a0, 0xc4202b2800)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ae460, 0x99c000, 0xc420060980)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:37:28 http: panic serving [::1]:50786: runtime error: index out of range
+goroutine 8 [running]:
+net/http.(*conn).serve.func1(0xc4202ae500)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420047a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202c80e0, 0xc4202b2c00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202c80e0, 0xc4202b2c00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201255e0, 0x99bac0, 0xc4202c80e0, 0xc4202b2c00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202c80e0, 0xc4202b2a00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201f6080, 0x99bac0, 0xc4202c80e0, 0xc4202b2a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202524e0, 0x99bac0, 0xc4202c80e0, 0xc4202b2a00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4202ae500, 0x99c000, 0xc420060a80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:37:28 http: panic serving [::1]:50788: runtime error: index out of range
+goroutine 42 [running]:
+net/http.(*conn).serve.func1(0xc42029a280)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420046a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202be380, 0xc4202a8d00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202be380, 0xc4202a8d00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201255e0, 0x99bac0, 0xc4202be380, 0xc4202a8d00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202be380, 0xc4202a8b00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201f6080, 0x99bac0, 0xc4202be380, 0xc4202a8b00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202524e0, 0x99bac0, 0xc4202be380, 0xc4202a8b00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42029a280, 0x99c000, 0xc420244a80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:38:43 http: panic serving [::1]:50816: runtime error: index out of range
+goroutine 14 [running]:
+net/http.(*conn).serve.func1(0xc420288000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201ffa68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4201f02a0, 0xc420136b00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4201f02a0, 0xc420136b00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4201f02a0, 0xc420136b00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201f02a0, 0xc420232300)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc4201f02a0, 0xc420232300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc4201f02a0, 0xc420232300)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc420288000, 0x99c000, 0xc420060980)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:41:11 http: panic serving [::1]:51482: runtime error: index out of range
+goroutine 43 [running]:
+net/http.(*conn).serve.func1(0xc42030e000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420046a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202820e0, 0xc420312200)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202820e0, 0xc420312200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4202820e0, 0xc420312200)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202820e0, 0xc420312000)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc4202820e0, 0xc420312000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc4202820e0, 0xc420312000)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42030e000, 0x99c000, 0xc42022a780)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:41:11 http: panic serving [::1]:51492: runtime error: index out of range
+goroutine 50 [running]:
+net/http.(*conn).serve.func1(0xc42031a000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc42032ca68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc420360000, 0xc420326400)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc420360000, 0xc420326400)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc420360000, 0xc420326400)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420360000, 0xc420326100)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc420360000, 0xc420326100)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc420360000, 0xc420326100)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42031a000, 0x99c000, 0xc4202342c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:41:11 http: panic serving [::1]:51496: runtime error: index out of range
+goroutine 51 [running]:
+net/http.(*conn).serve.func1(0xc42031a0a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420047a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202821c0, 0xc420312400)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202821c0, 0xc420312400)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4202821c0, 0xc420312400)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202821c0, 0xc420326000)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc4202821c0, 0xc420326000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc4202821c0, 0xc420326000)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42031a0a0, 0x99c000, 0xc420234200)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:41:11 http: panic serving [::1]:51500: runtime error: index out of range
+goroutine 46 [running]:
+net/http.(*conn).serve.func1(0xc42030e0a0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420047a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4202822a0, 0xc420312700)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4202822a0, 0xc420312700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4202822a0, 0xc420312700)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4202822a0, 0xc420312500)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc4202822a0, 0xc420312500)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc4202822a0, 0xc420312500)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42030e0a0, 0x99c000, 0xc42022aa80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:41:12 http: panic serving [::1]:51510: runtime error: index out of range
+goroutine 66 [running]:
+net/http.(*conn).serve.func1(0xc4201e83c0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc4201ffa68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc4201f0380, 0xc420136e00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc4201f0380, 0xc420136e00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4201f0380, 0xc420136e00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201f0380, 0xc420136c00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc4201f0380, 0xc420136c00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc4201f0380, 0xc420136c00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc4201e83c0, 0x99c000, 0xc420306340)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:41:17 http: panic serving [::1]:51552: runtime error: index out of range
+goroutine 48 [running]:
+net/http.(*conn).serve.func1(0xc42030e140)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x779d00, 0x9c5340)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/models.(*Issue).GetSprintIssueList(0xc420047a68, 0x24, 0xe8119b12c0c22a15, 0x8b719ff8d50e42b6, 0x0, 0x0)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/models/issue.go:135 +0x2ec
+github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers.SprintIssueslist(0x99bac0, 0xc420282380, 0xc420312a00)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers/issue.go:221 +0x2f2
+net/http.HandlerFunc.ServeHTTP(0x7ffda0, 0x99bac0, 0xc420282380, 0xc420312a00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc420282380, 0xc420312a00)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420282380, 0xc420312800)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc420282380, 0xc420312800)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc42026c000, 0x99bac0, 0xc420282380, 0xc420312800)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42030e140, 0x99c000, 0xc42022ac40)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:43:18 http: panic serving [::1]:51824: interface conversion: interface {} is string, not gocql.UUID
+goroutine 64 [running]:
+net/http.(*conn).serve.func1(0xc420286000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420093b40)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc4201f02a0, 0xc420137000)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc4201ec760, 0x99bac0, 0xc4201f02a0, 0xc420137000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc4201f02a0, 0xc420137000)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc4201f02a0, 0xc420244700)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc4201f02a0, 0xc420244700)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202404e0, 0x99bac0, 0xc4201f02a0, 0xc420244700)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc420286000, 0x99c000, 0xc420060f80)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/17 20:43:18 http: panic serving [::1]:51826: interface conversion: interface {} is string, not gocql.UUID
+goroutine 82 [running]:
+net/http.(*conn).serve.func1(0xc42030e000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420276280)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc420322000, 0xc420316200)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420280040, 0x99bac0, 0xc420322000, 0xc420316200)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4201195e0, 0x99bac0, 0xc420322000, 0xc420316200)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc420322000, 0xc420316000)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ec080, 0x99bac0, 0xc420322000, 0xc420316000)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc4202404e0, 0x99bac0, 0xc420322000, 0xc420316000)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42030e000, 0x99c000, 0xc4202760c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/18 13:02:33 http: panic serving [::1]:56720: interface conversion: interface {} is string, not gocql.UUID
+goroutine 28 [running]:
+net/http.(*conn).serve.func1(0xc42025e000)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc420210480)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025a1c0, 0xc420290600)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420238420, 0x99bac0, 0xc42025a1c0, 0xc420290600)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025a1c0, 0xc420290600)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025a1c0, 0xc420116e00)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc42025a1c0, 0xc420116e00)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420254000, 0x99bac0, 0xc42025a1c0, 0xc420116e00)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42025e000, 0x99c000, 0xc4201f04c0)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288
+2018/02/18 13:02:33 http: panic serving [::1]:56722: interface conversion: interface {} is string, not gocql.UUID
+goroutine 30 [running]:
+net/http.(*conn).serve.func1(0xc42025e1e0)
+	/usr/local/go/src/net/http/server.go:1697 +0xd0
+panic(0x77d5a0, 0xc4202105c0)
+	/usr/local/go/src/runtime/panic.go:491 +0x283
+github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares.AuthenticatedMiddleware.func1(0x99bac0, 0xc42025a2a0, 0xc420290900)
+	/home/mike/go/src/github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares/authenticated.go:39 +0x581
+net/http.HandlerFunc.ServeHTTP(0xc420238600, 0x99bac0, 0xc42025a2a0, 0xc420290900)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc4200f95e0, 0x99bac0, 0xc42025a2a0, 0xc420290900)
+	/home/mike/go/src/github.com/gorilla/mux/mux.go:159 +0xed
+github.com/rs/cors.(*Cors).Handler.func1(0x99bac0, 0xc42025a2a0, 0xc420262300)
+	/home/mike/go/src/github.com/rs/cors/cors.go:200 +0x108
+net/http.HandlerFunc.ServeHTTP(0xc4201ca0a0, 0x99bac0, 0xc42025a2a0, 0xc420262300)
+	/usr/local/go/src/net/http/server.go:1918 +0x44
+net/http.serverHandler.ServeHTTP(0xc420254000, 0x99bac0, 0xc42025a2a0, 0xc420262300)
+	/usr/local/go/src/net/http/server.go:2619 +0xb4
+net/http.(*conn).serve(0xc42025e1e0, 0x99c000, 0xc4201f0780)
+	/usr/local/go/src/net/http/server.go:1801 +0x71d
+created by net/http.(*Server).Serve
+	/usr/local/go/src/net/http/server.go:2720 +0x288

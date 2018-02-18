@@ -34,7 +34,7 @@ func init() {
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
 	projectRouter.Use(middlewares.RoleMiddleware)
 
-	issueRouter := Router.PathPrefix("/project/board/").Subrouter()
+	issueRouter := Router.PathPrefix("/project/board").Subrouter()
 	applyIssueRoutes(issueRouter)
 
 }
@@ -96,23 +96,23 @@ func applyBoardRoutes(r *mux.Router) {
 }
 
 func applyIssueRoutes(r *mux.Router) {
-	r.HandleFunc("{board_id}/issue/create/", controllers.StoreIssue).Methods("POST")
-	r.HandleFunc("{board_id}/issue/create", controllers.StoreIssue).Methods("POST")
+	r.HandleFunc("/{board_id}/issue/create/", controllers.StoreIssue).Methods("POST")
+	r.HandleFunc("/{board_id}/issue/create", controllers.StoreIssue).Methods("POST")
 
-	r.HandleFunc("issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT")
-	r.HandleFunc("issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT")
+	r.HandleFunc("/issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT")
+	r.HandleFunc("/issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT")
 
-	r.HandleFunc("issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE")
-	r.HandleFunc("issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE")
+	r.HandleFunc("/issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE")
+	r.HandleFunc("/issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE")
 
-	r.HandleFunc("{board_id}/issue/list/", controllers.BoardIssueslist).Methods("GET")
-	r.HandleFunc("{board_id}/issue/list", controllers.BoardIssueslist).Methods("GET")
+	r.HandleFunc("/{board_id}/issue/list/", controllers.BoardIssueslist).Methods("GET")
+	r.HandleFunc("/{board_id}/issue/list", controllers.BoardIssueslist).Methods("GET")
 
-	r.HandleFunc("sprint/{sprint_id}/issue/list/", controllers.SprintIssueslist).Methods("GET")
-	r.HandleFunc("sprint/{sprint_id}/issue/list", controllers.SprintIssueslist).Methods("GET")
+	r.HandleFunc("/sprint/{sprint_id}/issue/list/", controllers.SprintIssueslist).Methods("GET")
+	r.HandleFunc("/sprint/{sprint_id}/issue/list", controllers.SprintIssueslist).Methods("GET")
 
-	r.HandleFunc("issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
-	r.HandleFunc("issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
+	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
+	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
 
 }
 

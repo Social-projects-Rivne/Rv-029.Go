@@ -20,6 +20,7 @@ func main() {
 	// board.ProjectID, err := gocql.ParseUUID("4aa8434e-1177-11e8-ba8e-c85b76da292c")
 	// board.ProjectName = "project number two"
 	// board.Name = "board"
+	
 
 
 	f, err := os.OpenFile("log_file", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
