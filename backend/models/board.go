@@ -17,6 +17,10 @@ type Board struct {
 	UpdatedAt   time.Time  `cql:"updated_at"`
 }
 
+type BoardStorage interface {
+	Insert() error
+}
+
 func (b *Board) Insert() error {
 	err := db.GetInstance().Session.Query(`INSERT INTO boards (id, project_id, project_name, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`,
 		b.ID, b.ProjectID, b.ProjectName, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()

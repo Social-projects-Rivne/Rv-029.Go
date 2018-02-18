@@ -16,7 +16,7 @@ const DefaultPage = ({ classes, children }) => {
 const styles = {
   root: {
     minHeight: '100vh',
-    backgroundColor: '#2B2D42'
+    backgroundColor: '#2B2D42',
   }
 }
 
