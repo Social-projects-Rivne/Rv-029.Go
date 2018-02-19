@@ -8,9 +8,11 @@ import (
 	"log"
 )
 
+//ProjectTableSeeder model
 type ProjectTableSeeder struct {
 }
 
+//Run .
 func (ProjectTableSeeder) Run() {
 
 
@@ -41,9 +43,5 @@ func (ProjectTableSeeder) Run() {
 	}
 
 	project.Insert()
-
-	
-
-
 
 }

@@ -14,15 +14,15 @@ import FormLogin from './components/FormLogin'
 import FormRegister from './components/FormRegister'
 import FormRestorePassword from './components/FormRestorePassword'
 import FormNewPassword from './components/FormNewPassword'
-import ProjectCard from "./components/ProjectCard";
+import BoardPage from './components/BoardPage'
 
 import HomePage from './containers/HomePage'
 import DefaultPage from './containers/DefaultPage'
 import ProjectsPage from "./containers/ProjectsPage";
+import CreateProjectsPage from "./containers/CreateProjectsPage";
 
 import auth from './services/auth'
 import ViewProjectPage from './components/ViewProjectPage'
-import BoardPage from './components/BoardPage'
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -75,8 +75,9 @@ export const routes = (
       </Route>
 
       <Route component={DefaultPage} onEnter={authorizedMiddleware}>
-        <Route name="projects_list" path="projects" component={ProjectsPage}/>
-        <Route name="view_project" path="project/:id" component={ViewProjectPage}/>
+        <Route path="projects" component={ProjectsPage}/>
+        <Route path="project/create" component={CreateProjectsPage}/>
+        <Route path="project/:id" component={ViewProjectPage}/>
         <Route path="board/:id" component={BoardPage}/>
       </Route>
 

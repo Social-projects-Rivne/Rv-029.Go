@@ -81,6 +81,16 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                                     <ListItemText primary="Projects" />
                                 </ListItem>
                             </Link>
+                            <Link
+                                to="project/create"
+                                className={classes.link}>
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <Icon color="primary">add</Icon>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Add Project" />
+                                </ListItem>
+                            </Link>
                         </List>
                         <Divider />
                         {projectBoardsList}
