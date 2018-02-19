@@ -6,6 +6,7 @@ import (
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
+	"log"
 )
 
 type Role string
@@ -14,6 +15,11 @@ const ROLE_ADMIN = "Admin"
 const ROLE_STAFF = "Staff"
 const ROLE_OWNER = "Owner"
 const ROLE_USER = "User"
+
+
+//Projects queries
+const UPDATE_USER_PROJECT_ROLE  = "UPDATE users SET projects = projects +  ? WHERE id = ?"
+const DELETE_USER_PROJECT_ROLE  = "DELETE projects[?] FROM users WHERE id= ?"
 
 //User type
 
@@ -89,4 +95,35 @@ func (user *User) GetClaims() map[string]interface{} {
 	claims["UUID"] = user.UUID
 
 	return claims
+}
+
+/*
+* Projects methods
+*/
+
+func (user *User) AddRoleToProject(projectId gocql.UUID,role string) error  {
+	roleMap := make(map[gocql.UUID]string)
+	roleMap[projectId] = role
+	err := db.GetInstance().Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,user.UUID).Exec()
+
+	if err != nil {
+		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
+		return err
+	}
+
+	return nil
+
+}
+
+func (user *User) DeleteProject(projectId gocql.UUID) error  {
+
+	err := db.GetInstance().Session.Query(DELETE_USER_PROJECT_ROLE,projectId,user.UUID).Exec()
+
+	if err != nil {
+		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
+		return err
+	}
+
+	return nil
+
 }
