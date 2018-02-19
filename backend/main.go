@@ -13,6 +13,8 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 )
 
+
+
 func main() {
 	var cmd string
 

@@ -7,11 +7,20 @@ import (
 	"log"
 )
 
-const INSERT_PROJECT 	= "INSERT INTO projects (id,name,created_at,updated_at) VALUES (?,?,?,?);"
-const UPDATE_PROJECT 	= "Update projects SET name = ? ,updated_at = ? WHERE id= ? ;"
-const DELETE_PROJECT 	= "DELETE FROM projects WHERE id= ? ;"
-const FIND_PROJECT 		= "SELECT id, name, created_at, updated_at FROM projects WHERE id = ? LIMIT 1"
-const GET_PROJECTS 		= "SELECT id,name,created_at,updated_at from projects"
+const INSERT_PROJECT = "INSERT INTO projects (id,name,created_at,updated_at) VALUES (?,?,?,?);"
+const UPDATE_PROJECT = "Update projects SET name = ? ,updated_at = ? WHERE id= ? ;"
+const DELETE_PROJECT = "DELETE FROM projects WHERE id= ? ;"
+const FIND_PROJECT 	 = "SELECT id, name, created_at, updated_at FROM projects WHERE id = ? LIMIT 1"
+const GET_PROJECTS 	 = "SELECT id,name,created_at,updated_at from projects"
+
+
+type ProjectStorage interface {
+	Insert() error
+	Update() error
+	Delete() error
+	FindByID() error
+	GetProjectList() error
+}
 
 //Project type
 type Project struct {
@@ -20,6 +29,8 @@ type Project struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+
 
 //Insert func inserts project obj into table
 func (project *Project) Insert() error {
