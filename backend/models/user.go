@@ -1,11 +1,11 @@
 package models
 
 import (
-	"log"
 	"time"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
+	"log"
 )
 
 //Role .
@@ -22,6 +22,11 @@ const ROLE_OWNER = "Owner"
 
 //ROLE_USER .
 const ROLE_USER = "User"
+
+
+//Projects queries
+const UPDATE_USER_PROJECT_ROLE  = "UPDATE users SET projects = projects +  ? WHERE id = ?"
+const DELETE_USER_PROJECT_ROLE  = "DELETE projects[?] FROM users WHERE id= ?"
 
 //User type
 type User struct {
@@ -56,6 +61,18 @@ func (user *User) Insert() error {
 		user.Salt, user.Role, user.Status,user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 
 		log.Printf("Error occured while inserting user %v", err)
+		return err
+	}
+	return nil
+}
+
+//Update func finds user from database
+func (user *User) Update() error {
+
+	if err := db.GetInstance().Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
+		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
+
+		log.Printf("Error occured while updating user %v", err)
 		return err
 	}
 	return nil
@@ -125,4 +142,35 @@ func (user *User) GetClaims() map[string]interface{} {
 	claims["UUID"] = user.UUID
 
 	return claims
+}
+
+/*
+* Projects methods
+*/
+
+func (user *User) AddRoleToProject(projectId gocql.UUID,role string) error  {
+	roleMap := make(map[gocql.UUID]string)
+	roleMap[projectId] = role
+	err := db.GetInstance().Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,user.UUID).Exec()
+
+	if err != nil {
+		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
+		return err
+	}
+
+	return nil
+
+}
+
+func (user *User) DeleteProject(projectId gocql.UUID) error  {
+
+	err := db.GetInstance().Session.Query(DELETE_USER_PROJECT_ROLE,projectId,user.UUID).Exec()
+
+	if err != nil {
+		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
+		return err
+	}
+
+	return nil
+
 }
