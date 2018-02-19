@@ -13,6 +13,7 @@ const DELETE_PROJECT 	= "DELETE FROM projects WHERE id= ? ;"
 const FIND_PROJECT 		= "SELECT id, name, created_at, updated_at FROM projects WHERE id = ? LIMIT 1"
 const GET_PROJECTS 		= "SELECT id,name,created_at,updated_at from projects"
 
+//Project type
 type Project struct {
 	UUID      gocql.UUID
 	Name 	  string
@@ -21,6 +22,7 @@ type Project struct {
 
 }
 
+//Insert func inserts project obj into table
 func (project *Project) Insert() error {
 
 	err := db.GetInstance().Session.Query(INSERT_PROJECT,gocql.TimeUUID(),  project.Name,  project.CreatedAt, project.UpdatedAt).Exec();
@@ -34,6 +36,7 @@ func (project *Project) Insert() error {
 
 }
 
+//Update func updates name of the project by id
 func (project *Project) Update() error {
 
 	err := db.GetInstance().Session.Query(UPDATE_PROJECT, project.Name, project.UpdatedAt , project.UUID).Exec()
@@ -47,6 +50,7 @@ func (project *Project) Update() error {
 
 }
 
+//Delete func deletes project by id
 func (project *Project) Delete() error {
 
 	err := db.GetInstance().Session.Query(DELETE_PROJECT , project.UUID).Exec()
@@ -60,6 +64,7 @@ func (project *Project) Delete() error {
 
 }
 
+//FindByID func finds project by id
 func (project *Project) FindByID() error {
 
 	err := db.GetInstance().Session.Query(FIND_PROJECT,project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)

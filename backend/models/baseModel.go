@@ -2,12 +2,13 @@ package models
 
 import (
 	"fmt"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
-	"github.com/relops/cqlr"
 	"log"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/relops/cqlr"
 )
 
 const PRIMERY = "primery"
@@ -78,7 +79,6 @@ func (b *BaseModel) Update(table string, structure interface{}) {
 	query := fmt.Sprintf("UPDATE %v SET  ", table) + b.Fields + b.Condition
 
 	bind := cqlr.Bind(query, structure)
-
 	if err := bind.Exec(db.GetInstance().Session); err != nil {
 		log.Fatal(err)
 	}
@@ -99,22 +99,3 @@ func (b *BaseModel) AndWhere(column string, sign string, value interface{}) {
 	b.Condition += fmt.Sprintf("%v", value)
 
 }
-
-//FindUser finds user by any field
-func (b *BaseModel) Select(table string,structure interface{}) interface{} {
-
-	query := fmt.Sprintf("SELECT * FROM %v %v ",table, b.Condition)
-
-	q := db.GetInstance().Session.Query(query)
-	c := cqlr.BindQuery(q)
-
-	s := reflect.ValueOf(structure)
-fmt.Println(s)
-	for c.Scan(s) {
-
-		return structure
-	}
-	return nil
-}
-
-

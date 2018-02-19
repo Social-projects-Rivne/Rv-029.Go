@@ -8,7 +8,7 @@ const DefaultPage = ({ classes, children }) => {
     <Grid container
       className={classes.root}
       spacing={0}
-      alignItems={'center'}
+      // alignItems={'center'}
       justify={'center'} >
       <TopBar />
       { children }
