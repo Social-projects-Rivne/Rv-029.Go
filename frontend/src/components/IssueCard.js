@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import ExpansionPanel, {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
@@ -9,18 +10,30 @@ import DeleteIcon from 'material-ui-icons/Delete';
 import Icon from 'material-ui/Icon';
 import Typography from 'material-ui/Typography'
 import Grid from 'material-ui/Grid'
+import Chip from 'material-ui/Chip';
 
-const IssueCard = () => {
+const IssueCard = ({ title, desc, status, estimate }) => {
   return(
     <ExpansionPanel>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography>Issue 1</Typography>
+        <Grid
+          container
+          alignItems={'center'}>
+          <Grid style={{ marginRight: '1em' }}>
+            <Chip label={ status } />
+          </Grid>
+          <Grid>
+            <Typography>{ title }</Typography>
+          </Grid>
+        </Grid>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
-        <Typography>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-          sit amet blandit leo lobortis eget.
-        </Typography>
+        <Grid container >
+          <Grid item xs={12}>
+            <Typography type={'title'}>{ `Estimate: ${estimate}` }</Typography>
+            <Typography> { desc } </Typography>
+          </Grid>
+        </Grid>
       </ExpansionPanelDetails>
       <ExpansionPanelDetails>
         <Grid
@@ -38,6 +51,14 @@ const IssueCard = () => {
       </ExpansionPanelDetails>
     </ExpansionPanel>
   )
+}
+
+
+IssueCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  status: PropTypes.string.isRequired,
+  estimate: PropTypes.number.isRequired
 }
 
 export default IssueCard

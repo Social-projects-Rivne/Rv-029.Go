@@ -10,9 +10,11 @@ import (
 	"github.com/gocql/gocql"
 )
 
+//BoardTableSeeder model
 type BoardTableSeeder struct {
 }
 
+//Run .
 func (BoardTableSeeder) Run() {
 
 	id, err := gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")

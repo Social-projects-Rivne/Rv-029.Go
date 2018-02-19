@@ -27,7 +27,9 @@ const styles = theme => ({
         padding: theme.spacing.unit * 2,
     },
     list: {
-        paddingTop: 20
+        paddingTop: 20,
+        paddingLeft: 80,
+        paddingRight: 80,
     }
 });
 
@@ -40,11 +42,11 @@ class ProjectsPage extends Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
+        
         axios.get(API_URL + 'project/list')
             .then((response) => {
-                console.log(response.data)
-                this.props.projectsActions.setProjects(response.data)
+                this.props.projectsActions.setProjects(response.data.Data)
             })
             .catch((error) => {
                 if (error.response && error.response.data.Message) {
@@ -60,18 +62,24 @@ class ProjectsPage extends Component {
     }
 
     render () {
-        const {classes, projects, } = this.props
+        const {classes, projects } = this.props
 
+        let projectCards = null
+        if (projects.currentProjects.length > 0) {
+            projectCards = projects.currentProjects.map((value, index) => (
+                <Grid key={index} item>
+                    <ProjectCard project={value}/>
+                </Grid>
+            ))
+        } else {
+            projectCards = <h3>No projects found</h3>
+        }
 
         return (
             <Grid className={classes.root}>
                 <Grid item xs={12}>
                     <Grid container className={classes.list}>
-                        {projects.currentProjects.map((value, index) => (
-                            <Grid key={index} item>
-                               <ProjectCard project={value}/>
-                            </Grid>
-                         ))}
+                        {projectCards}
                     </Grid>
                 </Grid>
             </Grid>

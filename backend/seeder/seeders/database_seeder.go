@@ -9,4 +9,5 @@ func Run() {
 	seeders.Call(ProjectTableSeeder{})
 	seeders.Call(BoardTableSeeder{})
 	seeders.Call(SprintTableSeeder{})
+	seeders.Call(IssueTableSeeder{})
 }
