@@ -23,7 +23,18 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	board := r.Context().Value("board").(models.Board)
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+
+	if err != nil {
+		res := failedResponse{false, "Board ID is not valid"}
+		res.send(w)
+		return
+	}
+
+	board := models.Board{}
+	board.ID = boardId
+	board.FindByID()
 
 	sprint := models.Sprint{
 		gocql.TimeUUID(),
@@ -62,7 +73,13 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	sprintId, _ := gocql.ParseUUID(vars["sprint_id"])
+	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
+
+	if err != nil {
+		res := failedResponse{false, "Sprint ID is not valid"}
+		res.send(w)
+		return
+	}
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
@@ -166,8 +183,6 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(sprintsList)
-
-	res := successResponse{true, "Done", jsonResponse}
+	res := successResponse{true, "Done", sprintsList}
 	res.send(w)
 }
