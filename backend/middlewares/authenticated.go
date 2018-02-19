@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/gocql/gocql"
 	"context"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
@@ -34,8 +35,25 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 			userContext := r.Context().Value("user")
 			claims := userContext.(*jwt.Token).Claims.(jwt.MapClaims)
 
+			UUID, err := gocql.ParseUUID(claims["UUID"].(string))
+			if err != nil {
+				response := struct {
+					Status  bool
+					Message string
+				}{
+					Status:  false,
+					Message: "Invalid user JWT token claims",
+				}
+				jsonResponse, _ := json.Marshal(response)
+
+				w.WriteHeader(http.StatusForbidden)
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(jsonResponse)
+			}
+
 			currentUser := models.User{}
-			err := currentUser.FindByID(claims["UUID"].(string))
+			currentUser.UUID = UUID
+			err = currentUser.FindByID()
 			if err != nil {
 				response := struct {
 					Status  bool

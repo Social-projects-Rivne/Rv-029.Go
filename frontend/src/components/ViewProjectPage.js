@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {withStyles} from 'material-ui/styles'
 import Grid from 'material-ui/Grid'
-import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
@@ -15,6 +14,23 @@ import axios from "axios"
 class ViewProjectPage extends Component {
 
   componentWillMount() {
+    if (this.props.projects.currentProject == null) {
+        axios.get(API_URL + `project/show/${this.props.ownProps.params.id}`)
+            .then((response) => {
+                this.props.projectsActions.setCurrentProject(response.data)
+                this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            })
+    } else {
+        this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
+    }
+
     axios.get(API_URL + `project/${this.props.ownProps.params.id}/board/list`)
     .then((response) => {
       this.props.boardsActions.setBoards(response.data)
@@ -28,6 +44,20 @@ class ViewProjectPage extends Component {
     })
   }
 
+<<<<<<< HEAD
+=======
+  componentDidMount() {
+    if (this.props.projects.currentProjects.length > 0) {
+      let project = this.props.projects.currentProjects.filter((value, index) => {
+        return value.UUID == this.props.ownProps.params.id;
+      })
+      if (project.length > 0) {
+        this.props.projectsActions.setCurrentProject(project[0])
+      }
+    }
+  }
+
+>>>>>>> 3b899faad40f9803ee884c54936abe6a1354b292
   static propTypes = {
     classes: PropTypes.object.isRequired,
   }
@@ -64,13 +94,19 @@ const styles = theme => ({
     padding: theme.spacing.unit * 2,
   },
   list: {
-    paddingTop: 20
+    paddingTop: 20,
+    paddingLeft: 80,
+    paddingRight: 80,
   }
 });
 
 const mapStateToProps = (state, ownProps) => {
   return {
     boards: state.boards,
+<<<<<<< HEAD
+=======
+    projects: state.projects,
+>>>>>>> 3b899faad40f9803ee884c54936abe6a1354b292
     defaultPage: state.defaultPage,
     ownProps
   }

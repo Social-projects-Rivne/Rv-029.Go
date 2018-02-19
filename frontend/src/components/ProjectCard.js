@@ -1,37 +1,52 @@
-import React from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
-import Paper from 'material-ui/Paper';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import { Link, browserHistory } from 'react-router'
+import * as boardsActions from "../actions/BoardsActions";
+import * as defaultPageActions from "../actions/DefaultPageActions";
+import * as projectsActions from "../actions/ProjectsActions";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 
-function ProjectCard(props) {
-    const { classes, project } = props;
+class ProjectCard extends Component {
 
-    return (
-        <div>
-            <Card className={classes.card}>
-                <CardContent>
-                    <Typography className={classes.title}>{project.user_name}</Typography>
-                    <Typography variant="headline" component="h2">{project.name}</Typography>
-                    <Typography component="p">{project.desc}</Typography>
-                </CardContent>
-                <CardActions>
-                    <Link
-                          to={`project/${project.id}`}
-                          className={classes.link}>
+    static propTypes = {
+        project: PropTypes.object.isRequired,
+        classes: PropTypes.object.isRequired,
+    }
+
+    viewProject = (projectID) => {
+        const results = this.props.projects.currentProjects.filter((item) => { return item.UUID === projectID });
+        if (results.length > 0) {
+            this.props.projectsActions.setCurrentProject(results[0])
+        }
+        browserHistory.push('/project/' + projectID)
+    }
+
+    render = () => {
+        const { classes, project } = this.props;
+
+        return (
+            <div>
+                <Card className={classes.card}>
+                    <CardContent>
+                        <Typography variant="headline" component="h2">{project.Name}</Typography>
+                    </CardContent>
+                    <CardActions>
                         <Button
-                          size="small"
-                          color={'secondary'}>
+                            onClick={() => { this.viewProject(project.UUID) }}
+                            size="small"
+                            color={'secondary'}>
                             View
                         </Button>
-                    </Link>
-                </CardActions>
-            </Card>
-        </div>
-    )
+                    </CardActions>
+                </Card>
+            </div>
+        )
+    }
 }
 
 
@@ -58,9 +73,21 @@ const styles = theme => ({
     }
 });
 
-ProjectCard.propTypes = {
-    project: PropTypes.object.isRequired,
-    classes: PropTypes.object.isRequired,
-};
+const mapStateToProps = (state, ownProps) => {
+    return {
+        projects: state.projects,
+        defaultPage: state.defaultPage,
+        ownProps
+    }
+}
 
-export default withStyles(styles)(ProjectCard);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        projectsActions: bindActionCreators(projectsActions, dispatch),
+        defaultPageActions: bindActionCreators(defaultPageActions, dispatch)
+    }
+}
+
+export default withStyles(styles)(
+    connect(mapStateToProps, mapDispatchToProps)(ProjectCard)
+)

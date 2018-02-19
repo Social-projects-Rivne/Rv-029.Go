@@ -1,15 +1,16 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 var Router *mux.Router
 
-func init()  {
+func init() {
 	Router = mux.NewRouter()
 	Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/public"))))
 
@@ -31,9 +32,10 @@ func init()  {
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
-	projectRouter.Use(middlewares.RoleMiddleware)
+	projectRouter.Use(middlewares.ProjectAccessMiddleware)
 
-
+	issueRouter := Router.PathPrefix("/project/board").Subrouter()
+	applyIssueRoutes(issueRouter)
 
 }
 
@@ -54,21 +56,21 @@ func applyAuthorizedUserRoutes(r *mux.Router) {
 	r.HandleFunc("", controllers.Dashboard)
 }
 
-func applyProjectsRoutes(r *mux.Router)  {
+func applyProjectsRoutes(r *mux.Router) {
 
-	r.HandleFunc("/create/", controllers.StoreProject).Methods("POST")
-	r.HandleFunc("/create", controllers.StoreProject).Methods("POST")
+	r.HandleFunc("/create/", controllers.CreateProject).Methods("POST")
+	r.HandleFunc("/create", controllers.CreateProject).Methods("POST")
 
-	r.HandleFunc("/update/{id}/", controllers.UpdateProject).Methods("PUT")
-	r.HandleFunc("/update/{id}", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/update/{project_id}/", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/update/{project_id}", controllers.UpdateProject).Methods("PUT")
 
-	r.HandleFunc("/delete/{id}/", controllers.DeleteProject).Methods("DELETE")
-	r.HandleFunc("/delete/{id}", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/delete/{project_id}/", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/delete/{project_id}", controllers.DeleteProject).Methods("DELETE")
 
-	r.HandleFunc("/show/{id}/", controllers.ShowProjects).Methods("GET")
-	r.HandleFunc("/show/{id}", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{project_id}/", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{project_id}", controllers.ShowProjects).Methods("GET")
 
-	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 }
 
@@ -91,6 +93,27 @@ func applyBoardRoutes(r *mux.Router) {
 
 	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
+}
+
+func applyIssueRoutes(r *mux.Router) {
+	r.HandleFunc("/{board_id}/issue/create/", controllers.StoreIssue).Methods("POST")
+	r.HandleFunc("/{board_id}/issue/create", controllers.StoreIssue).Methods("POST")
+
+	r.HandleFunc("/issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT")
+	r.HandleFunc("/issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT")
+
+	r.HandleFunc("/issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE")
+	r.HandleFunc("/issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE")
+
+	r.HandleFunc("/{board_id}/issue/list/", controllers.BoardIssueslist).Methods("GET")
+	r.HandleFunc("/{board_id}/issue/list", controllers.BoardIssueslist).Methods("GET")
+
+	r.HandleFunc("/sprint/{sprint_id}/issue/list/", controllers.SprintIssueslist).Methods("GET")
+	r.HandleFunc("/sprint/{sprint_id}/issue/list", controllers.SprintIssueslist).Methods("GET")
+
+	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
+	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
+
 }
 
 func applySprintRoutes(r *mux.Router) {

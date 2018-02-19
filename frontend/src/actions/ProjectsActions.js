@@ -1,4 +1,5 @@
 import {
+    HANDLE_PROJECT_SELECTED,
     HANDLE_PROJECTS_LOADED,
     CURRENT_PROJECT
 } from '../constants/projects'
@@ -9,10 +10,9 @@ export const setProjects = (projects) => {
         payload: projects
     }
 }
-
-export const setCurrentProject = (projectID) => {
+export const setCurrentProject = (project) => {
     return {
-        type: CURRENT_PROJECT,
-        payload: projectID
+        type: HANDLE_PROJECT_SELECTED,
+        payload: project
     }
 }

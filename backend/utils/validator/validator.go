@@ -58,8 +58,8 @@ func (v *baseValidator) ValidateEmail(email string) error {
 
 func (v *baseValidator) ValidateEmailUnique(email string) error {
 	user := models.User{}
-
-	user.FindByEmail(email)
+	user.Email = email
+	user.FindByEmail()
 	if user.Email != "" {
 		return errors.New(fmt.Sprintf("User with %s email already exists", email))
 	}
@@ -69,8 +69,8 @@ func (v *baseValidator) ValidateEmailUnique(email string) error {
 
 func (v *baseValidator) ValidateEmailExists(email string) error {
 	user := models.User{}
-
-	user.FindByEmail(email)
+	user.Email = email
+	user.FindByEmail()
 	if user.Email == "" {
 		return errors.New(fmt.Sprintf("User with %s email not exists", email))
 	}
