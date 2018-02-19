@@ -32,7 +32,7 @@ func init() {
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
-	projectRouter.Use(middlewares.RoleMiddleware)
+	projectRouter.Use(middlewares.ProjectAccessMiddleware)
 
 	issueRouter := Router.PathPrefix("/project/board").Subrouter()
 	applyIssueRoutes(issueRouter)
@@ -58,17 +58,17 @@ func applyAuthorizedUserRoutes(r *mux.Router) {
 
 func applyProjectsRoutes(r *mux.Router) {
 
-	r.HandleFunc("/create/", controllers.StoreProject).Methods("POST")
-	r.HandleFunc("/create", controllers.StoreProject).Methods("POST")
+	r.HandleFunc("/create/", controllers.CreateProject).Methods("POST")
+	r.HandleFunc("/create", controllers.CreateProject).Methods("POST")
 
-	r.HandleFunc("/update/{id}/", controllers.UpdateProject).Methods("PUT")
-	r.HandleFunc("/update/{id}", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/update/{project_id}/", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/update/{project_id}", controllers.UpdateProject).Methods("PUT")
 
-	r.HandleFunc("/delete/{id}/", controllers.DeleteProject).Methods("DELETE")
-	r.HandleFunc("/delete/{id}", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/delete/{project_id}/", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/delete/{project_id}", controllers.DeleteProject).Methods("DELETE")
 
-	r.HandleFunc("/show/{id}/", controllers.ShowProjects).Methods("GET")
-	r.HandleFunc("/show/{id}", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{project_id}/", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{project_id}", controllers.ShowProjects).Methods("GET")
 
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")

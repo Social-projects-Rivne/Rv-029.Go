@@ -44,6 +44,4 @@ func (ProjectTableSeeder) Run() {
 
 	project.Insert()
 
-
-
 }
