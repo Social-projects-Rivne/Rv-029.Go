@@ -6,13 +6,11 @@ import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
-import * as projectsActions from "../actions/ProjectsActions"
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {API_URL} from "../constants/global"
 import messages from "../services/messages"
 import axios from "axios"
-
 
 class ViewProjectPage extends Component {
 
@@ -28,10 +26,6 @@ class ViewProjectPage extends Component {
         messages("Server error occured")
       }
     })
-  }
-
-  componentDidMount() {
-    this.props.projectsActions.setCurrentProject(this.props.ownProps.params.id)
   }
 
   static propTypes = {
@@ -78,7 +72,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     boards: state.boards,
     defaultPage: state.defaultPage,
-    projects: state.projects,
     ownProps
   }
 }
@@ -87,7 +80,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     boardsActions: bindActionCreators(boardsActions, dispatch),
     defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
-    projectsActions: bindActionCreators(projectsActions, dispatch)
   }
 }
 
