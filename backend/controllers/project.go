@@ -18,13 +18,13 @@ func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	projects , err := project.GetProjectList()
 	if err != nil{
 		log.Printf("Error in controllers/project.go . Can't get projects list, method: ProjectsList where: %s", err.Error())
-		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
-		response.send(w)
+		response := Response{Message: fmt.Sprintf("Error %s", err.Error())}
+		response.Failed(w)
 		return
 	}
 
-	response := successResponse{true,"Projects list",projects}
-	response.send(w)
+	response := Response{Message:"Projects list", Data: projects}
+	response.Success(w)
 }
 
 func ShowProjects(w http.ResponseWriter, r *http.Request) {
@@ -33,8 +33,8 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project.go . Can't parse uuid, method: ShowProjects where: %s", err.Error())
-		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
-		response.send(w)
+		response := Response{Message: fmt.Sprintf("Error %s", err.Error())}
+		response.Failed(w)
 		return
 	}
 
@@ -42,8 +42,8 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 	project.UUID = projectId
 	project.FindByID()
 
-	response := successResponse{true,"Projects list",project}
-	response.send(w)
+	response := Response{Message:"Projects list", Data: project}
+	response.Success(w)
 
 }
 
@@ -54,8 +54,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		response := failedResponse{false, err.Error()}
-		response.send(w)
+		response := Response{Message: err.Error()}
+		response.Failed(w)
 		return
 	}
 
@@ -66,8 +66,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
 	user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
 
-	response := successResponse{true, "Project has created",nil}
-	response.send(w)
+	response := Response{Message: "Project has created"}
+	response.Success(w)
 
 }
 
@@ -77,8 +77,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		response := failedResponse{false, err.Error()}
-		response.send(w)
+		response := Response{Message: err.Error()}
+		response.Failed(w)
 		return
 	}
 
@@ -87,8 +87,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project.go . Can't parse uuid, method: UpdateProject where: %s", err.Error())
-		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
-		response.send(w)
+		response := Response{Message: fmt.Sprintf("Error %s", err.Error())}
+		response.Failed(w)
 		return
 	}
 
@@ -100,8 +100,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	project.Update()
 
-	response := successResponse{true, "Project has updated",nil}
-	response.send(w)
+	response := Response{Message: "Project has updated"}
+	response.Success(w)
 
 }
 
@@ -112,8 +112,8 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project.go . Can't parse uuid, method: DeleteProject where: %s", err.Error())
-		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
-		response.send(w)
+		response := Response{Message: fmt.Sprintf("Error %s", err.Error())}
+		response.Failed(w)
 		return
 	}
 	project := models.Project{}
@@ -124,7 +124,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 
 	project.Delete()
 
-	response := successResponse{true, "Project has deleted",nil}
-	response.send(w)
+	response := Response{Message: "Project has deleted"}
+	response.Success(w)
 }
 
