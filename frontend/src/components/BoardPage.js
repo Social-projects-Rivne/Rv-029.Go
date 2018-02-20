@@ -127,10 +127,6 @@ class BoardPage extends Component{
     })
   }
 
-  updateSprint = () => {
-    this.props.sprintsActions.setCurrentSprint()
-  }
-
   render() {
     const { classes } = this.props
     return (
@@ -168,10 +164,8 @@ class BoardPage extends Component{
           {this.props.issues.currentIssues.map((item, i) => (
             <IssueCard
               key={i}
-              title={item.name}
-              desc={item.description}
-              status={item.status}
-              estimate={item.estimate}
+              data={item}
+              onUpdate={this.getIssuesList}
             />
           ))}
 
@@ -206,12 +200,7 @@ class BoardPage extends Component{
             <SprintCard
               key={i}
               data={item}
-              title={item.goal}
-              status={item.status}
-              date={item.created_at}
-              desc={item.description}
-              id={item.id}
-            />
+              onUpdate={this.getSprintsList} />
           ))}
 
         </Grid>

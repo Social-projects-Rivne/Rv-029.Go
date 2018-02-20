@@ -18,7 +18,7 @@ type SprintCreateRequestData struct {
 func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 	var err error
 
-	s.Status = "TODO"
+	s.Status = "Todo"
 
 	err = s.ValidateRequired(s.Goal)
 	if err != nil {

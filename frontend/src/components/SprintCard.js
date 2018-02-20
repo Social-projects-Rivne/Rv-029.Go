@@ -1,101 +1,140 @@
-
-// TODO: initial text when update
-// TODO: update sprints list after single sprint update
-
 import React, { Component } from 'react'
-import * as defaultPageActions from "../actions/DefaultPageActions"
-import * as sprintsActions from "../actions/SprintsActions"
+import { Link } from 'react-router'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import axios from "axios"
-import Card, { CardHeader, CardActions, CardContent } from 'material-ui/Card'
-import Button from 'material-ui/Button'
-import { Link, browserHistory } from 'react-router'
-import Typography from 'material-ui/Typography'
+import PropTypes from 'prop-types'
+import { API_URL } from "../constants/global"
+import * as defaultPageActions from "../actions/DefaultPageActions"
+import * as sprintsActions from "../actions/SprintsActions"
 import { withStyles } from 'material-ui/styles'
+import { FormControl } from 'material-ui/Form'
+import { InputLabel } from 'material-ui/Input'
+import { MenuItem } from 'material-ui/Menu'
+import Button from 'material-ui/Button'
+import Chip from 'material-ui/Chip'
+import DeleteIcon from 'material-ui-icons/Delete'
 import Grid from 'material-ui/Grid'
-import Chip from 'material-ui/Chip';
-import IconButton from 'material-ui/IconButton';
-import DeleteIcon from 'material-ui-icons/Delete';
-import Icon from 'material-ui/Icon';
-import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton'
+import Select from 'material-ui/Select'
+import TextField from 'material-ui/TextField'
+import Typography from 'material-ui/Typography'
+import EditIcon from 'material-ui-icons/ModeEdit';
+import Card, {
+  CardHeader,
+  CardActions,
+  CardContent
+} from 'material-ui/Card'
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
-} from 'material-ui/Dialog';
+  DialogTitle
+} from 'material-ui/Dialog'
 
 class SprintCard extends Component {
   state = {
-    anchorEl: null,
-    updateSprintOpen: false
+    updateSprintOpen: false,
+  }
+
+  static propTypes = {
+    data: PropTypes.object.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    sprints: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired,
+    sprintsActions: PropTypes.object.isRequired,
+    defaultPageActions: PropTypes.object.isRequired
   }
 
   handleOpenUpdateSprintClick = () => {
-    this.setState({
-      updateSprintOpen: true
-    })
-    console.log(this.props.data)
+    this.setState({ updateSprintOpen: true })
     this.props.sprintsActions.setCurrentSprint(this.props.data)
   }
 
   handleClose = () => {
-    this.setState({ updateSprintOpen: false });
-  };
+    this.setState({ updateSprintOpen: false })
+  }
 
   updateSprint = () => {
-    axios.put(API_URL + `project/board/sprint/update/${this.props.id}`, {
-      goal: this.props.boards.goalInput,
-      desc: this.props.boards.descInput
+    const { id } = this.props.data
+    const { onUpdate } = this.props
+    const { sprintGoal, sprintDesc, sprintStatus } = this.props.sprints
+    const { setNotificationMessage, setErrorMessage } = this.props.defaultPageActions
+
+    axios.put(API_URL + `project/board/sprint/update/${ id }`, {
+      goal: sprintGoal,
+      desc: sprintDesc,
+      status: sprintStatus
     })
-    .then((response) => {
-      this.props.defaultPageActions.setNotificationMessage(response.data.Message)
-      this.getSprintsList()
+    .then((res) => {
+      setNotificationMessage(res.data.Message)
+      onUpdate()
       this.handleClose()
     })
-    .catch((error) => {
-      if (error.response && error.response.data.Message) {
-        this.props.defaultPageActions.setErrorMessage(error.response.data.Message)
+    .catch((err) => {
+      if (err.response && err.response.data.Message) {
+       setErrorMessage(err.response.data.Message)
       } else {
-        this.props.defaultPageActions.setErrorMessage("Server error occured")
+       setErrorMessage("Server error occured")
       }
       this.handleClose()
     })
   }
 
+  deleteSprint = () => {
+    const { id } = this.props.data
+    const { onUpdate } = this.props
+    const { setNotificationMessage, setErrorMessage } = this.props.defaultPageActions
+
+    axios.delete(API_URL + `project/board/sprint/delete/${ id }`, {})
+    .then((response) => {
+      setNotificationMessage(response.data.Message)
+      onUpdate()
+    })
+    .catch((error) => {
+      if (error.response && error.response.data.Message) {
+        setErrorMessage(error.response.data.Message)
+      } else {
+        setErrorMessage("Server error occured")
+      }
+    })
+  }
+
   render() {
-    const { classes } = this.props;
-    const { open } = this.state;
-    const { anchorEl } = this.state;
+    const { classes } = this.props
+    const { id, status, goal, created_at, description } = this.props.data
+    const { sprintGoal, sprintDesc, sprintStatus } = this.props.sprints
+    const {
+      setGoalUpdateSprintInput,
+      setDescUpdateSprintInput,
+      setStatusUpdateSprintInput
+    } = this.props.sprintsActions
 
     return (
-
       <Card className={classes.root}>
         <CardHeader
-          avatar={
-            <Chip label={this.props.status} />
-          }
+          className={classes.test}
+          avatar={ <Chip label={status} /> }
           action={
-            <Grid item>
+            <Grid>
               {/* FIXME: horizontal scroll cause of this btn WTF? */}
               <IconButton onClick={this.handleOpenUpdateSprintClick}>
-                <Icon> edit_icon</Icon>
+                <EditIcon />
               </IconButton>
-              <IconButton>
+              <IconButton onClick={this.deleteSprint}>
                 <DeleteIcon />
               </IconButton>
             </Grid>
           }
-          title={this.props.title}
-          subheader={this.props.date} />
+          title={goal}
+          subheader={created_at} />
         <CardContent>
-          <Typography>{this.props.desc}</Typography>
+          <Typography>{description}</Typography>
         </CardContent>
         <CardActions>
           <Link
-            // to="view_board"
-            className={this.props.classes.link}>
+            to={`${id}`}
+            className={classes.link}>
             <Button
               size="small"
               color={'secondary'}>
@@ -104,7 +143,6 @@ class SprintCard extends Component {
           </Link>
         </CardActions>
 
-        {/* #################### MODAL UPDATE SPRINT #################### */}
         <Dialog
           open={this.state.updateSprintOpen}
           onClose={this.handleClose}
@@ -120,15 +158,32 @@ class SprintCard extends Component {
               id="goal"
               label="Goal"
               type="text"
-              onChange={(e) => {this.props.boardsActions.setGoal(e.target.value)}}
+              value={sprintGoal}
+              onChange={(e) => {setGoalUpdateSprintInput(e.target.value)}}
               fullWidth />
             <TextField
               margin="dense"
               id="desc"
               label="Description"
               type="text"
-              onChange={(e) => {this.props.boardsActions.setDesc(e.target.value)}}
+              value={sprintDesc}
+              onChange={(e) => {setDescUpdateSprintInput(e.target.value)}}
               fullWidth />
+
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="age-simple">Status</InputLabel>
+              <Select
+                value={sprintStatus}
+                onChange={(e) => {setStatusUpdateSprintInput(e.target.value)}}
+                inputProps={{
+                  name: 'status',
+                  id: 'status-simple', }}>
+                <MenuItem value={"Todo"}>Todo</MenuItem>
+                <MenuItem value={"In process"}>In process</MenuItem>
+                <MenuItem value={"Done"}>Done</MenuItem>
+              </Select>
+            </FormControl>
+
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
@@ -152,8 +207,13 @@ const styles = {
   link: {
     textDecoration: 'none'
   },
+  formControl: {
+    width: '100%'
+  },
+  test: {
+    maxWidth: '100%'
+  }
 }
-
 
 const mapStateToProps = (state, ownProps) => {
   return {
