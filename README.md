@@ -38,7 +38,6 @@ migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations 
 migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations down
 
 # Seeds
-
 Run seeds
 ```sh
 go run backend/main.go db:seed

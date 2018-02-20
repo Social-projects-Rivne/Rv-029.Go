@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 )
 
 const DBError = "Error while accessing to database"
@@ -17,7 +18,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		res := Response{Message: err.Error()}
+		res := helpers.Response{Message: err.Error()}
 		res.Failed(w)
 		return
 	}
@@ -26,7 +27,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		res := Response{Message: "Board ID is not valid"}
+		res := helpers.Response{Message: "Board ID is not valid"}
 		res.Failed(w)
 		return
 	}
@@ -36,7 +37,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = board.FindByID()
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
@@ -57,12 +58,12 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Insert()
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
 
-	res := Response{Message: "Sprint has created"}
+	res := helpers.Response{Message: "Sprint has created"}
 	res.Success(w)
 }
 
@@ -72,7 +73,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		res := Response{Message: err.Error()}
+		res := helpers.Response{Message: err.Error()}
 		res.Failed(w)
 		return
 	}
@@ -81,7 +82,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		res := Response{Message: "Sprint ID is not valid"}
+		res := helpers.Response{Message: "Sprint ID is not valid"}
 		res.Failed(w)
 		return
 	}
@@ -91,7 +92,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.FindById()
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
@@ -103,12 +104,12 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Update()
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
 
-	res := Response{Message: "Sprint has updated"}
+	res := helpers.Response{Message: "Sprint has updated"}
 	res.Success(w)
 }
 
@@ -117,7 +118,7 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		res := Response{Message: "Sprint ID is not valid"}
+		res := helpers.Response{Message: "Sprint ID is not valid"}
 		res.Failed(w)
 		return
 	}
@@ -128,12 +129,12 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Delete()
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
 
-	res := Response{Message: "Sprint has deleted"}
+	res := helpers.Response{Message: "Sprint has deleted"}
 	res.Success(w)
 }
 
@@ -142,7 +143,7 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		response := Response{Message: "Sprint ID is not valid"}
+		response := helpers.Response{Message: "Sprint ID is not valid"}
 		response.Failed(w)
 		return
 	}
@@ -153,12 +154,12 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.FindById()
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
 
-	res := Response{Message: "Done", Data: sprint}
+	res := helpers.Response{Message: "Done", Data: sprint}
 	res.Success(w)
 }
 
@@ -167,7 +168,7 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		res := Response{Message: "Board ID is not valid"}
+		res := helpers.Response{Message: "Board ID is not valid"}
 		res.Failed(w)
 		return
 	}
@@ -177,11 +178,11 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	sprintsList, err := sprint.List(boardId)
 
 	if err != nil {
-		res := Response{Message: DBError}
+		res := helpers.Response{Message: DBError}
 		res.Failed(w)
 		return
 	}
 
-	res := Response{Message: "Done", Data: sprintsList}
+	res := helpers.Response{Message: "Done", Data: sprintsList}
 	res.Success(w)
 }
