@@ -12,6 +12,16 @@ cp .env.example .env
 docker-compose up -d cassandra react
 ```
 
+# Install Dependencies
+## Install glide
+https://github.com/Masterminds/glide#install
+
+## Install dependencies
+```sh
+    glide install
+```
+
+
 # Migrations
 
 ## Create keyspace

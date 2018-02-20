@@ -228,8 +228,8 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := successResponse{Status: true, Data: sprintIssueList, Message: "Done"}
-	response.send(w)
+	res := helpers.Response{Message: "Done", Data: sprintIssueList}
+	res.Success(w)
 }
 
 //ShowIssue Failed issue obj
