@@ -1,4 +1,13 @@
+
+// TODO: initial text when update
+// TODO: update sprints list after single sprint update
+
 import React, { Component } from 'react'
+import * as defaultPageActions from "../actions/DefaultPageActions"
+import * as sprintsActions from "../actions/SprintsActions"
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import axios from "axios"
 import Card, { CardHeader, CardActions, CardContent } from 'material-ui/Card'
 import Button from 'material-ui/Button'
 import { Link, browserHistory } from 'react-router'
@@ -9,21 +18,51 @@ import Chip from 'material-ui/Chip';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from 'material-ui-icons/Delete';
 import Icon from 'material-ui/Icon';
+import TextField from 'material-ui/TextField';
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
 
 class SprintCard extends Component {
-
   state = {
-    open: false,
-    anchorEl: null
+    anchorEl: null,
+    updateSprintOpen: false
   }
 
-  handleClick = () => {
-    this.setState({ open: true });
-  };
+  handleOpenUpdateSprintClick = () => {
+    this.setState({
+      updateSprintOpen: true
+    })
+    console.log(this.props.data)
+    this.props.sprintsActions.setCurrentSprint(this.props.data)
+  }
 
   handleClose = () => {
-    this.setState({ open: false });
+    this.setState({ updateSprintOpen: false });
   };
+
+  updateSprint = () => {
+    axios.put(API_URL + `project/board/sprint/update/${this.props.id}`, {
+      goal: this.props.boards.goalInput,
+      desc: this.props.boards.descInput
+    })
+    .then((response) => {
+      this.props.defaultPageActions.setNotificationMessage(response.data.Message)
+      this.getSprintsList()
+      this.handleClose()
+    })
+    .catch((error) => {
+      if (error.response && error.response.data.Message) {
+        this.props.defaultPageActions.setErrorMessage(error.response.data.Message)
+      } else {
+        this.props.defaultPageActions.setErrorMessage("Server error occured")
+      }
+      this.handleClose()
+    })
+  }
 
   render() {
     const { classes } = this.props;
@@ -40,8 +79,8 @@ class SprintCard extends Component {
           action={
             <Grid item>
               {/* FIXME: horizontal scroll cause of this btn WTF? */}
-              <IconButton>
-                <Icon>edit_icon</Icon>
+              <IconButton onClick={this.handleOpenUpdateSprintClick}>
+                <Icon> edit_icon</Icon>
               </IconButton>
               <IconButton>
                 <DeleteIcon />
@@ -64,6 +103,43 @@ class SprintCard extends Component {
             </Button>
           </Link>
         </CardActions>
+
+        {/* #################### MODAL UPDATE SPRINT #################### */}
+        <Dialog
+          open={this.state.updateSprintOpen}
+          onClose={this.handleClose}
+          aria-labelledby="form-dialog-title" >
+          <DialogTitle id="form-dialog-title">Update Sprint</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please, fill required fields.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="goal"
+              label="Goal"
+              type="text"
+              onChange={(e) => {this.props.boardsActions.setGoal(e.target.value)}}
+              fullWidth />
+            <TextField
+              margin="dense"
+              id="desc"
+              label="Description"
+              type="text"
+              onChange={(e) => {this.props.boardsActions.setDesc(e.target.value)}}
+              fullWidth />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.updateSprint} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+
       </Card>
     )
   }
@@ -78,5 +154,24 @@ const styles = {
   },
 }
 
-export default withStyles(styles)(SprintCard)
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    defaultPage: state.defaultPage,
+    sprints: state.sprints,
+    ownProps
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
+    sprintsActions: bindActionCreators(sprintsActions, dispatch),
+  }
+}
+
+export default withStyles(styles)(
+  connect(mapStateToProps, mapDispatchToProps)(SprintCard)
+)
+
 

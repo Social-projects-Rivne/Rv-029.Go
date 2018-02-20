@@ -19,6 +19,8 @@ func decodeAndValidate(r *http.Request, v validator.InputValidation) error {
 	return v.Validate(r)
 }
 
+// TODO: make single Response
+
 type failedResponse struct {
 	Status  bool
 	Message string

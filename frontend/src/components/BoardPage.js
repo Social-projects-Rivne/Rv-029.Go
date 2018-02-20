@@ -50,44 +50,51 @@ class BoardPage extends Component{
     });
   };
 
-  // FIXME: renders only first time
   componentDidMount() {
-    axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/sprint/list`)
-    .then((response) => {
-      this.props.sprintsActions.setSprints(response.data.Data)
-    })
-    .catch((error) => {
-      if (error.response && error.response.data.Message) {
-        messages(error.response.data.Message)
-      } else {
-        messages("Server error occured")
-      }
-    });
+    this.getSprintsList()
+    this.getIssuesList()
+  }
 
+  getSprintsList = () => {
+    axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/sprint/list`)
+      .then((response) => {
+        this.props.sprintsActions.setSprints(response.data.Data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      });
+  }
+
+  getIssuesList = () => {
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
-    .then((response) => {
-      this.props.issuesActions.setIssues(response.data)
-      console.log(response.data)
-    })
-    .catch((error) => {
-      if (error.response && error.response.data.Message) {
-        messages(error.response.data.Message)
-      } else {
-        messages("Server error occured")
-      }
-    });
+      .then((response) => {
+        this.props.issuesActions.setIssues(response.data)
+        console.log(response.data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      });
   }
 
   createIssue = () => {
     axios.post(API_URL + `project/board/${this.props.ownProps.params.id}/issue/create`, {
       name: this.props.boards.nameInput,
       description: this.props.boards.descInput,
-      user_id: this.props.issues.currentIssues[0].user_id, //FIXME: only for debugging. Doesn't work properly.
+      user_id:'9646324a-0aa2-11e8-ba34-b06ebf83499f', // debug
       estimate: +this.props.boards.estimation,
       status: 'Todo'
     })
     .then((response) => {
       console.log(response)
+      this.getIssuesList()
       this.handleClose()
     })
     .catch((error) => {
@@ -107,6 +114,7 @@ class BoardPage extends Component{
     })
     .then((response) => {
       this.props.defaultPageActions.setNotificationMessage(response.data.Message)
+      this.getSprintsList()
       this.handleClose()
     })
     .catch((error) => {
@@ -117,6 +125,10 @@ class BoardPage extends Component{
       }
       this.handleClose()
     })
+  }
+
+  updateSprint = () => {
+    this.props.sprintsActions.setCurrentSprint()
   }
 
   render() {
@@ -193,10 +205,13 @@ class BoardPage extends Component{
           {this.props.sprints.currentSprints.map((item, i) => (
             <SprintCard
               key={i}
+              data={item}
               title={item.goal}
               status={item.status}
               date={item.created_at}
-              desc={item.description} />
+              desc={item.description}
+              id={item.id}
+            />
           ))}
 
         </Grid>
@@ -244,7 +259,7 @@ class BoardPage extends Component{
           </DialogActions>
         </Dialog>
 
-        {/* #################### MODAL SPRINT #################### */}
+        {/* #################### MODAL CREATE SPRINT #################### */}
         <Dialog
           open={this.state.createSprintOpen}
           onClose={this.handleClose}
@@ -279,6 +294,8 @@ class BoardPage extends Component{
             </Button>
           </DialogActions>
         </Dialog>
+
+
 
       </Grid>
     )
