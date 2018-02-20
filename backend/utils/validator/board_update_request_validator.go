@@ -16,6 +16,20 @@ type BoardUpdateRequestData struct {
 }
 
 func (b *BoardUpdateRequestData) Validate(r *http.Request) error {
+	var err error
+
+	err = b.ValidateRequired(b.Name)
+	if err != nil {
+		log.Printf(err.Error())
+		return err
+	}
+
+	err = b.ValidateRequired(b.Desc)
+	if err != nil {
+		log.Printf(err.Error())
+		return err
+	}
+
 	return validateBoardId(r)
 }
 
@@ -30,7 +44,7 @@ func validateBoardId(r *http.Request) error {
 		Consistency(gocql.One).Scan(&boardName)
 
 	if boardName == "" {
-		err := fmt.Errorf("There is no board with ID %v", boardId)
+		err := fmt.Errorf("There is no board with ID %q", boardId)
 		log.Printf(err.Error())
 		return err
 	}

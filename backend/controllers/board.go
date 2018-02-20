@@ -22,8 +22,18 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Getting project data from request from "Validation"
-	project := r.Context().Value("project").(models.Project)
+	vars := mux.Vars(r)
+	projectId, err := gocql.ParseUUID(vars["project_id"])
+
+	project := models.Project{}
+	project.UUID = projectId
+	err = project.FindByID()
+
+	if err != nil {
+		response := failedResponse{false, "Project ID is not valid"}
+		response.send(w)
+		return
+	}
 
 	board := models.Board{
 		gocql.TimeUUID(),
@@ -69,16 +79,16 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	board.FindByID()
+	err = board.FindByID()
 
-	if boardRequestData.Name != "" {
-		board.Name = boardRequestData.Name
+	if err != nil {
+		response := failedResponse{false, "Error while accessing to database"}
+		response.send(w)
+		return
 	}
 
-	if boardRequestData.Desc != "" {
-		board.Desc = boardRequestData.Desc
-	}
-
+	board.Name = boardRequestData.Name
+	board.Desc = boardRequestData.Desc
 	board.UpdatedAt = time.Now()
 	err = board.Update()
 

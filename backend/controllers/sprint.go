@@ -34,7 +34,13 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	board.FindByID()
+	err = board.FindByID()
+
+	if err != nil {
+		res := failedResponse{false, DBError}
+		res.send(w)
+		return
+	}
 
 	sprint := models.Sprint{
 		gocql.TimeUUID(),
@@ -83,22 +89,18 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	sprint.FindById()
+	err = sprint.FindById()
 
-	if sprintRequestData.Goal != "" {
-		sprint.Goal = sprintRequestData.Goal
+	if err != nil {
+		res := failedResponse{false, DBError}
+		res.send(w)
+		return
 	}
 
-	if sprintRequestData.Desc != "" {
-		sprint.Desc = sprintRequestData.Desc
-	}
-
-	if sprintRequestData.Status != "" {
-		sprint.Status = sprintRequestData.Status
-	}
-
+	sprint.Goal = sprintRequestData.Goal
+	sprint.Desc = sprintRequestData.Desc
+	sprint.Status = sprintRequestData.Status
 	sprint.UpdatedAt = time.Now()
-
 	err = sprint.Update()
 
 	if err != nil {
@@ -157,7 +159,7 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(sprint)
+	jsonResponse, _ := json.Marshal(sprint)// fixme
 
 	res := successResponse{true, "Done", jsonResponse}
 	res.send(w)
