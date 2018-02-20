@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 	"log"
 )
@@ -55,7 +54,7 @@ type Userer interface {
 //Insert func inserts user object in database
 func (user *User) Insert() error {
 
-	if err := db.GetInstance().Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,
+	if err := Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,
 		salt,role,status,projects,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
 		user.Salt, user.Role, user.Status,user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
@@ -69,7 +68,7 @@ func (user *User) Insert() error {
 //Update func finds user from database
 func (user *User) Update() error {
 
-	if err := db.GetInstance().Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
+	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
@@ -81,7 +80,7 @@ func (user *User) Update() error {
 //UpdateByID updates user by his id
 func (user *User) UpdateByID() error {
 
-	if err := db.GetInstance().Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
+	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
@@ -93,7 +92,7 @@ func (user *User) UpdateByID() error {
 //Delete removes user by his id
 func (user *User) Delete() error {
 
-	if err := db.GetInstance().Session.Query(`DELETE FROM users WHERE id= ? ;`,
+	if err := Session.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 
 			log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
@@ -104,7 +103,7 @@ func (user *User) Delete() error {
 
 //FindByID finds user by id
 func (user *User) FindByID() error {
-	if err := db.GetInstance().Session.Query(`SELECT id, email, first_name, last_name,
+	if err := Session.Query(`SELECT id, email, first_name, last_name,
 		 projects, updated_at, created_at, password, salt, role, status FROM users WHERE id = ? LIMIT 1`, user.UUID).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
 		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
@@ -117,7 +116,7 @@ func (user *User) FindByID() error {
 
 //FindByEmail finds user by email
 func (user *User) FindByEmail() error {
-	if err := db.GetInstance().Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, 
+	if err := Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, 
 		projects, created_at, updated_at FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`, user.Email).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password,
 		&user.Salt, &user.Role, &user.Status, &user.Projects, &user.CreatedAt, &user.UpdatedAt); err != nil {
@@ -131,7 +130,7 @@ func (user *User) FindByEmail() error {
 //GetAll returns all users
 func (user *User) GetAll() ([]map[string]interface{}, error) {
 
-	return db.GetInstance().Session.Query(`SELECT * FROM users`).Iter().SliceMap()
+	return Session.Query(`SELECT * FROM users`).Iter().SliceMap()
 
 }
 
@@ -151,7 +150,7 @@ func (user *User) GetClaims() map[string]interface{} {
 func (user *User) AddRoleToProject(projectId gocql.UUID,role string) error  {
 	roleMap := make(map[gocql.UUID]string)
 	roleMap[projectId] = role
-	err := db.GetInstance().Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,user.UUID).Exec()
+	err := Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,user.UUID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
@@ -164,7 +163,7 @@ func (user *User) AddRoleToProject(projectId gocql.UUID,role string) error  {
 
 func (user *User) DeleteProject(projectId gocql.UUID) error  {
 
-	err := db.GetInstance().Session.Query(DELETE_USER_PROJECT_ROLE,projectId,user.UUID).Exec()
+	err := Session.Query(DELETE_USER_PROJECT_ROLE,projectId,user.UUID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
