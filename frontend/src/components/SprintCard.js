@@ -100,6 +100,10 @@ class SprintCard extends Component {
     })
   }
 
+  viewSprint = () => {
+    browserHistory.push('/sprint/' + this.props.id);
+  }
+
   render() {
     const { classes } = this.props
     const { id, status, goal, created_at, description } = this.props.data
@@ -132,15 +136,12 @@ class SprintCard extends Component {
           <Typography>{description}</Typography>
         </CardContent>
         <CardActions>
-          <Link
-            to={`${id}`}
-            className={classes.link}>
-            <Button
-              size="small"
-              color={'secondary'}>
-              View
-            </Button>
-          </Link>
+          <Button
+            onClick={() => { this.viewSprint() }}
+            size="small"
+            color={'secondary'}>
+            View
+          </Button>
         </CardActions>
 
         <Dialog

@@ -228,10 +228,8 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(sprintIssueList)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := successResponse{Status: true, Data: sprintIssueList, Message: "Done"}
+	response.send(w)
 }
 
 //ShowIssue Failed issue obj

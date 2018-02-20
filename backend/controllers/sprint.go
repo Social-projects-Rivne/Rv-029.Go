@@ -152,7 +152,6 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	sprint.ID = sprintId
 
 	err = sprint.FindById()
-
 	if err != nil {
 		res := helpers.Response{Message: DBError}
 		res.Failed(w)

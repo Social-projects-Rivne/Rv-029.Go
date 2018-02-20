@@ -1,5 +1,7 @@
 import {
   HANDLE_CURRENT_SPRINT,
+  HANDLE_SPRINT_OPEN,
+  HANDLE_SPRINT_ISSUES_LOADED,
   HANDLE_SPRINTS_LOADED,
   HANDLE_GOAL_UPDATE_SPRINT_INPUT,
   HANDLE_DESC_UPDATE_SPRINT_INPUT,
@@ -11,6 +13,13 @@ export const setSprints = (projects) => {
     type: HANDLE_SPRINTS_LOADED,
     payload: projects
   }
+}
+
+export const setActiveSprint = (sprint) => {
+    return {
+        type: HANDLE_SPRINT_OPEN,
+        payload: sprint
+    }
 }
 
 export const setCurrentSprint = (sprint) => {
@@ -39,4 +48,11 @@ export const setStatusUpdateSprintInput = (status) => {
     type: HANDLE_STATUS_UPDATE_SPRINT_INPUT,
     payload: status
   }
+}
+
+export const setSprintIssues = (issues) => {
+    return {
+        type: HANDLE_SPRINT_ISSUES_LOADED,
+        payload: issues
+    }
 }

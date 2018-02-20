@@ -122,17 +122,36 @@ func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 }
 
 //GetSprintIssueList returns all issues by board_id
-func (issue *Issue) GetSprintIssueList() ([]map[string]interface{}, error) {
+func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 
-	issueList, err := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter().SliceMap()
+	var issues []Issue
+	var row map[string]interface{}
 
-	if err != nil {
+	iterator := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter()
+
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			issues = append(issues, Issue{
+				UUID: 		row["id"].(gocql.UUID),
+				Name: 		row["name"].(string),
+				CreatedAt: 	row["created_at"].(time.Time),
+				UpdatedAt: 	row["updated_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
 		log.Printf("Error in method GetSprintIssueList inside models/issue.go: %s\n", err.Error())
 		return nil, err
 	}
 
-	return issueList, nil
-
+	return issues, nil
 }
 
 // //GetClaims Return list of claims to generate jwt token
