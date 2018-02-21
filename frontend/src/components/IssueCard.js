@@ -103,7 +103,7 @@ class IssueCard extends Component  {
 
   render() {
     const { classes } = this.props
-    const { name, description, status, estimate } = this.props.data
+    const { Name, Description, Status, Estimate } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
     const {
       setNameUpdateIssueInput,
@@ -119,18 +119,18 @@ class IssueCard extends Component  {
             container
             alignItems={'center'}>
             <Grid style={{ marginRight: '1em' }}>
-              <Chip label={status} />
+              <Chip label={Status} />
             </Grid>
             <Grid>
-              <Typography>{name}</Typography>
+              <Typography>{Name}</Typography>
             </Grid>
           </Grid>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container >
             <Grid item xs={12}>
-              <Typography type={'title'}>{ `Estimate: ${estimate}` }</Typography>
-              <Typography> {description} </Typography>
+              <Typography type={'title'}>{ `Estimate: ${Estimate}` }</Typography>
+              <Typography> {Description} </Typography>
             </Grid>
           </Grid>
         </ExpansionPanelDetails>

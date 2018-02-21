@@ -90,7 +90,6 @@ class BoardPage extends Component{
       status: 'Todo'
     })
     .then((response) => {
-      console.log(response)
       this.getIssuesList()
       this.handleClose()
     })
