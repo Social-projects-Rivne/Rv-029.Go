@@ -220,7 +220,6 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 	issue.SprintID = id
 
 	sprintIssueList, err := issue.GetSprintIssueList()
-
 	if err != nil {
 		log.Printf("Error occured in controllers/issue.go method: SprintIssueList, where: issue.GetSprintIssueList, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: SprintIssueList, where: issue.GetSprintIssueList, error: %s", err.Error())}

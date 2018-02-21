@@ -20,6 +20,7 @@ import Select from 'material-ui/Select'
 import TextField from 'material-ui/TextField'
 import Typography from 'material-ui/Typography'
 import EditIcon from 'material-ui-icons/ModeEdit';
+import { browserHistory } from 'react-router'
 import Card, {
   CardHeader,
   CardActions,
@@ -101,7 +102,7 @@ class SprintCard extends Component {
   }
 
   viewSprint = () => {
-    browserHistory.push('/sprint/' + this.props.id);
+    browserHistory.push('/sprint/' + this.props.data.id);
   }
 
   render() {

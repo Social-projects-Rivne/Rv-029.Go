@@ -124,7 +124,7 @@ func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 //GetSprintIssueList returns all issues by board_id
 func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 
-	var issues []Issue
+	issues := []Issue{}
 	var row map[string]interface{}
 
 	iterator := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter()
@@ -138,10 +138,21 @@ func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 			}
 
 			issues = append(issues, Issue{
-				UUID: 		row["id"].(gocql.UUID),
-				Name: 		row["name"].(string),
-				CreatedAt: 	row["created_at"].(time.Time),
-				UpdatedAt: 	row["updated_at"].(time.Time),
+				UUID: row["id"].(gocql.UUID),
+				Name: row["name"].(string),
+				Status: row["status"].(string),
+				Description: row["description"].(string),
+				Estimate: row["estimate"].(int),
+				UserID: row["user_id"].(gocql.UUID),
+				UserFirstName: row["user_first_name"].(string),
+				UserLastName: row["user_last_name"].(string),
+				SprintID: row["sprint_id"].(gocql.UUID),
+				BoardID: row["board_id"].(gocql.UUID),
+				BoardName: row["board_name"].(string),
+				ProjectID: row["project_id"].(gocql.UUID),
+				ProjectName: row["project_name"].(string),
+				CreatedAt: row["created_at"].(time.Time),
+				UpdatedAt: row["updated_at"].(time.Time),
 			})
 		}
 	}
