@@ -221,7 +221,7 @@ class BoardPage extends Component{
               id="name"
               label="Name"
               type="text"
-              onChange={(e) => {this.props.boardsActions.setGoal(e.target.value)}}
+              onChange={(e) => {this.props.boardsActions.setName(e.target.value)}}
               fullWidth />
             <TextField
               margin="dense"
