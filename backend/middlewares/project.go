@@ -35,7 +35,11 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 						Status: false,
 						Message: "You haven't permission",
 					}
-					jsonResponse, _ := json.Marshal(response)
+					jsonResponse, err := json.Marshal(response)
+					if err != nil{
+						log.Printf("Error in middlewares/project.go error: %+v",err)
+						return
+					}
 
 					w.WriteHeader(http.StatusForbidden)
 					w.Header().Set("Content-Type", "application/json")
@@ -56,7 +60,11 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 						Status: false,
 						Message: "You haven't permission",
 					}
-					jsonResponse, _ := json.Marshal(response)
+					jsonResponse, err := json.Marshal(response)
+					if err != nil{
+						log.Printf("Error in middlewares/project.go error: %+v",err)
+						return
+					}
 
 					w.WriteHeader(http.StatusForbidden)
 					w.Header().Set("Content-Type", "application/json")
@@ -75,7 +83,11 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 					Status: false,
 					Message: "You haven't permission",
 				}
-				jsonResponse, _ := json.Marshal(response)
+				jsonResponse, err := json.Marshal(response)
+				if err != nil{
+					log.Printf("Error in middlewares/project.go error: %+v",err)
+					return
+				}
 
 				w.WriteHeader(http.StatusForbidden)
 				w.Header().Set("Content-Type", "application/json")

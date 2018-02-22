@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"net/http"
+	"log"
 )
 
 // decodeAndValidate - entry point for deserialization and validation
@@ -25,7 +26,11 @@ type failedResponse struct {
 }
 
 func (b *failedResponse) send(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
+	jsonResponse, err := json.Marshal(b)
+	if err != nil{
+		log.Printf("Error in controllers/base error: %+v",err)
+		return
+	}
 	w.WriteHeader(http.StatusBadRequest)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
@@ -38,7 +43,11 @@ type successResponse struct {
 }
 
 func (b *successResponse) send(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
+	jsonResponse, err := json.Marshal(b)
+	if err != nil{
+		log.Printf("Error in controllers/base error: %+v",err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)

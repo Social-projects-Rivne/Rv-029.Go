@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"log"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -17,6 +18,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)
 		response := failedResponse{false, err.Error()}
 		response.send(w)
 		return
@@ -36,8 +38,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = board.Insert()
-
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)
 		response := failedResponse{false, "Error while accessing to database"}
 		response.send(w)
 		return
@@ -53,6 +55,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, err.Error()}
 		response.send(w)
 		return
@@ -62,6 +65,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Board ID is not valid"}
 		response.send(w)
 		return
@@ -69,7 +73,10 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	board.FindByID()
+	if err = board.FindByID();err != nil{
+		log.Printf("Error in controllers/board error: %+v",err)
+		return		
+	}
 
 	if boardRequestData.Name != "" {
 		board.Name = boardRequestData.Name
@@ -81,8 +88,8 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board.UpdatedAt = time.Now()
 	err = board.Update()
-
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Error while accessing to database"}
 		response.send(w)
 		return
@@ -97,6 +104,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Project ID is not valid"}
 		response.send(w)
 		return
@@ -107,6 +115,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Delete()
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Error while accessing to database"}
 		response.send(w)
 		return
@@ -121,6 +130,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 	id, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Board ID is not valid"}
 		response.send(w)
 		return
@@ -131,13 +141,18 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.FindByID()
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Error while accessing to database"}
 		response.send(w)
 		return
 	}
 
 	// TODO: refactor
-	jsonResponse, _ := json.Marshal(board)
+	jsonResponse, err := json.Marshal(board)
+	if err != nil{
+		log.Printf("Error in controllers/board error: %+v",err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
@@ -148,6 +163,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Project ID is not valid"}
 		response.send(w)
 		return
@@ -158,13 +174,18 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	boardsList, err := board.List(projectId)
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := failedResponse{false, "Error while accessing to database"}
 		response.send(w)
 		return
 	}
 
 	// TODO: refactor
-	jsonResponse, _ := json.Marshal(boardsList)
+	jsonResponse, err := json.Marshal(boardsList)
+	if err != nil{
+		log.Printf("Error in controllers/board error: %+v",err)
+		return		
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)

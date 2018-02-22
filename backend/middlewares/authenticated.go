@@ -9,6 +9,7 @@ import (
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
+	"log"
 )
 
 // Check if user authenticated
@@ -25,7 +26,11 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 				Status:  false,
 				Message: "You are not authorized.",
 			}
-			jsonResponse, _ := json.Marshal(response)
+			jsonResponse, err := json.Marshal(response)
+			if err != nil{
+				log.Printf("Error in middlewares/authenticated.go error: %+v",err)
+				return
+			}
 
 			w.WriteHeader(http.StatusForbidden)
 			w.Header().Set("Content-Type", "application/json")
@@ -44,7 +49,11 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 					Status:  false,
 					Message: "Invalid user JWT token claims",
 				}
-				jsonResponse, _ := json.Marshal(response)
+				jsonResponse, err := json.Marshal(response)
+				if err != nil{
+					log.Printf("Error in middlewares/authenticated.go error: %+v",err)
+					return
+				}
 
 				w.WriteHeader(http.StatusForbidden)
 				w.Header().Set("Content-Type", "application/json")
@@ -62,7 +71,11 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 					Status:  false,
 					Message: "You are not authorized.",
 				}
-				jsonResponse, _ := json.Marshal(response)
+				jsonResponse, err := json.Marshal(response)
+				if err != nil{
+					log.Printf("Error in middlewares/authenticated.go error: %+v",err)
+					return
+				}
 
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(jsonResponse)

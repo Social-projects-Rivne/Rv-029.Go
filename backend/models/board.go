@@ -28,7 +28,7 @@ func (b *Board) Insert() error {
 		b.ID, b.ProjectID, b.ProjectName, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Insert inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -41,7 +41,7 @@ func (b *Board) Update() error {
 		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Update inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -53,7 +53,7 @@ func (b *Board) Delete() error {
 	err := db.GetInstance().Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Delete inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -66,7 +66,7 @@ func (b *Board) FindByID() error {
 		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in method inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -79,7 +79,7 @@ func (b *Board) List(projectId gocql.UUID) ([]map[string]interface{}, error) {
 	boardsList, err := db.GetInstance().Session.Query(`SELECT * FROM boardslist WHERE project_id = ?;`, projectId).Iter().SliceMap()
 
 	if err != nil {
-		log.Printf("Error in method List inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return nil, err
 	}
 

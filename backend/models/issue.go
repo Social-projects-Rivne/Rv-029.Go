@@ -54,8 +54,8 @@ func (issue *Issue) Insert() error {
 		issue.SprintID, issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName,
 		issue.CreatedAt, issue.UpdatedAt).Exec(); err != nil {
 
-		log.Printf("Error occured inside models/issue.go, method:Insert, error: %v", err)
-		return err
+			log.Printf("Error in models/issue.go error: %+v",err)
+			return err
 	}
 	return nil
 }
@@ -71,7 +71,7 @@ func (issue *Issue) Update() error {
 		issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName, issue.SprintID,
 		issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName, issue.UpdatedAt, issue.UUID).Exec(); err != nil {
 
-		log.Printf("Error occured inside models/issue.go, method: Update, error: %v", err)
+			log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -82,7 +82,7 @@ func (issue *Issue) Delete() error {
 
 	if err := db.GetInstance().Session.Query(`DELETE FROM issues WHERE id= ? ;`,
 		issue.UUID).Exec(); err != nil {
-		log.Printf("Error occured inside models/issue.go, method: Delete, error: %v", err)
+			log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -101,7 +101,7 @@ func (issue *Issue) FindByID() error {
 		&issue.UserFirstName, &issue.UserLastName, &issue.SprintID, &issue.BoardID, &issue.BoardName,
 		&issue.ProjectID, &issue.ProjectName, &issue.CreatedAt, &issue.UpdatedAt); err != nil {
 
-		log.Printf("Error occured inside models/issue.go, method:FindByID, error: %v", err)
+			log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -113,7 +113,7 @@ func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 	issueList, err := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE board_id = ? ALLOW FILTERING", issue.BoardID).Iter().SliceMap()
 
 	if err != nil {
-		log.Printf("Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: %s\n", err.Error())
+		log.Printf("Error in models/issue.go error: %+v",err)
 		return nil, err
 	}
 
@@ -127,7 +127,7 @@ func (issue *Issue) GetSprintIssueList() ([]map[string]interface{}, error) {
 	issueList, err := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter().SliceMap()
 
 	if err != nil {
-		log.Printf("Error in method GetSprintIssueList inside models/issue.go: %s\n", err.Error())
+		log.Printf("Error in models/issue.go error: %+v",err)
 		return nil, err
 	}
 

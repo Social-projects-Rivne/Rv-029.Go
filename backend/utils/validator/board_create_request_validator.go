@@ -20,13 +20,13 @@ func (b *BoardCreateRequestData) Validate(r *http.Request) error {
 
 	err = b.ValidateRequired(b.Name)
 	if err != nil {
-		log.Printf(err.Error())
+		log.Printf("Error in utils/validator/board_create_request_validator.go error: %+v",err)
 		return err
 	}
 
 	err = b.ValidateRequired(b.Desc)
 	if err != nil {
-		log.Printf(err.Error())
+		log.Printf("Error in utils/validator/board_create_request_validator.go error: %+v",err)
 		return err
 	}
 
@@ -34,7 +34,7 @@ func (b *BoardCreateRequestData) Validate(r *http.Request) error {
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	if err != nil {
-		log.Printf("Invalid Project ID: %v\n", err.Error())
+		log.Printf("Error in utils/validator/board_create_request_validator.go error: %+v",err)
 		return err
 	}
 
@@ -43,6 +43,7 @@ func (b *BoardCreateRequestData) Validate(r *http.Request) error {
 	err = project.FindByID()
 
 	if err != nil {
+		log.Printf("Error in utils/validator/board_create_request_validator.go error: %+v",err)		
 		return err
 	}
 

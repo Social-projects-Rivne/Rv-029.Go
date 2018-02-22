@@ -17,7 +17,7 @@ func ProjectsList(w http.ResponseWriter, r *http.Request) {
 
 	projects , err := project.GetProjectList()
 	if err != nil{
-		log.Printf("Error in controllers/project.go . Can't get projects list, method: ProjectsList where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
 		response.send(w)
 		return
@@ -32,7 +32,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: ShowProjects where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
 		response.send(w)
 		return
@@ -40,7 +40,10 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 
 	project := models.Project{}
 	project.UUID = projectId
-	project.FindByID()
+	if err = project.FindByID();err !=nil{
+		log.Printf("Error in controllers/project error: %+v",err)
+		return
+	}
 
 	response := successResponse{true,"Projects list",project}
 	response.send(w)
@@ -62,7 +65,10 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 	user := r.Context().Value("user").(models.User)
 
 	project := models.Project{gocql.TimeUUID(),projectRequestData.Name,time.Now(),time.Now()}
-	project.Insert()
+	if err = project.Insert();err != nil{
+		log.Printf("Error in controllers/project error: %+v",err)
+		return
+	}
 
 	user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
 
@@ -86,7 +92,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: UpdateProject where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
 		response.send(w)
 		return
@@ -98,7 +104,10 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	project.Name = projectRequestData.Name
 	project.UpdatedAt = time.Now()
 
-	project.Update()
+	if err = project.Update();err != nil{
+		log.Printf("Error in controllers/project error: %+v",err)
+		return
+	}
 
 	response := successResponse{true, "Project has updated",nil}
 	response.send(w)
@@ -111,7 +120,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: DeleteProject where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := failedResponse{false, fmt.Sprintf("Error %s", err.Error())}
 		response.send(w)
 		return
@@ -122,7 +131,10 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	user := r.Context().Value("user").(models.User)
 	user.DeleteProject(project.UUID)
 
-	project.Delete()
+	if err = project.Delete(); err != nil{
+		log.Printf("Error in controllers/project error: %+v",err)
+		return
+	}
 
 	response := successResponse{true, "Project has deleted",nil}
 	response.send(w)

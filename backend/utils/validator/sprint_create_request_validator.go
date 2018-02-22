@@ -22,14 +22,14 @@ func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 	err = s.ValidateRequired(s.Goal)
 
 	if err != nil {
-		log.Printf(err.Error())
+		log.Printf("Error in utils/validator/sprint_create_request_validator.go error: %+v",err)
 		return err
 	}
 
 	err = s.ValidateRequired(s.Desc)
 
 	if err != nil {
-		log.Printf(err.Error())
+		log.Printf("Error in utils/validator/sprint_create_request_validator.go error: %+v",err)
 		return err
 	}
 
@@ -37,7 +37,7 @@ func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		log.Printf("Invalid Board ID: %v\n", err.Error())
+		log.Printf("Error in utils/validator/sprint_create_request_validator.go error: %+v",err)
 		return err
 	}
 
@@ -46,6 +46,7 @@ func (s *SprintCreateRequestData) Validate(r *http.Request) error {
 	err = board.FindByID()
 
 	if err != nil {
+		log.Printf("Error in utils/validator/sprint_create_request_validator.go error: %+v",err)		
 		return err
 	}
 

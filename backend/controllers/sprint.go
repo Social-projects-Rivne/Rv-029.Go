@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"log"
 )
 
 const DBError = "Error while accessing to database"
@@ -18,6 +19,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := failedResponse{false, err.Error()}
 		res.send(w)
 		return
@@ -41,6 +43,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Insert()
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, DBError}
 		res.send(w)
 		return
@@ -56,6 +59,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, err.Error()}
 		res.send(w)
 		return
@@ -66,7 +70,10 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	sprint.FindById()
+	if err = sprint.FindById();err != nil{
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		return		
+	}
 
 	if sprintRequestData.Goal != "" {
 		sprint.Goal = sprintRequestData.Goal
@@ -85,6 +92,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Update()
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, DBError}
 		res.send(w)
 		return
@@ -99,6 +107,7 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, "Sprint ID is not valid"}
 		res.send(w)
 		return
@@ -110,6 +119,7 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Delete()
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, DBError}
 		res.send(w)
 		return
@@ -124,6 +134,7 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		response := failedResponse{false, "Sprint ID is not valid"}
 		response.send(w)
 		return
@@ -135,12 +146,17 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.FindById()
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, DBError}
 		res.send(w)
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(sprint)
+	jsonResponse, err := json.Marshal(sprint)
+	if err != nil{
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		return
+	}
 
 	res := successResponse{true, "Done", jsonResponse}
 	res.send(w)
@@ -151,6 +167,7 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, "Board ID is not valid"}
 		res.send(w)
 		return
@@ -161,12 +178,17 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	sprintsList, err := sprint.List(boardId)
 
 	if err != nil {
+		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := failedResponse{false, DBError}
 		res.send(w)
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(sprintsList)
+	jsonResponse, err := json.Marshal(sprintsList)
+	if err != nil{
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		return
+	}
 
 	res := successResponse{true, "Done", jsonResponse}
 	res.send(w)

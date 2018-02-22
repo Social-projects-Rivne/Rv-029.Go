@@ -33,25 +33,32 @@ func GetInstance() *DB {
 }
 
 func (db *DB) init() {
-	filename, _ := filepath.Abs("./backend/config/db.yml")
+	filename, err := filepath.Abs("./backend/config/db.yml")
+	if err != nil{
+		log.Printf("Error in utils/db/db.go error: %+v",err)
+	}
 	yamlFile, err := ioutil.ReadFile(filename)
 
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.Printf("Error in utils/db/db.go error: %+v",err)
 	}
 
 	config := &dbConfig{}
 
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.Printf("Error in utils/db/db.go error: %+v",err)
 	}
 
 	cluster := gocql.NewCluster(config.Hosts...)
 	cluster.Keyspace = config.Keyspace
 	cluster.Authenticator = config.Authenticator
 	cluster.Consistency = gocql.One
-	session, _ := cluster.CreateSession()
+	session, err := cluster.CreateSession()
+	if err != nil{
+		log.Printf("Error in utils/db/db.go error: %+v",err)
+		return		
+	}
 
 	db.Session = session
 }

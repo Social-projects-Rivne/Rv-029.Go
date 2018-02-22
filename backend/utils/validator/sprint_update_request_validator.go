@@ -22,7 +22,11 @@ func (s *SprintUpdateRequestData) Validate(r *http.Request) error {
 
 func validateSprintId(r *http.Request) error {
 	vars := mux.Vars(r)
-	sprintId, _ := gocql.ParseUUID(vars["sprint_id"])
+	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
+	if err != nil{
+		log.Printf("Error in utils/validator/sprint_update_request_validator.go error: %+v",err)
+		return err
+	}
 
 	var sprintName string
 
@@ -32,7 +36,7 @@ func validateSprintId(r *http.Request) error {
 
 	if sprintName == "" {
 		err := fmt.Errorf("There is no sprint with ID %q", sprintId)
-		log.Printf(err.Error())
+		log.Printf("Error in utils/validator/sprint_update_request_validator.go error: %+v",err)
 		return err
 	}
 

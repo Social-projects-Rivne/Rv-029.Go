@@ -18,12 +18,12 @@ func (ProjectTableSeeder) Run() {
 
 	id1 , err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
 	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
+		log.Printf("Error in seeder/seeders/project_table_seeder.go error: %+v",err)
 	}
 
 	id2 , err := gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
 	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
+		log.Printf("Error in seeder/seeders/project_table_seeder.go error: %+v",err)
 	}
 
 	project := models.Project{
@@ -33,7 +33,10 @@ func (ProjectTableSeeder) Run() {
 		UpdatedAt: time.Now(),
 	}
 
-	project.Insert()
+	if err := project.Insert();err != nil{
+		log.Printf("Error in seeder/seeders/project_table_seeder.go error: %+v",err)
+		return		
+	}
 
 	project = models.Project{
 		UUID:      id2,
@@ -42,6 +45,8 @@ func (ProjectTableSeeder) Run() {
 		UpdatedAt: time.Now(),
 	}
 
-	project.Insert()
-
+	if err := project.Insert();err != nil{
+		log.Printf("Error in seeder/seeders/project_table_seeder.go error: %+v",err)
+		return		
+	}
 }
