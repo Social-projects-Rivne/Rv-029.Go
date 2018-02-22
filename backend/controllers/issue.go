@@ -58,7 +58,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 
 	board := &models.Board{}
 	board.ID = issue.BoardID
-	if err := board.FindByID(); err != nil {
+	if err := models.BoardDB.FindByID(board); err != nil {
 		log.Printf("Error occured in controllers/issue.go, method:StoreIssue, where: board.FindByID, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go, method:StoreIssue, where: board.FindByID, error: %s", err.Error())}
 		response.Failed(w)

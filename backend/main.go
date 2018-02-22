@@ -11,9 +11,12 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 )
 
 func main() {
+	models.InitBoardDB(&models.BoardStorage{ db.GetInstance().Session })
+
 	var cmd string
 
 	f, err := os.OpenFile(fmt.Sprint("./logs/", time.Now().Format("2006_01_02"), "_task_manager.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)

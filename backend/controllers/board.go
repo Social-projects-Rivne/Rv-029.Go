@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
-	"fmt"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +44,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		time.Now(),
 	}
 
-	err = board.Insert()
+	err = models.BoardDB.Insert(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -79,7 +78,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -90,7 +89,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board.Name = boardRequestData.Name
 	board.Desc = boardRequestData.Desc
 	board.UpdatedAt = time.Now()
-	err = board.Update()
+	err = models.BoardDB.Update(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -105,28 +104,16 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	boardId, err := gocql.ParseUUID(vars["board_id"])
-	//boardId, err := gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")
 
 	if err != nil {
-		fmt.Println(r.URL.Path)
-		fmt.Println(vars)
-		//response := helpers.Response{Message: "Board ID is not valid"}
-		response := helpers.Response{Message: err.Error()}
+		response := helpers.Response{Message: "Board ID is not valid"}
 		response.Failed(w)
 		return
-	} else {
-		fmt.Println(boardId)
 	}
 
-	fmt.Println("1#######################")
 	board := models.Board{}
 	board.ID = boardId
-	//err = Delete(&board)
-	err = models.CStore.Delete(&board)
-	//boardModel := NewModel{&board}
-	fmt.Println("2#######################")
-	//err = boardModel.Delete()
-
+	err = models.BoardDB.Delete(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -150,7 +137,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = id
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -172,9 +159,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	board := models.Board{}
-
-	boardsList, err := board.List(projectId)
+	boardsList, err := models.BoardDB.List(projectId)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
