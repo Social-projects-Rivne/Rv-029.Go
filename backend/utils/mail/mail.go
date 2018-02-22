@@ -3,19 +3,16 @@ package mail
 import (
 	"crypto/tls"
 	"fmt"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
 	"net/mail"
 	"net/smtp"
-	"path/filepath"
 )
 
 type mailer interface {
 	Send(address []mail.Address, subject string, msg string) error
 }
 
-type smtpMailer struct {
+type SmtpMailerConfig struct {
 	Connection struct {
 		Host     string
 		Port     int
@@ -31,32 +28,27 @@ type smtpMailer struct {
 	}
 }
 
-var Mailer *smtpMailer
+type SmtpMailer struct {
+	*SmtpMailerConfig
+}
 
-func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
+var	Mailer *SmtpMailer
 
-	filename, _ := filepath.Abs("./backend/config/mail.yml")
-	yamlFile, err := ioutil.ReadFile(filename)
+func InitFromConfig(config *SmtpMailerConfig) *SmtpMailer {
+	mailer := &SmtpMailer{config}
 
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-
-	Mailer = &smtpMailer{}
-
-	err = yaml.Unmarshal(yamlFile, &Mailer)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-
-	switch Mailer.Connection.Auth {
+	switch mailer.Connection.Auth {
 	//case "login": //TODO:
 	case "cram_md5":
-		Mailer.auth = smtp.CRAMMD5Auth(Mailer.Connection.Username, Mailer.Connection.Password)
+		mailer.auth = smtp.CRAMMD5Auth(mailer.Connection.Username, mailer.Connection.Password)
 	default:
-		Mailer.auth = smtp.PlainAuth("", Mailer.Connection.Username, Mailer.Connection.Password, Mailer.Connection.Host)
+		mailer.auth = smtp.PlainAuth("", mailer.Connection.Username, mailer.Connection.Password, mailer.Connection.Host)
 	}
 
+	return mailer
+}
+
+func (m *SmtpMailer) Send(toEmail, toName, subject, msg string) error {
 	from := mail.Address{m.Sender.Name, m.Sender.Email}
 	to := mail.Address{m.Sender.Name, m.Sender.Email}
 

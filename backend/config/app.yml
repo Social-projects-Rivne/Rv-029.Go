@@ -1,0 +1,39 @@
+db:
+  hosts: ["127.0.0.1"]
+  port: 9042
+  keyspace: task_manager
+  authenticator:
+    username:
+    password:
+jwt:
+  claims:
+    #identifier of the server or system
+    iss: "Task Manager App"
+    #date/time when token was issued (default now)
+    iat:
+    #expiration time, at which the token is no longer valid (based on ttl)
+    exp:
+    #time after what token will be valid
+    nbf:
+    #Audience (user email)
+    aud:
+    #subject
+    sub:
+  #secret key
+  secret: "SomeSecretKey"
+  #minites - duration on which token will be valid
+  ttl: 60
+  #minutes - duration on which refresh token will be valid
+  refresh_ttl: 20160
+mail:
+  sender:
+    name: "Some Sender"
+    email: "sender@mail.com"
+  connection:
+    host: smtp.mailtrap.io
+    port: 465
+    username: 7becbf096c9b34
+    password: deb0640e7fac43
+    # plain, login, cram_md5
+    auth: plain
+    tls: true
