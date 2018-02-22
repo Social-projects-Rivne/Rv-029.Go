@@ -18,3 +18,4 @@ func decodeAndValidate(r *http.Request, v validator.InputValidation) error {
 	// perform validation on the InputValidation implementation
 	return v.Validate(r)
 }
+

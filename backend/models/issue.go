@@ -5,7 +5,6 @@ import (
 	"time"
 	//"log"
 
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 )
 
@@ -46,7 +45,7 @@ type Issue struct {
 //Insert func inserts user object in database
 func (issue *Issue) Insert() error {
 
-	if err := db.GetInstance().Session.Query(`INSERT INTO issues (id,name,status,description,estimate,user_id,
+	if err := Session.Query(`INSERT INTO issues (id,name,status,description,estimate,user_id,
 		user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,
 		project_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`,
 
@@ -63,7 +62,7 @@ func (issue *Issue) Insert() error {
 //Update updates issue by UUID
 func (issue *Issue) Update() error {
 
-	if err := db.GetInstance().Session.Query(`Update issues SET name = ?, status = ?, description = ?,
+	if err := Session.Query(`Update issues SET name = ?, status = ?, description = ?,
 		 estimate = ?, user_id = ?,user_first_name = ?,
 		 user_last_name = ?,sprint_id = ?, board_id = ?,board_name = ?,
 		  project_id = ?, project_name = ?,updated_at = ? WHERE id= ? ;`,
@@ -80,7 +79,7 @@ func (issue *Issue) Update() error {
 //Delete removes issue by id
 func (issue *Issue) Delete() error {
 
-	if err := db.GetInstance().Session.Query(`DELETE FROM issues WHERE id= ? ;`,
+	if err := Session.Query(`DELETE FROM issues WHERE id= ? ;`,
 		issue.UUID).Exec(); err != nil {
 		log.Printf("Error occured inside models/issue.go, method: Delete, error: %v", err)
 		return err
@@ -91,7 +90,7 @@ func (issue *Issue) Delete() error {
 //FindByID finds issue by id
 func (issue *Issue) FindByID() error {
 
-	if err := db.GetInstance().Session.Query(`SELECT id, name, status, description,
+	if err := Session.Query(`SELECT id, name, status, description,
 		estimate, user_id,user_first_name, user_last_name,
 		sprint_id, board_id, board_name, project_id,
 		project_name, created_at, updated_at
@@ -110,7 +109,7 @@ func (issue *Issue) FindByID() error {
 //GetBoardIssueList returns all issues by board_id
 func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 
-	issueList, err := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE board_id = ? ALLOW FILTERING", issue.BoardID).Iter().SliceMap()
+	issueList, err := Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE board_id = ? ALLOW FILTERING", issue.BoardID).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: %s\n", err.Error())
@@ -127,7 +126,7 @@ func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 	issues := []Issue{}
 	var row map[string]interface{}
 
-	iterator := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter()
+	iterator := Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter()
 
 	if iterator.NumRows() > 0 {
 		for {

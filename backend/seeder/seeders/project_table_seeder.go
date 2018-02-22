@@ -33,7 +33,7 @@ func (ProjectTableSeeder) Run() {
 		UpdatedAt: time.Now(),
 	}
 
-	project.Insert()
+	models.ProjectDB.Insert(&project)
 
 	project = models.Project{
 		UUID:      id2,
@@ -42,6 +42,6 @@ func (ProjectTableSeeder) Run() {
 		UpdatedAt: time.Now(),
 	}
 
-	project.Insert()
+	models.ProjectDB.Insert(&project)
 
 }

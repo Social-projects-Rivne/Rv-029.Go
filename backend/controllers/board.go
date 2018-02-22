@@ -26,7 +26,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	project := models.Project{}
 	project.UUID = projectId
-	err = project.FindByID()
+	err = models.ProjectDB.FindByID(&project)
 
 	if err != nil {
 		response := helpers.Response{Message: "Project ID is not valid"}
@@ -44,7 +44,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		time.Now(),
 	}
 
-	err = board.Insert()
+	err = models.BoardDB.Insert(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -78,7 +78,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -89,7 +89,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board.Name = boardRequestData.Name
 	board.Desc = boardRequestData.Desc
 	board.UpdatedAt = time.Now()
-	err = board.Update()
+	err = models.BoardDB.Update(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -106,14 +106,14 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := helpers.Response{Message: "Project ID is not valid"}
+		response := helpers.Response{Message: "Board ID is not valid"}
 		response.Failed(w)
 		return
 	}
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.Delete()
+	err = models.BoardDB.Delete(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -137,7 +137,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = id
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -159,9 +159,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	board := models.Board{}
-
-	boardsList, err := board.List(projectId)
+	boardsList, err := models.BoardDB.List(projectId)
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}

@@ -3,7 +3,6 @@ package middlewares
 import (
 	"net/http"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/gocql/gocql"
 	"log"

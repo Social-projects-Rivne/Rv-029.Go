@@ -58,6 +58,9 @@ func init()  {
 }
 
 func main() {
+	models.InitBoardDB(&models.BoardStorage{ APP.DB })
+	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
+
 	var cmd string
 
 	jwt.Config = &APP.Config.JWT

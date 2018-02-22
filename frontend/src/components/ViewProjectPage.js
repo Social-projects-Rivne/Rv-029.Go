@@ -13,7 +13,6 @@ import {API_URL} from "../constants/global"
 import messages from "../services/messages"
 import axios from "axios"
 
-
 class ViewProjectPage extends Component {
 
   componentWillMount() {
