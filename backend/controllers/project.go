@@ -18,7 +18,7 @@ func ProjectsList(w http.ResponseWriter) {
 
 	projects , err := project.GetProjectList()
 	if err != nil{
-		log.Printf("Error in controllers/project.go . Can't get projects list, method: ProjectsList where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()),StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -33,7 +33,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: ShowProjects where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
@@ -43,7 +43,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 	project.UUID = projectId
 	err = project.FindByID()
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: ShowProjects where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()) ,StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -105,7 +105,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: UpdateProject where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()),StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -135,7 +135,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project.go . Can't parse uuid, method: DeleteProject where: %s", err.Error())
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
