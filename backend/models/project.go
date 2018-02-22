@@ -23,8 +23,9 @@ type Project struct {
 //Insert func inserts project obj into table
 func (project *Project) Insert() error {
 
-	err := Session.Query(INSERT_PROJECT,gocql.TimeUUID(),  project.Name,  project.CreatedAt, project.UpdatedAt).Exec();
+	project.UUID = gocql.TimeUUID()
 
+	err := Session.Query(INSERT_PROJECT, project.UUID,  project.Name,  project.CreatedAt, project.UpdatedAt).Exec();
 	if err != nil {
 		log.Printf("Error in method Insert models/project.go: %s\n", err.Error())
 		return err

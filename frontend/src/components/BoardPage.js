@@ -69,8 +69,7 @@ class BoardPage extends Component{
   getIssuesList = () => {
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
-        this.props.issuesActions.setIssues(response.data)
-        console.log(response.data)
+        this.props.issuesActions.setIssues(response.data.Data)
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {

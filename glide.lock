@@ -1,8 +1,10 @@
-hash: 9e90594c8e251c6c3858511e1443001b5abce3fdd21b4307e2c08240c15039f4
-updated: 2018-02-19T22:15:35.319213139+02:00
+hash: d6ca59accc943b975db223165c33952c3f6c40a86f13e28f3b6944daba86e8ac
+updated: 2018-02-22T22:45:55.146352004+02:00
 imports:
 - name: github.com/auth0/go-jwt-middleware
   version: 5493cabe49f7bfa6e2ec444a09d334d90cd4e2bd
+- name: github.com/corpix/uarand
+  version: 2b8494104d86337cdd41d0a49cbed8e4583c0ab4
 - name: github.com/dgrijalva/jwt-go
   version: dbeaa9332f19a944acb5736b4456cfcc02140e29
 - name: github.com/gocql/gocql
@@ -23,10 +25,12 @@ imports:
   version: 53c1911da2b537f792e7cafcb446b05ffe33b996
 - name: github.com/hailocab/go-hostpool
   version: e80d13ce29ede4452c43dea11e79b9bc8a15b478
+- name: github.com/icrowley/fake
+  version: 4178557ae428460c3780a381c824a1f3aceb6325
 - name: github.com/relops/cqlr
   version: 0ac35893ea3f1e4ee717ba838972b70a0943f7d7
 - name: github.com/rs/cors
-  version: 7af7a1e09ba336d2ea14b1ce73bf693c6837dbf6
+  version: feef513b9575b32f84bafa580aad89b011259019
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
