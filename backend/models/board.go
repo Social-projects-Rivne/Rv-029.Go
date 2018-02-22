@@ -4,7 +4,6 @@ import (
 	"github.com/gocql/gocql"
 	"log"
 	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 )
 
 //Board model
@@ -24,7 +23,7 @@ type BoardStorage interface {
 
 //Insert func inserts board object in database
 func (b *Board) Insert() error {
-	err := db.GetInstance().Session.Query(`INSERT INTO boards (id, project_id, project_name, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+	err := Session.Query(`INSERT INTO boards (id, project_id, project_name, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`,
 		b.ID, b.ProjectID, b.ProjectName, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
 
 	if err != nil {
@@ -37,7 +36,7 @@ func (b *Board) Insert() error {
 
 //Update func updates board name and description by id
 func (b *Board) Update() error {
-	err := db.GetInstance().Session.Query(`UPDATE boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
+	err := Session.Query(`UPDATE boards SET name = ?, description = ?, updated_at = ? WHERE id = ?;`,
 		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec()
 
 	if err != nil {
@@ -50,7 +49,7 @@ func (b *Board) Update() error {
 
 //Delete removes board by id
 func (b *Board) Delete() error {
-	err := db.GetInstance().Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec()
+	err := Session.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method Delete inside models/board.go: %s\n", err.Error())
@@ -62,7 +61,7 @@ func (b *Board) Delete() error {
 
 //FindByID func finds board by id
 func (b *Board) FindByID() error {
-	err := db.GetInstance().Session.Query(`SELECT id, project_id, name, description, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
+	err := Session.Query(`SELECT id, project_id, name, description, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
 		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
@@ -76,7 +75,7 @@ func (b *Board) FindByID() error {
 //List func return list of boards orger by project_id
 func (b *Board) List(projectId gocql.UUID) ([]map[string]interface{}, error) {
 
-	boardsList, err := db.GetInstance().Session.Query(`SELECT * FROM boardslist WHERE project_id = ?;`, projectId).Iter().SliceMap()
+	boardsList, err := Session.Query(`SELECT * FROM boardslist WHERE project_id = ?;`, projectId).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Error in method List inside models/board.go: %s\n", err.Error())
