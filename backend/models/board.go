@@ -76,11 +76,11 @@ func (s *BoardStorage) Delete(b *Board) error {
 
 //FindByID func finds board by id
 func (s *BoardStorage) FindByID(b *Board) error {
-	err := s.DB.Query(`SELECT id, project_id, name, description, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
-		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.CreatedAt, &b.UpdatedAt)
+	err := s.DB.Query(`SELECT id, project_id, name, description, project_name, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
+		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.ProjectName, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in method inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in method inside models/board.go: %+v\n", err)
 		return err
 	}
 
