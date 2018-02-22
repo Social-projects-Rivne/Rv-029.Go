@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+const (
+	SPRINT_STAUS_TODO = "TODO"
+	SPRINT_STAUS_IN_PROGRESS = "In Progress"
+	SPRINT_STAUS_DONE = "Done"
+)
+
 type Sprint struct {
 	ID          gocql.UUID `cql:"id" key:"primary"`
 	ProjectId   gocql.UUID `cql:"project_id"`

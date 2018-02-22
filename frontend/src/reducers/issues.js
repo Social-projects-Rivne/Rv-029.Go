@@ -24,10 +24,10 @@ export default function (state = initialState, action) {
       return {
         ...state,
         currentIssue: action.payload,
-        issueName: action.payload.name,
-        issueDesc: action.payload.description,
-        issueStatus: action.payload.status,
-        issueEstimate: action.payload.estimate
+        issueName: action.payload.Name,
+        issueDesc: action.payload.Description,
+        issueStatus: action.payload.Status,
+        issueEstimate: action.payload.Estimate
       }
     case HANDLE_NAME_UPDATE_ISSUE_INPUT:
       return { ...state, issueName: action.payload }

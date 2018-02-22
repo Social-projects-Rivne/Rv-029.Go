@@ -202,10 +202,8 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(boardIssueList)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := helpers.Response{Message: "Done", Data: boardIssueList}
+	response.Success(w)
 }
 
 //SprintIssueslist returns list of issues order by sprint_id

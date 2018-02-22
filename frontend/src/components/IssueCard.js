@@ -55,12 +55,12 @@ class IssueCard extends Component  {
   }
 
   updateIssue = () => {
-    const { id } = this.props.data
+    const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
-    axios.put(API_URL + `project/board/issue/update/${ id }`, {
+    axios.put(API_URL + `project/board/issue/update/${ UUID }`, {
       name: issueName,
       description: issueDesc,
       estimate: +issueEstimate,
@@ -111,7 +111,7 @@ class IssueCard extends Component  {
       setEstimateUpdateIssueInput,
       setStatusUpdateIssueInput
     } = this.props.issuesActions
-
+      
     return (
       <ExpansionPanel>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>

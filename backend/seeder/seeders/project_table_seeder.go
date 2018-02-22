@@ -6,42 +6,37 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"log"
+	"github.com/icrowley/fake"
+	"fmt"
 )
 
 //ProjectTableSeeder model
 type ProjectTableSeeder struct {
 }
 
+var projects []models.Project
+var userProjects map[gocql.UUID]string
+
 //Run .
 func (ProjectTableSeeder) Run() {
 
+	projects = []models.Project{}
+	userProjects = make(map[gocql.UUID]string)
 
-	id1 , err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
-	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
+	for i:=0; i<10; i++ {
+		project := models.Project{
+			UUID:      gocql.TimeUUID(),
+			Name:      fmt.Sprintf("%s #%d", fake.WordsN(3), i),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+
+		err := project.Insert()
+		if err != nil {
+			log.Fatalf("Project was`n inserted during seeding. Error: %+v")
+		}
+
+		userProjects[project.UUID] = models.ROLE_OWNER
+		projects = append(projects, project)
 	}
-
-	id2 , err := gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
-	if err != nil {
-		log.Fatal("Can't parse uuid ",err)
-	}
-
-	project := models.Project{
-		UUID:      id1,
-		Name:      "project number one",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	project.Insert()
-
-	project = models.Project{
-		UUID:      id2,
-		Name:      "project number two",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	project.Insert()
-
 }
