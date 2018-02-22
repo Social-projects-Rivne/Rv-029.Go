@@ -11,6 +11,10 @@ import (
 	"github.com/relops/cqlr"
 )
 
+
+
+
+
 const PRIMERY = "primery"
 
 type BaseModel struct {

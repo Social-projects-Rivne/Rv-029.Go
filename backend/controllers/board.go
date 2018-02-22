@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
+	"fmt"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -106,14 +107,18 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := helpers.Response{Message: "Project ID is not valid"}
+		fmt.Println(r.URL.Path)
+		fmt.Println(vars["board_id"])
+		//response := helpers.Response{Message: "Board ID is not valid"}
+		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
 	}
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.Delete()
+	boardModel := NewModel{&board}
+	err = boardModel.Delete()
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}

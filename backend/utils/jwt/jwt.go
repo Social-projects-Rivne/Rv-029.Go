@@ -18,7 +18,12 @@ type JWTConfig struct {
 
 var Config *JWTConfig
 
-func init() {
+type WithClaims interface {
+	GetClaims() map[string]interface{}
+}
+
+// Generate jwt token with default and custom claims
+func GenerateToken(wc WithClaims) (string, error) {
 	filename, _ := filepath.Abs("./backend/config/jwt.yml")
 	yamlFile, err := ioutil.ReadFile(filename)
 
@@ -34,14 +39,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-}
 
-type WithClaims interface {
-	GetClaims() map[string]interface{}
-}
-
-// Generate jwt token with default and custom claims
-func GenerateToken(wc WithClaims) (string, error) {
 	// Merge default and custom claims
 	claims := Config.Claims
 	for key, value := range wc.GetClaims() {

@@ -21,3 +21,6 @@
 
 # Node modules
 node_modules/
+
+# pilu/fresh
+tmp/
