@@ -8,18 +8,30 @@ import (
 	"net/http"
 	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
+	"log"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
-	var boardRequestData validator.BoardCreateRequestData
 
-	err := decodeAndValidate(r, &boardRequestData)
+	req, err := models.BoardRequest.Decode(r, models.BoardCreateRequest{})
+	request := req.(models.BoardCreateRequest)
 
 	if err != nil {
+		log.Fatal("error")
+		// todo fix exception
 		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
 	}
+
+	log.Fatal("end")
+
+	//err = decodeAndValidate(r, &boardRequestData)
+	//if err != nil {
+	//	response := helpers.Response{Message: err.Error()}
+	//	response.Failed(w)
+	//	return
+	//}
 
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
@@ -38,8 +50,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		gocql.TimeUUID(),
 		project.UUID,
 		project.Name,
-		boardRequestData.Name,
-		boardRequestData.Desc,
+		request.Name,
+		request.Desc,
 		time.Now(),
 		time.Now(),
 	}

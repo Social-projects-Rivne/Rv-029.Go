@@ -1,9 +1,9 @@
 package models
 
 import (
+	"github.com/gocql/gocql"
 	"log"
 	"time"
-	"github.com/gocql/gocql"
 )
 
 type Board struct {
