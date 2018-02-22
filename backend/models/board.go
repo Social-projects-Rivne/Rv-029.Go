@@ -18,9 +18,20 @@ type Board struct {
 	UpdatedAt   time.Time  `cql:"updated_at"`
 }
 
+type IBoardStorage interface {
+	Insert(board *Board) error
+
+}
+
+type BoardStorageType struct {
+	db *gocql.Session
+}
+
+var BoardStorage IBoardStorage
+
 //Insert func inserts board object in database
-func (b *Board) Insert() error {
-	err := db.GetInstance().Session.Query(`INSERT INTO boards (id, project_id, project_name, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+func (s *BoardStorageType) Insert(b *Board) error {
+	err := s.db.Query(`INSERT INTO boards (id, project_id, project_name, name, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?);`,
 		b.ID, b.ProjectID, b.ProjectName, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
 
 	if err != nil {

@@ -105,20 +105,28 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	boardId, err := gocql.ParseUUID(vars["board_id"])
+	//boardId, err := gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")
 
 	if err != nil {
 		fmt.Println(r.URL.Path)
-		fmt.Println(vars["board_id"])
+		fmt.Println(vars)
 		//response := helpers.Response{Message: "Board ID is not valid"}
 		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
+	} else {
+		fmt.Println(boardId)
 	}
 
+	fmt.Println("1#######################")
 	board := models.Board{}
 	board.ID = boardId
-	boardModel := NewModel{&board}
-	err = boardModel.Delete()
+	//err = Delete(&board)
+	err = models.CStore.Delete(&board)
+	//boardModel := NewModel{&board}
+	fmt.Println("2#######################")
+	//err = boardModel.Delete()
+
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}

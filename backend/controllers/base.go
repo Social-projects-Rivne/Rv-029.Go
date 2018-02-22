@@ -5,6 +5,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"net/http"
 	"github.com/gocql/gocql"
+	"fmt"
 )
 
 // decodeAndValidate - entry point for deserialization and validation
@@ -32,6 +33,11 @@ type NewModel struct {
 	Model CRUD
 }
 
+func Delete(c CRUD) error {
+	fmt.Println("3#######################")
+	return c.Delete()
+}
+
 func (n *NewModel) Insert() error {
 	return n.Model.Insert()
 }
@@ -41,6 +47,7 @@ func (n *NewModel) Update() error {
 }
 
 func (n *NewModel) Delete() error {
+	fmt.Println("123")
 	return n.Model.Delete()
 }
 
