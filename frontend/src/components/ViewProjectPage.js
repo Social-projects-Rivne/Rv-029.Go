@@ -2,9 +2,11 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {withStyles} from 'material-ui/styles'
 import Grid from 'material-ui/Grid'
+import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
+import * as projectsActions from "../actions/ProjectsActions"
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {API_URL} from "../constants/global"
@@ -44,8 +46,6 @@ class ViewProjectPage extends Component {
     })
   }
 
-<<<<<<< HEAD
-=======
   componentDidMount() {
     if (this.props.projects.currentProjects.length > 0) {
       let project = this.props.projects.currentProjects.filter((value, index) => {
@@ -57,7 +57,6 @@ class ViewProjectPage extends Component {
     }
   }
 
->>>>>>> 3b899faad40f9803ee884c54936abe6a1354b292
   static propTypes = {
     classes: PropTypes.object.isRequired,
   }
@@ -103,10 +102,7 @@ const styles = theme => ({
 const mapStateToProps = (state, ownProps) => {
   return {
     boards: state.boards,
-<<<<<<< HEAD
-=======
     projects: state.projects,
->>>>>>> 3b899faad40f9803ee884c54936abe6a1354b292
     defaultPage: state.defaultPage,
     ownProps
   }
@@ -116,6 +112,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     boardsActions: bindActionCreators(boardsActions, dispatch),
     defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
+    projectsActions: bindActionCreators(projectsActions, dispatch)
   }
 }
 

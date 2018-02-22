@@ -1,3 +1,6 @@
+
+// TODO: pass user_id into queries
+
 import React, { Component } from 'react'
 import SprintCard from "./SprintCard"
 import {API_URL} from "../constants/global"
@@ -6,6 +9,7 @@ import PropTypes from 'prop-types'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
 import * as sprintsActions from "../actions/SprintsActions"
+import * as issuesActions from "../actions/IssuesActions"
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import messages from "../services/messages"
@@ -46,31 +50,51 @@ class BoardPage extends Component{
     });
   };
 
-  // FIXME: renders only first time
   componentDidMount() {
+    this.getSprintsList()
+    this.getIssuesList()
+  }
+
+  getSprintsList = () => {
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/sprint/list`)
-    .then((response) => {
-      this.props.sprintsActions.setSprints(response.data.Data)
-      console.log(response.data)
-    })
-    .catch((error) => {
-      if (error.response && error.response.data.Message) {
-        messages(error.response.data.Message)
-      } else {
-        messages("Server error occured")
-      }
-    });
+      .then((response) => {
+        this.props.sprintsActions.setSprints(response.data.Data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      });
+  }
+
+  getIssuesList = () => {
+    axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
+      .then((response) => {
+        this.props.issuesActions.setIssues(response.data)
+        console.log(response.data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      });
   }
 
   createIssue = () => {
     axios.post(API_URL + `project/board/${this.props.ownProps.params.id}/issue/create`, {
-      name: this.props.name,
-      desc: this.props.desc,
-      estimate: this.props.estimation,
-      user_id: 'userID'
+      name: this.props.boards.nameInput,
+      description: this.props.boards.descInput,
+      user_id:'9646324a-0aa2-11e8-ba34-b06ebf83499f', // debug
+      estimate: +this.props.boards.estimation,
+      status: 'Todo'
     })
     .then((response) => {
       console.log(response)
+      this.getIssuesList()
       this.handleClose()
     })
     .catch((error) => {
@@ -90,6 +114,7 @@ class BoardPage extends Component{
     })
     .then((response) => {
       this.props.defaultPageActions.setNotificationMessage(response.data.Message)
+      this.getSprintsList()
       this.handleClose()
     })
     .catch((error) => {
@@ -136,7 +161,13 @@ class BoardPage extends Component{
 
           </Grid>
 
-          <IssueCard />
+          {this.props.issues.currentIssues.map((item, i) => (
+            <IssueCard
+              key={i}
+              data={item}
+              onUpdate={this.getIssuesList}
+            />
+          ))}
 
         </Grid>
 
@@ -168,10 +199,8 @@ class BoardPage extends Component{
           {this.props.sprints.currentSprints.map((item, i) => (
             <SprintCard
               key={i}
-              title={item.goal}
-              status={item.status}
-              date={item.created_at}
-              desc={item.description} />
+              data={item}
+              onUpdate={this.getSprintsList} />
           ))}
 
         </Grid>
@@ -192,7 +221,7 @@ class BoardPage extends Component{
               id="name"
               label="Name"
               type="text"
-              onChange={(e) => {this.props.boardsActions.setGoal(e.target.value)}}
+              onChange={(e) => {this.props.boardsActions.setName(e.target.value)}}
               fullWidth />
             <TextField
               margin="dense"
@@ -219,7 +248,7 @@ class BoardPage extends Component{
           </DialogActions>
         </Dialog>
 
-        {/* #################### MODAL SPRINT #################### */}
+        {/* #################### MODAL CREATE SPRINT #################### */}
         <Dialog
           open={this.state.createSprintOpen}
           onClose={this.handleClose}
@@ -255,6 +284,8 @@ class BoardPage extends Component{
           </DialogActions>
         </Dialog>
 
+
+
       </Grid>
     )
   }
@@ -283,9 +314,10 @@ const styles = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    boards: state.boards,
     defaultPage: state.defaultPage,
     sprints: state.sprints,
+    boards: state.boards,
+    issues: state.issues,
     ownProps
   }
 }
@@ -293,8 +325,9 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
-    boardsActions: bindActionCreators(boardsActions, dispatch),
-    sprintsActions: bindActionCreators(sprintsActions, dispatch)
+    sprintsActions: bindActionCreators(sprintsActions, dispatch),
+    issuesActions: bindActionCreators(issuesActions, dispatch),
+    boardsActions: bindActionCreators(boardsActions, dispatch)
   }
 }
 

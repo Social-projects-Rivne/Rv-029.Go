@@ -33,7 +33,8 @@ func GetInstance() *DB {
 }
 
 func (db *DB) init() {
-	filename, _ := filepath.Abs("./backend/config/db.yml")
+	//filename, _ := filepath.Abs("./backend/config/db.yml")
+	filename, _ := filepath.Abs("../config/db.yml") // DEBUG
 	yamlFile, err := ioutil.ReadFile(filename)
 
 	if err != nil {

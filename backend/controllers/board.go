@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	//"log"
-	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -17,13 +16,23 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
-		response := failedResponse{false, err.Error()}
-		response.send(w)
+		response := helpers.Response{Message: err.Error()}
+		response.Failed(w)
 		return
 	}
 
-	// Getting project data from request from "Validation"
-	project := r.Context().Value("project").(models.Project)
+	vars := mux.Vars(r)
+	projectId, err := gocql.ParseUUID(vars["project_id"])
+
+	project := models.Project{}
+	project.UUID = projectId
+	err = project.FindByID()
+
+	if err != nil {
+		response := helpers.Response{Message: "Project ID is not valid"}
+		response.Failed(w)
+		return
+	}
 
 	board := models.Board{
 		gocql.TimeUUID(),
@@ -35,16 +44,16 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		time.Now(),
 	}
 
-	err = board.Insert()
+	err = models.BoardDB.Insert(&board)
 
 	if err != nil {
-		response := failedResponse{false, "Error while accessing to database"}
-		response.send(w)
+		response := helpers.Response{Message: "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	response := successResponse{true, "Board has created", nil}
-	response.send(w)
+	response := helpers.Response{Message: "Board has created"}
+	response.Success(w)
 }
 
 func UpdateBoard(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +62,8 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
-		response := failedResponse{false, err.Error()}
-		response.send(w)
+		response := helpers.Response{Message: err.Error()}
+		response.Failed(w)
 		return
 	}
 
@@ -62,34 +71,34 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := failedResponse{false, "Board ID is not valid"}
-		response.send(w)
+		response := helpers.Response{Message: "Board ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
 	board := models.Board{}
 	board.ID = boardId
-	board.FindByID()
-
-	if boardRequestData.Name != "" {
-		board.Name = boardRequestData.Name
-	}
-
-	if boardRequestData.Desc != "" {
-		board.Desc = boardRequestData.Desc
-	}
-
-	board.UpdatedAt = time.Now()
-	err = board.Update()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
-		response := failedResponse{false, "Error while accessing to database"}
-		response.send(w)
+		response := helpers.Response{Message: "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	response := successResponse{true, "Board has updated", nil}
-	response.send(w)
+	board.Name = boardRequestData.Name
+	board.Desc = boardRequestData.Desc
+	board.UpdatedAt = time.Now()
+	err = models.BoardDB.Update(&board)
+
+	if err != nil {
+		response := helpers.Response{Message: "Error while accessing to database"}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "Board has updated"}
+	response.Success(w)
 }
 
 func DeleteBoard(w http.ResponseWriter, r *http.Request) {
@@ -97,23 +106,23 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := failedResponse{false, "Project ID is not valid"}
-		response.send(w)
+		response := helpers.Response{Message: "Board ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.Delete()
+	err = models.BoardDB.Delete(&board)
 
 	if err != nil {
-		response := failedResponse{false, "Error while accessing to database"}
-		response.send(w)
+		response := helpers.Response{Message: "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	response := successResponse{true, "Board has deleted", nil}
-	response.send(w)
+	response := helpers.Response{Message: "Board has deleted"}
+	response.Success(w)
 }
 
 func SelectBoard(w http.ResponseWriter, r *http.Request) {
@@ -121,26 +130,23 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 	id, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		response := failedResponse{false, "Board ID is not valid"}
-		response.send(w)
+		response := helpers.Response{Message: "Board ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
 	board := models.Board{}
 	board.ID = id
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
-		response := failedResponse{false, "Error while accessing to database"}
-		response.send(w)
+		response := helpers.Response{Message: "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	// TODO: refactor
-	jsonResponse, _ := json.Marshal(board)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := helpers.Response{Data: board}
+	response.Success(w)
 }
 
 func BoardsList(w http.ResponseWriter, r *http.Request) {
@@ -148,24 +154,19 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	if err != nil {
-		response := failedResponse{false, "Project ID is not valid"}
-		response.send(w)
+		response := helpers.Response{Message: "Project ID is not valid"}
+		response.Failed(w)
 		return
 	}
 
-	board := models.Board{}
-
-	boardsList, err := board.List(projectId)
+	boardsList, err := models.BoardDB.List(projectId)
 
 	if err != nil {
-		response := failedResponse{false, "Error while accessing to database"}
-		response.send(w)
+		response := helpers.Response{Message: "Error while accessing to database"}
+		response.Failed(w)
 		return
 	}
 
-	// TODO: refactor
-	jsonResponse, _ := json.Marshal(boardsList)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := helpers.Response{Data: boardsList}
+	response.Success(w)
 }

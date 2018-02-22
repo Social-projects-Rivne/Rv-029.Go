@@ -33,7 +33,8 @@ type smtpMailer struct {
 
 var Mailer *smtpMailer
 
-func init() {
+func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
+
 	filename, _ := filepath.Abs("./backend/config/mail.yml")
 	yamlFile, err := ioutil.ReadFile(filename)
 
@@ -55,9 +56,7 @@ func init() {
 	default:
 		Mailer.auth = smtp.PlainAuth("", Mailer.Connection.Username, Mailer.Connection.Password, Mailer.Connection.Host)
 	}
-}
 
-func (m *smtpMailer) Send(toEmail, toName, subject, msg string) error {
 	from := mail.Address{m.Sender.Name, m.Sender.Email}
 	to := mail.Address{m.Sender.Name, m.Sender.Email}
 
