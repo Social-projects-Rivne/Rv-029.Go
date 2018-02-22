@@ -1,6 +1,3 @@
-
-// TODO: pass user_id into queries
-
 import React, { Component } from 'react'
 import SprintCard from "./SprintCard"
 import {API_URL} from "../constants/global"
@@ -93,7 +90,6 @@ class BoardPage extends Component{
       status: 'Todo'
     })
     .then((response) => {
-      console.log(response)
       this.getIssuesList()
       this.handleClose()
     })

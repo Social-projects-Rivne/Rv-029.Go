@@ -39,7 +39,7 @@ func (BoardTableSeeder) Run() {
 		UpdatedAt:   time.Now(),
 	}
 
-	if err := board.Insert(); err != nil {
+	if err := models.BoardDB.Insert(board); err != nil {
 		log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 		return
 	}
@@ -69,7 +69,7 @@ func (BoardTableSeeder) Run() {
 		UpdatedAt:   time.Now(),
 	}
 
-	if err := board.Insert(); err != nil {
+	if err := models.BoardDB.Insert(board); err != nil {
 		log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 		return
 	}

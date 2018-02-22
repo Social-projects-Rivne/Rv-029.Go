@@ -220,7 +220,6 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 	issue.SprintID = id
 
 	sprintIssueList, err := issue.GetSprintIssueList()
-
 	if err != nil {
 		log.Printf("Error occured in controllers/issue.go method: SprintIssueList, where: issue.GetSprintIssueList, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: SprintIssueList, where: issue.GetSprintIssueList, error: %s", err.Error())}
@@ -228,10 +227,8 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(sprintIssueList)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	res := helpers.Response{Message: "Done", Data: sprintIssueList}
+	res.Success(w)
 }
 
 //ShowIssue Failed issue obj
