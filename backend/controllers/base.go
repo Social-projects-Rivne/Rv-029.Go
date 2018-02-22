@@ -18,28 +18,3 @@ func decodeAndValidate(r *http.Request, v validator.InputValidation) error {
 	// perform validation on the InputValidation implementation
 	return v.Validate(r)
 }
-
-type failedResponse struct {
-	Status  bool
-	Message string
-}
-
-func (b *failedResponse) send(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
-	w.WriteHeader(http.StatusBadRequest)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}
-
-type successResponse struct {
-	Status  bool
-	Message string
-	Data    interface{}
-}
-
-func (b *successResponse) send(w http.ResponseWriter) {
-	jsonResponse, _ := json.Marshal(b)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}

@@ -47,33 +47,7 @@ migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations 
 # roll back all migrations
 migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations down
 
-# roll back the most recently applied migration, then run it again.
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations redo
-
-# run down and then up command
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations reset
-
-# show the current migration version
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations version
-
-# apply the next n migrations
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations migrate +1
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations migrate +2
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations migrate +n
-
-# roll back the previous n migrations
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations migrate -1
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations migrate -2
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations migrate -n
-
-# go to specific migration
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations goto 1
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations goto 10
-migrate -url cassandra://127.0.0.1:9042/task_manager -path ./backend/migrations goto v
-```
-
 # Seeds
-
 Run seeds
 ```sh
 go run backend/main.go db:seed
@@ -123,41 +97,3 @@ go run backend/main.go
 | Sprint Issues list | project/board/sprint/:sprint_id/issue/list | - | GET | YES |
 | Show Issue | project/board/issue/show/:issue_id | - | GET | YES |
 
-
-
-# React app
-## Developing
-
-### Auto run in localhost:80 with docker entrypoint script. Manage webpack.config.js to change port
-### To run manually 
-run
-```sh
-$ npm install
-```
-
-start webpack dev server
-```sh
-$ npm start
-```
-
-serve static html
-```sh
-$ go run dev.go
-```
-go to localhost:8080/static/
-
-
-### Get prebuild app
-
-run
-```sh
-$ npm run build:prod
-```
-in your index.html change
-```html
-<script src="http://localhost:3000/bundle.js"></script>
-```
-to
-```sh
-<script src="bundle.js"></script>
-```

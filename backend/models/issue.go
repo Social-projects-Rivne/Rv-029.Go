@@ -5,6 +5,7 @@ import (
 	"time"
 	//"log"
 
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"github.com/gocql/gocql"
 )
 
@@ -45,7 +46,7 @@ type Issue struct {
 //Insert func inserts user object in database
 func (issue *Issue) Insert() error {
 
-	if err := Session.Query(`INSERT INTO issues (id,name,status,description,estimate,user_id,
+	if err := db.GetInstance().Session.Query(`INSERT INTO issues (id,name,status,description,estimate,user_id,
 		user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,
 		project_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`,
 
@@ -62,7 +63,7 @@ func (issue *Issue) Insert() error {
 //Update updates issue by UUID
 func (issue *Issue) Update() error {
 
-	if err := Session.Query(`Update issues SET name = ?, status = ?, description = ?,
+	if err := db.GetInstance().Session.Query(`Update issues SET name = ?, status = ?, description = ?,
 		 estimate = ?, user_id = ?,user_first_name = ?,
 		 user_last_name = ?,sprint_id = ?, board_id = ?,board_name = ?,
 		  project_id = ?, project_name = ?,updated_at = ? WHERE id= ? ;`,
@@ -79,7 +80,7 @@ func (issue *Issue) Update() error {
 //Delete removes issue by id
 func (issue *Issue) Delete() error {
 
-	if err := Session.Query(`DELETE FROM issues WHERE id= ? ;`,
+	if err := db.GetInstance().Session.Query(`DELETE FROM issues WHERE id= ? ;`,
 		issue.UUID).Exec(); err != nil {
 		log.Printf("Error occured inside models/issue.go, method: Delete, error: %v", err)
 		return err
@@ -90,7 +91,7 @@ func (issue *Issue) Delete() error {
 //FindByID finds issue by id
 func (issue *Issue) FindByID() error {
 
-	if err := Session.Query(`SELECT id, name, status, description,
+	if err := db.GetInstance().Session.Query(`SELECT id, name, status, description,
 		estimate, user_id,user_first_name, user_last_name,
 		sprint_id, board_id, board_name, project_id,
 		project_name, created_at, updated_at
@@ -109,7 +110,7 @@ func (issue *Issue) FindByID() error {
 //GetBoardIssueList returns all issues by board_id
 func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 
-	issueList, err := Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE board_id = ? ALLOW FILTERING", issue.BoardID).Iter().SliceMap()
+	issueList, err := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE board_id = ? ALLOW FILTERING", issue.BoardID).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Error in method GetBoardIssueList inside models/issue.go, method:GetBoardIssueList, error: %s\n", err.Error())
@@ -121,17 +122,47 @@ func (issue *Issue) GetBoardIssueList() ([]map[string]interface{}, error) {
 }
 
 //GetSprintIssueList returns all issues by board_id
-func (issue *Issue) GetSprintIssueList() ([]map[string]interface{}, error) {
+func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 
-	issueList, err := Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter().SliceMap()
+	issues := []Issue{}
+	var row map[string]interface{}
 
-	if err != nil {
+	iterator := db.GetInstance().Session.Query("SELECT id, name, status, description, estimate, user_id,user_first_name, user_last_name, sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING", issue.SprintID).Iter()
+
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			issues = append(issues, Issue{
+				UUID: row["id"].(gocql.UUID),
+				Name: row["name"].(string),
+				Status: row["status"].(string),
+				Description: row["description"].(string),
+				Estimate: row["estimate"].(int),
+				UserID: row["user_id"].(gocql.UUID),
+				UserFirstName: row["user_first_name"].(string),
+				UserLastName: row["user_last_name"].(string),
+				SprintID: row["sprint_id"].(gocql.UUID),
+				BoardID: row["board_id"].(gocql.UUID),
+				BoardName: row["board_name"].(string),
+				ProjectID: row["project_id"].(gocql.UUID),
+				ProjectName: row["project_name"].(string),
+				CreatedAt: row["created_at"].(time.Time),
+				UpdatedAt: row["updated_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
 		log.Printf("Error in method GetSprintIssueList inside models/issue.go: %s\n", err.Error())
 		return nil, err
 	}
 
-	return issueList, nil
-
+	return issues, nil
 }
 
 // //GetClaims Return list of claims to generate jwt token

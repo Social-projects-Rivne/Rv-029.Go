@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gocql/gocql"
 	"log"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 )
 
 // Check if user have permission in project methods
@@ -23,23 +24,12 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 			//check if project id is not empty
 			if vars["project_id"] != ""{
 
-				projectId , err := gocql.ParseUUID(vars["id"])
+				projectId , err := gocql.ParseUUID(vars["project_id"])
 				if err != nil {
 					log.Printf("Can't parse uuid in project middlaware")
 					// return error response
-					//TODO refactor error response make some helper
-					response := struct {
-						Status bool
-						Message string
-					}{
-						Status: false,
-						Message: "You haven't permission",
-					}
-					jsonResponse, _ := json.Marshal(response)
-
-					w.WriteHeader(http.StatusForbidden)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(jsonResponse)
+					response := helpers.Response{Message: "Invalid UUID "}
+					response.Failed(w)
 					return
 				}
 
@@ -48,43 +38,18 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 					next.ServeHTTP(w, r)
 				}else{
 					// return error response
-					//TODO refactor error response make some helper
-					response := struct {
-						Status bool
-						Message string
-					}{
-						Status: false,
-						Message: "You haven't permission",
-					}
-					jsonResponse, _ := json.Marshal(response)
-
-					w.WriteHeader(http.StatusForbidden)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(jsonResponse)
+					response := helpers.Response{Message: "You haven't permission"}
+					response.Failed(w)
 					return
 				}
 
 
 			}else{
 				// return error response
-				//TODO refactor error response make some helper
-				response := struct {
-					Status bool
-					Message string
-				}{
-					Status: false,
-					Message: "You haven't permission",
-				}
-				jsonResponse, _ := json.Marshal(response)
-
-				w.WriteHeader(http.StatusForbidden)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(jsonResponse)
+				response := helpers.Response{Message: "You haven't permission"}
+				response.Failed(w)
 				return
 			}
-
-
-
 
 		}
 	})

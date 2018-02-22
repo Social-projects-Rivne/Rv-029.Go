@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {withStyles} from 'material-ui/styles'
 import Grid from 'material-ui/Grid'
+import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
@@ -19,7 +20,7 @@ class ViewProjectPage extends Component {
     if (this.props.projects.currentProject == null) {
         axios.get(API_URL + `project/show/${this.props.ownProps.params.id}`)
             .then((response) => {
-                this.props.projectsActions.setCurrentProject(response.data)
+                this.props.projectsActions.setCurrentProject(response.data.Data)
                 this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
             })
             .catch((error) => {
@@ -35,7 +36,7 @@ class ViewProjectPage extends Component {
 
     axios.get(API_URL + `project/${this.props.ownProps.params.id}/board/list`)
     .then((response) => {
-      this.props.boardsActions.setBoards(response.data)
+      this.props.boardsActions.setBoards(response.data.Data)
     })
     .catch((error) => {
       if (error.response && error.response.data.Message) {

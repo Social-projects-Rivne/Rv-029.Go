@@ -62,7 +62,7 @@ class ProjectsPage extends Component {
     }
 
     render () {
-        const {classes, projects, } = this.props
+        const {classes, projects } = this.props
 
         let projectCards = null
         if (projects.currentProjects.length > 0) {
