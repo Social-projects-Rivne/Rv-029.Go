@@ -35,7 +35,11 @@ func (b *BoardUpdateRequestData) Validate(r *http.Request) error {
 
 func validateBoardId(r *http.Request) error {
 	vars := mux.Vars(r)
-	boardId, _ := gocql.ParseUUID(vars["board_id"])
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+	if err != nil{
+		log.Printf("Error in utils/validator/board_update_request_validator.go error: %+v",err)
+		return err
+	}
 
 	var boardName string
 
@@ -44,8 +48,8 @@ func validateBoardId(r *http.Request) error {
 		Consistency(gocql.One).Scan(&boardName)
 
 	if boardName == "" {
-		err := fmt.Errorf("There is no board with ID %q", boardId)
-		log.Printf(err.Error())
+		err := fmt.Errorf("There is no board with ID %v", boardId)
+		log.Printf("Error in utils/validator/board_update_request_validator.go error: %+v",err)
 		return err
 	}
 

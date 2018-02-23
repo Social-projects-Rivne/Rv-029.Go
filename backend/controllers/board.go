@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
+	"log"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -16,6 +17,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)
 		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
@@ -45,8 +47,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = board.Insert()
-
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)
 		response := helpers.Response{Message: "Error while accessing to database"}
 		response.Failed(w)
 		return
@@ -62,6 +64,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &boardRequestData)
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
@@ -71,6 +74,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Board ID is not valid"}
 		response.Failed(w)
 		return
@@ -78,7 +82,14 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.FindByID()
+	if err = board.FindByID();err != nil{
+		log.Printf("Error in controllers/board error: %+v",err)
+		return		
+	}
+
+	if boardRequestData.Name != "" {
+		board.Name = boardRequestData.Name
+	}
 
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database"}
@@ -90,8 +101,8 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board.Desc = boardRequestData.Desc
 	board.UpdatedAt = time.Now()
 	err = board.Update()
-
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Error while accessing to database"}
 		response.Failed(w)
 		return
@@ -106,6 +117,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Project ID is not valid"}
 		response.Failed(w)
 		return
@@ -116,6 +128,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Delete()
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Error while accessing to database"}
 		response.Failed(w)
 		return
@@ -130,6 +143,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 	id, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Board ID is not valid"}
 		response.Failed(w)
 		return
@@ -140,6 +154,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.FindByID()
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Error while accessing to database"}
 		response.Failed(w)
 		return
@@ -154,6 +169,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Project ID is not valid"}
 		response.Failed(w)
 		return
@@ -164,6 +180,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	boardsList, err := board.List(projectId)
 
 	if err != nil {
+		log.Printf("Error in controllers/board error: %+v",err)	
 		response := helpers.Response{Message: "Error while accessing to database"}
 		response.Failed(w)
 		return

@@ -19,13 +19,13 @@ func (BoardTableSeeder) Run() {
 
 	id, err := gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")
 	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
+		log.Printf("Error in seeder/seeders/board_table_seeder.go error: %+v",err)
 		return
 	}
 
 	projectID, err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
 	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
+		log.Printf("Error in seeder/seeders/board_table_seeder.go error: %+v",err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (BoardTableSeeder) Run() {
 	}
 
 	if err := board.Insert(); err != nil {
-		log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
+		log.Printf("Error in seeder/seeders/board_table_seeder.go error: %+v",err)
 		return
 	}
 
@@ -49,13 +49,13 @@ func (BoardTableSeeder) Run() {
 
 	id, err = gocql.ParseUUID("93ab624a-1cb2-228a-ba34-c06ebf83322c")
 	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
+		log.Printf("Error in seeder/seeders/board_table_seeder.go error: %+v",err)
 		return
 	}
 
 	projectID, err = gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
 	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
+		log.Printf("Error in seeder/seeders/board_table_seeder.go error: %+v",err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (BoardTableSeeder) Run() {
 	}
 
 	if err := board.Insert(); err != nil {
-		log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
+		log.Printf("Error in seeder/seeders/board_table_seeder.go error: %+v",err)
 		return
 	}
 

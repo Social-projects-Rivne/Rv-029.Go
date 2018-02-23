@@ -19,11 +19,15 @@ type JWTConfig struct {
 var Config *JWTConfig
 
 func init() {
-	filename, _ := filepath.Abs("./backend/config/jwt.yml")
+	filename, err := filepath.Abs("./backend/config/jwt.yml")
+	if err != nil{
+		log.Printf("Error in utils/jwt/jwt.go error: %+v",err)
+		return
+	}
 	yamlFile, err := ioutil.ReadFile(filename)
 
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.Printf("Error in utils/jwt/jwt.go error: %+v",err)
 	}
 
 	Config = &JWTConfig{
@@ -32,7 +36,7 @@ func init() {
 
 	err = yaml.Unmarshal(yamlFile, &Config)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.Printf("Error in utils/jwt/jwt.go error: %+v",err)
 	}
 }
 
