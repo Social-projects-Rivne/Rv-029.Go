@@ -23,7 +23,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -33,7 +33,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -52,7 +52,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	user.UUID = issue.UserID
 	if err := user.FindByID(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -66,7 +66,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	board.ID = issue.BoardID
 	if err := board.FindByID(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -80,7 +80,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err := issue.Insert(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -97,7 +97,7 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -107,7 +107,7 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -116,7 +116,7 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = issueID
 	if err := issue.FindByID(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -131,7 +131,7 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err = issue.Update(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -159,7 +159,7 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -169,7 +169,7 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err := issue.Delete(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -187,7 +187,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -199,7 +199,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -218,7 +218,7 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -230,7 +230,7 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)		
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -246,7 +246,7 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -255,7 +255,7 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = id
 	if err := issue.FindByID(); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}

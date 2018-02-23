@@ -19,7 +19,7 @@ func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	projects , err := project.GetProjectList()
 	if err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err)}
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -34,7 +34,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err)}
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -43,6 +43,8 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 	project.UUID = projectId
 	if err = project.FindByID();err !=nil{
 		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return
 	}
 
@@ -58,7 +60,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		response := helpers.Response{Message: err.Error()}
+		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -68,6 +71,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 	project := models.Project{gocql.TimeUUID(),projectRequestData.Name,time.Now(),time.Now()}
 	if err = project.Insert();err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return
 	}
 
@@ -84,7 +89,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		response := helpers.Response{Message: err.Error()}
+		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -94,7 +100,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err)}
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -107,6 +113,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	if err = project.Update();err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return
 	}
 
@@ -122,7 +130,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err)}
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -134,6 +142,8 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 
 	if err = project.Delete(); err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return
 	}
 

@@ -18,7 +18,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)
-		response := helpers.Response{Message: err.Error()}
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -31,7 +31,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err = project.FindByID()
 
 	if err != nil {
-		response := helpers.Response{Message: "Project ID is not valid"}
+		response := helpers.Response{Message: "Project ID is not valid",StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -49,7 +49,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Insert()
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)
-		response := helpers.Response{Message: "Error while accessing to database"}
+		response := helpers.Response{Message: "Error while accessing to database",StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -65,7 +65,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: err.Error()}
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -84,17 +84,13 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board.ID = boardId
 	if err = board.FindByID();err != nil{
 		log.Printf("Error in controllers/board error: %+v",err)
+		response := helpers.Response{Message: err.Error(),StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return		
 	}
 
 	if boardRequestData.Name != "" {
 		board.Name = boardRequestData.Name
-	}
-
-	if err != nil {
-		response := helpers.Response{Message: "Error while accessing to database"}
-		response.Failed(w)
-		return
 	}
 
 	board.Name = boardRequestData.Name
@@ -103,7 +99,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	err = board.Update()
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Error while accessing to database"}
+		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -118,7 +114,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Project ID is not valid"}
+		response := helpers.Response{Message: "Project ID is not valid", StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -129,7 +125,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Error while accessing to database"}
+		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -144,7 +140,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Board ID is not valid"}
+		response := helpers.Response{Message: "Board ID is not valid", StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -155,7 +151,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Error while accessing to database"}
+		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -170,7 +166,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Project ID is not valid"}
+		response := helpers.Response{Message: "Project ID is not valid", StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -181,7 +177,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)	
-		response := helpers.Response{Message: "Error while accessing to database"}
+		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
