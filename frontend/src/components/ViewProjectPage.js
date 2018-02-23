@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {withStyles} from 'material-ui/styles'
 import Grid from 'material-ui/Grid'
+import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"

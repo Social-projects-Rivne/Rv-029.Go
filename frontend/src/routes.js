@@ -20,6 +20,7 @@ import HomePage from './containers/HomePage'
 import DefaultPage from './containers/DefaultPage'
 import ProjectsPage from "./containers/ProjectsPage";
 import CreateProjectsPage from "./containers/CreateProjectsPage";
+import SprintPage from "./containers/SprintPage";
 
 import auth from './services/auth'
 import ViewProjectPage from './components/ViewProjectPage'
@@ -79,6 +80,7 @@ export const routes = (
         <Route path="project/create" component={CreateProjectsPage}/>
         <Route path="project/:id" component={ViewProjectPage}/>
         <Route path="board/:id" component={BoardPage}/>
+        <Route path="sprint/:id" component={SprintPage}/>
       </Route>
 
       <Route path="home-page" component={HomePage}/>

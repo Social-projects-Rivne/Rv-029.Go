@@ -21,8 +21,8 @@ type Sprint struct {
 }
 
 func (s *Sprint) Insert() error {
-	err := db.GetInstance().Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
+	err := db.GetInstance().Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.Status, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
 		log.Printf("Error in method Insert inside models/sprint.go: %q\n", err.Error())
