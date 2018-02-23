@@ -9,6 +9,8 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gorilla/mux"
 	"errors"
+	"strings"
+	"encoding/json"
 )
 
 func TestDeleteBoardSuccess(t *testing.T)  {
@@ -100,20 +102,28 @@ func TestDeleteBoardDBError(t *testing.T)  {
 	}
 }
 
-func TestCreateBoardRequest(t *testing.T) {
+func TestCreateBoardSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockRequest := mocks.NewMockRequest(mockCtrl)
-	models.InitBoardRequest(mockRequest)
+	mockInputValidator := mocks.NewMockInputValidation(mockCtrl)
+	mockInputValidator.EXPECT().Validate(gomock.Any()).Return(nil).Times(1)
 
-	boardRequestModel := models.BoardCreateRequest{"Name", "Description"}
+	// mock board.insert
 
-	mockRequest.EXPECT().Decode(gomock.Any(), gomock.Any()).Return(boardRequestModel, nil).Times(1)
+	requestData := &struct {
+		Name string
+		Desc string
+	}{
+		"boardName",
+		"boardDescription",
+	}
+
+	body, _ := json.Marshal(requestData)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
-	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", nil)
+	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", strings.NewReader(string(body)))
 	if err != nil {
 		t.Fatal(err)
 	}
