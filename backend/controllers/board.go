@@ -28,7 +28,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	project := models.Project{}
 	project.UUID = projectId
-	err = project.FindByID()
+	err = models.ProjectDB.FindByID(&project)
 
 	if err != nil {
 		response := helpers.Response{Message: "Project ID is not valid"}
