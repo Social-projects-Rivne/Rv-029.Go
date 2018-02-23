@@ -175,7 +175,6 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	sprint := models.Sprint{}
 
 	sprintsList, err := sprint.List(boardId)
-
 	if err != nil {
 		res := helpers.Response{Message: DBError}
 		res.Failed(w)

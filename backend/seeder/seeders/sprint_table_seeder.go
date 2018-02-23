@@ -25,7 +25,7 @@ func (SprintTableSeeder) Run() {
 	var status string
 
 	for _, board := range boards {
-		for i:=0; i < 3; i++ {
+		for i:=0; i <= 3; i++ {
 			if i != 3 {
 				status = models.SPRINT_STAUS_DONE
 			} else {
