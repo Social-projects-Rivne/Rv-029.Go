@@ -8,6 +8,8 @@ import (
 	"regexp"
 )
 
+//go:generate mockgen -destination=../../mocks/mock_validator.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator InputValidation
+
 type InputValidation interface {
 	Validate(r *http.Request) error
 }

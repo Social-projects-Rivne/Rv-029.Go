@@ -28,3 +28,9 @@ func (d *Decoder) Decode(r *http.Request, i interface{}) (interface{}, error) {
 
 	return i, nil
 }
+
+var BoardRequest Request
+
+func InitBoardRequest(req Request) {
+	BoardRequest = req
+}

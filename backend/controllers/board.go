@@ -12,29 +12,19 @@ import (
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
-
-	req, err := models.BoardRequest.Decode(r, models.BoardCreateRequest{})
-	request := req.(models.BoardCreateRequest)
+	boardRequestData := new(validator.BoardUpdateRequestData)
+	err := decodeAndValidate(r, boardRequestData)
 
 	if err != nil {
-		log.Fatal("error")
-		// todo fix exception
 		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
 	}
 
-	log.Fatal("end")
-
-	//err = decodeAndValidate(r, &boardRequestData)
-	//if err != nil {
-	//	response := helpers.Response{Message: err.Error()}
-	//	response.Failed(w)
-	//	return
-	//}
-
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
+
+	log.Fatal("-------")
 
 	project := models.Project{}
 	project.UUID = projectId
@@ -50,8 +40,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		gocql.TimeUUID(),
 		project.UUID,
 		project.Name,
-		request.Name,
-		request.Desc,
+		boardRequestData.Name,
+		boardRequestData.Desc,
 		time.Now(),
 		time.Now(),
 	}
