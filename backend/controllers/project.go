@@ -115,6 +115,8 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	project := models.Project{}
 
+	fmt.Println(projectId)
+
 	project.UUID = projectId
 	project.Name = projectRequestData.Name
 	project.UpdatedAt = time.Now()

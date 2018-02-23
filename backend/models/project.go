@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// projects queries
 const (
 	INSERT_PROJECT 	= "INSERT INTO projects (id,name,created_at,updated_at) VALUES (?,?,?,?);"
 	UPDATE_PROJECT 	= "Update projects SET name = ? ,updated_at = ? WHERE id= ? ;"
@@ -47,7 +48,7 @@ func InitProjectDB(crud ProjectCRUD) {
 //Insert func inserts project obj into table
 func (p *ProjectStorage) Insert(project *Project) error {
 
-	err := Session.Query(INSERT_PROJECT,gocql.TimeUUID(),  project.Name,  project.CreatedAt, project.UpdatedAt).Exec();
+	err := Session.Query(INSERT_PROJECT, project.UUID , project.Name,  project.CreatedAt, project.UpdatedAt).Exec();
 
 	if err != nil {
 		log.Printf("Error in method Insert models/project.go: %s\n", err.Error())
