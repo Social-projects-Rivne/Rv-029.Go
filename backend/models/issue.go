@@ -17,7 +17,7 @@ STATUS_IN_PROGRESS = "In Progress"
 //STATUS_ON_HOLD uses when issue on hold
 STATUS_ON_HOLD = "On Hold"
 
-//STATUS_ON_REVIEW uses when issue on review
+//STATUS_ON_REVIEW uses when issue on review1
 STATUS_ON_REVIEW = "On Review"
 
 //STATUS_DONE uses when issue done
@@ -31,7 +31,7 @@ DELETE_ISSUE = "DELETE FROM issues WHERE id= ? ;"
 
 FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
 
-GET_BOARD_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at from issues WHERE board_id = ? ALLOW FILTERING"
+GET_BOARD_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at from issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000 ALLOW FILTERING"
 
 GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING"
 
