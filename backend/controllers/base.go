@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"net/http"
-	"log"
 )
 
 // decodeAndValidate - entry point for deserialization and validation of the submission input

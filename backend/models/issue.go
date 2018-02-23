@@ -8,34 +8,39 @@ import (
 	"github.com/gocql/gocql"
 )
 const(
-//STATUS_TODO uses when issue in TODO list
-STATUS_TODO = "TODO"
-
-//STATUS_IN_PROGRESS uses when issue in progress
-STATUS_IN_PROGRESS = "In Progress"
-
-//STATUS_ON_HOLD uses when issue on hold
-STATUS_ON_HOLD = "On Hold"
-
-//STATUS_ON_REVIEW uses when issue on review1
-STATUS_ON_REVIEW = "On Review"
-
-//STATUS_DONE uses when issue done
-STATUS_DONE = "Done"
-
-INSERT_iSSUE = "INSERT INTO issues (id,name,status,description,estimate,user_id,user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,project_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-
-UPDATE_ISSUE = "Update issues SET name = ?, status = ?, description = ?,estimate = ?, user_id = ?,user_first_name = ?,user_last_name = ?,sprint_id = ?, board_id = ?,board_name = ?,project_id = ?, project_name = ?, updated_at = ? WHERE id= ? ;"
-
-DELETE_ISSUE = "DELETE FROM issues WHERE id= ? ;"
-
-FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
-
-GET_BOARD_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at from issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000 ALLOW FILTERING"
-
-GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING"
-
+	STATUS_TODO = "TODO"
+	STATUS_IN_PROGRESS = "In Progress"
+	STATUS_ON_HOLD = "On Hold"
+	STATUS_ON_REVIEW = "On Review"
+	STATUS_DONE = "Done"
+	INSERT_iSSUE = "INSERT INTO issues (id,name,status,description,estimate,user_id,user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,project_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+	UPDATE_ISSUE = "Update issues SET name = ?, status = ?, description = ?,estimate = ?, user_id = ?,user_first_name = ?,user_last_name = ?,sprint_id = ?, board_id = ?,board_name = ?,project_id = ?, project_name = ?, updated_at = ? WHERE id= ? ;"
+	DELETE_ISSUE = "DELETE FROM issues WHERE id= ? ;"
+	FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
+	GET_BOARD_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at from issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000 ALLOW FILTERING"
+	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from issues WHERE sprint_id = ? ALLOW FILTERING"
 )
+
+//go:generate mockgen -destination=../mocks/mock_board.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models BoardCRUD
+
+type IssueCRUD interface {
+	Insert(*Issue) error
+	Update(*Issue) error
+	Delete(*Issue) error
+	FindByID(*Issue) error
+	GetBoardIssueList(gocql.UUID) ([]map[string]interface{}, error)
+	GetSprintIssueList(gocql.UUID) ([]map[string]interface{}, error)	
+}
+
+type IssueStorage struct {
+	DB *gocql.Session
+}
+
+var IssueDB IssueCRUD
+
+func InitIssueDB(crud IssueCRUD) {
+	IssueDB = crud
+}
 
 
 //Issue model
@@ -111,12 +116,12 @@ func (issue *Issue) FindByID() error {
 }
 
 //GetBoardIssueList returns all issues by board_id
-func (issue *Issue) GetBoardIssueList() ([]Issue, error) {
+func GetBoardIssueList(BoardID gocql.UUID) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
 
-	iterator := Session.Query(GET_BOARD_ISSUE_LIST, issue.BoardID).Iter()
+	iterator := Session.Query(GET_BOARD_ISSUE_LIST, BoardID).Iter()
 
 	if iterator.NumRows() > 0 {
 		for {
@@ -155,12 +160,12 @@ func (issue *Issue) GetBoardIssueList() ([]Issue, error) {
 }
 
 //GetSprintIssueList returns all issues by board_id
-func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
+func GetSprintIssueList(SprintID gocql.UUID) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
 
-	iterator := Session.Query(GET_SPRINT_ISSUE_LIST, issue.SprintID).Iter()
+	iterator := Session.Query(GET_SPRINT_ISSUE_LIST, SprintID).Iter()
 
 	if iterator.NumRows() > 0 {
 		for {

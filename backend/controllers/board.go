@@ -92,7 +92,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	if err = board.BoardDB.FindByID();err != nil{
+	if err = models.BoardDB.FindByID(&board);err != nil{
 		log.Printf("Error in controllers/board error: %+v",err)
 		response := helpers.Response{Message: err.Error(),StatusCode: http.StatusInternalServerError}
 		response.Failed(w)

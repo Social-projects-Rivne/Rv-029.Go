@@ -62,7 +62,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.BoardID = boardID
 	board := &models.Board{}
 	board.ID = issue.BoardID
-	if err := board.FindByID(); err != nil {
+	if err := models.BoardDB.FindByID(board); err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -190,10 +190,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	issue := models.Issue{}
-	issue.BoardID = id
-
-	boardIssueList, err := issue.GetBoardIssueList()
+	boardIssueList, err := GetBoardIssueList(id)
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)
@@ -219,10 +216,7 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	issue := models.Issue{}
-	issue.SprintID = id
-
-	sprintIssueList, err := issue.GetSprintIssueList()
+	sprintIssueList, err := GetSprintIssueList(id)
 
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v",err)		
