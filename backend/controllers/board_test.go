@@ -109,7 +109,13 @@ func TestCreateBoardSuccess(t *testing.T) {
 	mockInputValidator := mocks.NewMockInputValidation(mockCtrl)
 	mockInputValidator.EXPECT().Validate(gomock.Any()).Return(nil).Times(1)
 
-	// mock board.insert
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	models.InitProjectDB(mockProjectCRUD)
+	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	models.InitBoardDB(mockBoardCRUD)
+	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
 
 	requestData := &struct {
 		Name string
@@ -137,7 +143,7 @@ func TestCreateBoardSuccess(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expected := `{"Status":true,"Message":"Board has deleted","StatusCode":200,"Data":null}`
+	expected := `{"Status":true,"Message":"Board has created","StatusCode":200,"Data":null}`
 	if res.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)

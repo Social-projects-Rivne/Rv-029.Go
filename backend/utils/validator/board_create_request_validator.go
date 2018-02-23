@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+
 type BoardCreateRequestData struct {
 	*baseValidator
 	Name string `json:"name"`

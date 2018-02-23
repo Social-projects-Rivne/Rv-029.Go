@@ -1,18 +1,19 @@
 package controllers
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"net/http"
-	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
-	"log"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
-	boardRequestData := new(validator.BoardUpdateRequestData)
+
+	boardRequestData := new(validator.BoardCreateRequestData)
 	err := decodeAndValidate(r, boardRequestData)
 
 	if err != nil {
@@ -23,8 +24,6 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
-
-	log.Fatal("-------")
 
 	project := models.Project{}
 	project.UUID = projectId
