@@ -7,6 +7,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"github.com/gocql/gocql"
 	"log"
+	"github.com/icrowley/fake"
 )
 
 //UsersTableSeeder model
@@ -14,66 +15,44 @@ type UsersTableSeeder struct {
 
 }
 
+var users []models.User
+
 //Run .
 func (UsersTableSeeder) Run() {
 
-	projectId1 , err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
-	if err != nil {
-		log.Printf("Error in seeder/seeders/user_table_seeder.go error: %+v",err)
-	}
-	projectId2 , err := gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
-	if err != nil {
-		log.Printf("Error in seeder/seeders/user_table_seeder.go error: %+v",err)
-	}
+	users = []models.User{}
 
-	userId1 , err := gocql.ParseUUID("9646324a-0aa2-11e8-ba34-b06ebf83499f")
-	if err != nil {
-		log.Printf("Error in seeder/seeders/user_table_seeder.go error: %+v",err)
-	}
-	userId2, err := gocql.ParseUUID("9646324a-0aa2-11e8-ba15-b06ebf83499f")
-	if err != nil {
-		log.Printf("Error in seeder/seeders/user_table_seeder.go error: %+v",err)
-	}
-	projects := map[gocql.UUID]string{projectId1: "project number one", projectId2:"project number two"}
+	var email string
 
-	salt := password.GenerateSalt(8)
-	user := models.User{
-		UUID:      userId1,
-		Email:     "user@gmail.com",
-		FirstName: "Jon",
-		LastName:  "Jones",
-		Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
-		Salt:      salt,
-		Role:      models.ROLE_USER,
-		Status:	   1,
-		Projects:  projects,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+	for i:=0; i<10; i++ {
+		salt := password.GenerateSalt(8)
 
-	if err := user.Insert();err != nil{
-		log.Printf("Error in seeder/seeders/user_table_seeder.go error: %+v",err)
-		return		
-	}
+		if i == 0 {
+			email = "owner@gmail.com"
+		} else if i == 1 {
+			email = "user@gmail.com"
+		} else {
+			email = fake.EmailAddress()
+		}
 
-	salt = password.GenerateSalt(8)
-	user = models.User{
-		UUID:      userId2,
-		Email:     "owner@gmail.com",
-		FirstName: "Daniel",
-		LastName:  "Rigs",
-		Salt:      salt,
-		Status:		1,
-		Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
-		Role:      models.ROLE_OWNER,
-		Projects:  projects,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
+		user := models.User{
+			UUID:      gocql.TimeUUID(),
+			Email:     email,
+			FirstName: fake.FirstName(),
+			LastName:  fake.LastName(),
+			Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
+			Salt:      salt,
+			Role:      models.ROLE_OWNER,
+			Status:	   1,
+			Projects:  userProjects,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		err := user.Insert()
+		if err != nil {
+			log.Fatalf("User was`n inserted during seeding. Error: %+v", err)
+		}
 
-	if err := user.Insert();err != nil{
-		log.Printf("Error in seeder/seeders/user_table_seeder.go error: %+v",err)
-		return		
+		users = append(users, user)
 	}
-
 }

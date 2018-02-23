@@ -55,12 +55,12 @@ class IssueCard extends Component  {
   }
 
   updateIssue = () => {
-    const { id } = this.props.data
+    const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
-    axios.put(API_URL + `project/board/issue/update/${ id }`, {
+    axios.put(API_URL + `project/board/issue/update/${ UUID }`, {
       name: issueName,
       description: issueDesc,
       estimate: +issueEstimate,
@@ -103,7 +103,7 @@ class IssueCard extends Component  {
 
   render() {
     const { classes } = this.props
-    const { name, description, status, estimate } = this.props.data
+    const { Name, Description, Status, Estimate } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
     const {
       setNameUpdateIssueInput,
@@ -111,7 +111,7 @@ class IssueCard extends Component  {
       setEstimateUpdateIssueInput,
       setStatusUpdateIssueInput
     } = this.props.issuesActions
-
+      
     return (
       <ExpansionPanel>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -119,18 +119,18 @@ class IssueCard extends Component  {
             container
             alignItems={'center'}>
             <Grid style={{ marginRight: '1em' }}>
-              <Chip label={status} />
+              <Chip label={Status} />
             </Grid>
             <Grid>
-              <Typography>{name}</Typography>
+              <Typography>{Name}</Typography>
             </Grid>
           </Grid>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container >
             <Grid item xs={12}>
-              <Typography type={'title'}>{ `Estimate: ${estimate}` }</Typography>
-              <Typography> {description} </Typography>
+              <Typography type={'title'}>{ `Estimate: ${Estimate}` }</Typography>
+              <Typography> {Description} </Typography>
             </Grid>
           </Grid>
         </ExpansionPanelDetails>

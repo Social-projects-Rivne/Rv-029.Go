@@ -12,9 +12,9 @@ import (
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
-	var boardRequestData validator.BoardCreateRequestData
 
-	err := decodeAndValidate(r, &boardRequestData)
+	req, err := models.BoardRequest.Decode(r, models.BoardCreateRequest{})
+	request := req.(models.BoardCreateRequest)
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)
@@ -22,6 +22,15 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
+
+	log.Fatal("end")
+
+	//err = decodeAndValidate(r, &boardRequestData)
+	//if err != nil {
+	//	response := helpers.Response{Message: err.Error()}
+	//	response.Failed(w)
+	//	return
+	//}
 
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
@@ -40,13 +49,14 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		gocql.TimeUUID(),
 		project.UUID,
 		project.Name,
-		boardRequestData.Name,
-		boardRequestData.Desc,
+		request.Name,
+		request.Desc,
 		time.Now(),
 		time.Now(),
 	}
 
-	err = board.Insert()
+	err = models.BoardDB.Insert(&board)
+
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)
 		response := helpers.Response{Message: "Error while accessing to database",StatusCode: http.StatusInternalServerError}
@@ -82,7 +92,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	if err = board.FindByID();err != nil{
+	if err = board.BoardDB.FindByID();err != nil{
 		log.Printf("Error in controllers/board error: %+v",err)
 		response := helpers.Response{Message: err.Error(),StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -96,7 +106,8 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board.Name = boardRequestData.Name
 	board.Desc = boardRequestData.Desc
 	board.UpdatedAt = time.Now()
-	err = board.Update()
+	err = models.BoardDB.Update(&board)
+
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
 		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
@@ -121,7 +132,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.Delete()
+	err = models.BoardDB.Delete(&board)
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
@@ -147,7 +158,7 @@ func SelectBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = id
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
@@ -171,9 +182,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	board := models.Board{}
-
-	boardsList, err := board.List(projectId)
+	boardsList, err := models.BoardDB.List(projectId)
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)	

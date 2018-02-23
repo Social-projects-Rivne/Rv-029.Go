@@ -1,1 +1,1 @@
-DROP MATERIALIZED VIEW IF EXISTS task_manager.issues;
+DROP TABLE IF EXISTS task_manager.issues;

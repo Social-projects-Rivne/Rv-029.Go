@@ -15,6 +15,12 @@ import axios from "axios";
 
 const pageTitle = "Active Sprint";
 
+const STATUS_TODO = "TODO";
+const STATUS_IN_PROGRESS = "In Progress";
+const STATUS_ON_HOLD = "On Hold";
+const STATUS_ON_REVIEW = "On Review";
+const STATUS_DONE = "Done";
+
 const styles = theme => ({
     root: {
         // flexGrow: 1,
@@ -24,8 +30,11 @@ const styles = theme => ({
     paper: {
         marginLeft: 20,
     },
+    issue: {
+        marginLeft: 20,
+    },
     columnTitle: {
-        paddingTop: 20,
+        padding: 10,
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 18,
@@ -65,9 +74,32 @@ class SprintPage extends Component {
                 }
             });
 
+        this.getIssuesList()
+    }
+
+    groupByStatus = () => {
+        let i = 0, val, result = {};
+
+        for (; i < this.props.sprints.issues.length; i++) {
+            val = this.props.sprints.issues[i]['Status'];
+            if (val in result) {
+                result[val].push(this.props.sprints.issues[i]);
+            } else {
+                result[val] = [this.props.sprints.issues[i]];
+            }
+        }
+
+        return result;
+    };
+
+    getIssuesList = () => {
         axios.get(API_URL + `project/board/sprint/${this.props.ownProps.params.id}/issue/list`)
             .then((response) => {
-                this.props.sprintsActions.setSprintIssues(response.data.Data)
+                if (response.data.Data == null) {
+                    this.props.sprintsActions.setSprintIssues([])
+                } else {
+                    this.props.sprintsActions.setSprintIssues(response.data.Data)
+                }
             })
             .catch((error) => {
                 if (error.response && error.response.data.Message) {
@@ -76,24 +108,6 @@ class SprintPage extends Component {
                     messages("Server error occured")
                 }
             });
-    }
-
-    groupByStatus = () => {
-        console.log(this.props.sprints);
-        let i = 0, val, index, values = [], result = [];
-
-        for (; i < this.props.sprints.issues.length; i++) {
-            val = this.props.sprints.issues[i]['Status'];
-            index = values.indexOf(val);
-            if (index > -1)
-                result[index].push(this.props.sprints.issues[i]);
-            else {
-                values.push(val);
-                result.push([this.props.sprints.issues[i]]);
-            }
-        }
-
-        return result;
     };
 
     static propTypes = {
@@ -102,40 +116,49 @@ class SprintPage extends Component {
 
     render () {
         const {classes, projects, } = this.props
-        const issues = this.groupByStatus();
+        const issues = this.groupByStatus()
+
         return (
             <Grid className={classes.root}>
                 <Grid item xs={12} container>
                     <Grid item xs={4} className={classes.status}>
                         <Paper className={classes.paper} elevation={4}>
                             <h5 className={classes.columnTitle}>TODO:</h5>
-                            <hr/>
-                            <Grid container className={classes.list}>
-                                {issues.map((value, index) => (
-                                    <IssueCard key={value.id}
-                                        assigned={value.user_id}
-                                        status={value.Status}
-                                        description={value.desc}
-                                    />
-                                ))}
-                            </Grid>
                         </Paper>
+                        {STATUS_TODO in issues ? (
+                            issues[STATUS_TODO].map((item, index) => (
+                                <div className={classes.issue} key={index}>
+                                    <IssueCard data={item}
+                                               onUpdate={this.getIssuesList}
+                                        />
+                                </div>
+                        ))) : ("")}
                     </Grid>
                     <Grid item xs={4} className={classes.status}>
                         <Paper className={classes.paper} elevation={4}>
                             <h5 className={classes.columnTitle}>In Progress:</h5>
-                            <hr/>
-                            <Grid container className={classes.list}>
-                            </Grid>
                         </Paper>
+                        {STATUS_IN_PROGRESS in issues ? (
+                            issues[STATUS_IN_PROGRESS].map((item, index) => (
+                                <div className={classes.issue} key={index}>
+                                    <IssueCard data={item}
+                                               onUpdate={this.getIssuesList}
+                                    />
+                                </div>
+                            ))) : ("")}
                     </Grid>
                     <Grid item xs={4} className={classes.status}>
                         <Paper className={classes.paper} elevation={4}>
                             <h5 className={classes.columnTitle}>Done:</h5>
-                            <hr/>
-                            <Grid container className={classes.list}>
-                            </Grid>
                         </Paper>
+                        {STATUS_DONE in issues ? (
+                            issues[STATUS_DONE].map((item, index) => (
+                                <div className={classes.issue} key={index}>
+                                    <IssueCard data={item}
+                                               onUpdate={this.getIssuesList}
+                                    />
+                                </div>
+                            ))) : ("")}
                     </Grid>
                 </Grid>
             </Grid>

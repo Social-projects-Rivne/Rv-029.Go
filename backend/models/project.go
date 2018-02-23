@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 	"github.com/gocql/gocql"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
 	"log"
 )
 
@@ -24,8 +23,9 @@ type Project struct {
 //Insert func inserts project obj into table
 func (project *Project) Insert() error {
 
-	err := db.GetInstance().Session.Query(INSERT_PROJECT, project.UUID, project.Name, project.CreatedAt, project.UpdatedAt).Exec();
+	project.UUID = gocql.TimeUUID()
 
+	err := Session.Query(INSERT_PROJECT, project.UUID,  project.Name,  project.CreatedAt, project.UpdatedAt).Exec();
 	if err != nil {
 		log.Printf("Error in models/project.go error: %+v",err)
 		return err
@@ -38,7 +38,7 @@ func (project *Project) Insert() error {
 //Update func updates name of the project by id
 func (project *Project) Update() error {
 
-	err := db.GetInstance().Session.Query(UPDATE_PROJECT, project.Name, project.UpdatedAt , project.UUID).Exec()
+	err := Session.Query(UPDATE_PROJECT, project.Name, project.UpdatedAt , project.UUID).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/project.go error: %+v",err)
@@ -52,7 +52,7 @@ func (project *Project) Update() error {
 //Delete func deletes project by id
 func (project *Project) Delete() error {
 
-	err := db.GetInstance().Session.Query(DELETE_PROJECT , project.UUID).Exec()
+	err := Session.Query(DELETE_PROJECT , project.UUID).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/project.go error: %+v",err)
@@ -66,7 +66,7 @@ func (project *Project) Delete() error {
 //FindByID func finds project by id
 func (project *Project) FindByID() error {
 
-	err := db.GetInstance().Session.Query(FIND_PROJECT,project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
+	err := Session.Query(FIND_PROJECT,project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
 
 	if err != nil {
 		log.Printf("Error in models/project.go error: %+v",err)
@@ -80,7 +80,7 @@ func (project *Project) GetProjectList() ([]Project, error) {
 	var projects []Project
 	var row map[string]interface{}
 
-	iterator := db.GetInstance().Session.Query(GET_PROJECTS).Consistency(gocql.One).Iter()
+	iterator := Session.Query(GET_PROJECTS).Consistency(gocql.One).Iter()
 
 	if iterator.NumRows() > 0 {
 		for {

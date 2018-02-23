@@ -4,7 +4,12 @@ import (
 	"github.com/gocql/gocql"
 	"log"
 	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+)
+
+const (
+	SPRINT_STAUS_TODO = "TODO"
+	SPRINT_STAUS_IN_PROGRESS = "In Progress"
+	SPRINT_STAUS_DONE = "Done"
 )
 
 type Sprint struct {
@@ -21,8 +26,8 @@ type Sprint struct {
 }
 
 func (s *Sprint) Insert() error {
-	err := db.GetInstance().Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.Status, s.CreatedAt, s.UpdatedAt).Exec()
+	err := Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/sprint.go error: %+v",err)
@@ -33,7 +38,7 @@ func (s *Sprint) Insert() error {
 }
 
 func (s *Sprint) Update() error {
-	err := db.GetInstance().Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
+	err := Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
 		s.Goal, s.Desc, s.Status, s.UpdatedAt, s.ID).Exec()
 
 	if err != nil {
@@ -45,7 +50,7 @@ func (s *Sprint) Update() error {
 }
 
 func (s *Sprint) Delete() error {
-	err := db.GetInstance().Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
+	err := Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/sprint.go error: %+v",err)
@@ -56,7 +61,7 @@ func (s *Sprint) Delete() error {
 }
 
 func (s *Sprint) FindById() error {
-	err := db.GetInstance().Session.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
+	err := Session.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
 		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
 
 	if err != nil {
@@ -69,7 +74,7 @@ func (s *Sprint) FindById() error {
 
 func (s *Sprint) List(boardId gocql.UUID) ([]map[string]interface{}, error) {
 
-	sprintsList, err := db.GetInstance().Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
+	sprintsList, err := Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
 
 	if err != nil {
 		log.Printf("Error in models/sprint.go error: %+v",err)

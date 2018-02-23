@@ -1,18 +1,16 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
-	//"github.com/satori/go.uuid"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
+	"encoding/json"
 )
 
 //StoreIssue creates issue in database
@@ -204,10 +202,8 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, _ := json.Marshal(boardIssueList)
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	response := helpers.Response{Message: "Done", Data: boardIssueList}
+	response.Success(w)
 }
 
 //SprintIssueslist returns list of issues order by sprint_id

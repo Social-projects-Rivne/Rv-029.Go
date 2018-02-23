@@ -1,6 +1,3 @@
-
-// TODO: pass user_id into queries
-
 import React, { Component } from 'react'
 import SprintCard from "./SprintCard"
 import {API_URL} from "../constants/global"
@@ -72,8 +69,7 @@ class BoardPage extends Component{
   getIssuesList = () => {
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
-        this.props.issuesActions.setIssues(response.data)
-        console.log(response.data)
+        this.props.issuesActions.setIssues(response.data.Data)
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -93,7 +89,6 @@ class BoardPage extends Component{
       status: 'Todo'
     })
     .then((response) => {
-      console.log(response)
       this.getIssuesList()
       this.handleClose()
     })
@@ -221,7 +216,7 @@ class BoardPage extends Component{
               id="name"
               label="Name"
               type="text"
-              onChange={(e) => {this.props.boardsActions.setGoal(e.target.value)}}
+              onChange={(e) => {this.props.boardsActions.setName(e.target.value)}}
               fullWidth />
             <TextField
               margin="dense"

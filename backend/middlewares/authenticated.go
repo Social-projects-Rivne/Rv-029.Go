@@ -98,5 +98,5 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 		return []byte(jwt2.Config.Secret), nil
 	},
 	//TODO: make custom error handler
-	SigningMethod: jwt2.Config.Algo,
+	SigningMethod: jwt.SigningMethodHS256,
 })

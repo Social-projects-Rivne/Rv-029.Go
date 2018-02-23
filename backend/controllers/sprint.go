@@ -37,7 +37,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	err = board.FindByID()
+	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)				

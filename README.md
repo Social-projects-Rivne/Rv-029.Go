@@ -54,7 +54,6 @@ go run backend/main.go db:seed
 ```
 
 Default admin user email: `user@gmail.com`
-
 Default admin user password: `qwerty1234`
 
 # Golang web server
@@ -64,6 +63,14 @@ Run server with command. By default port uses :8080
 
 ```sh
 go run backend/main.go
+```
+
+## Fresh
+Use pilu/fresh to build and (re)start app
+
+```sh
+$ go get github.com/pilu/fresh
+$ fresh
 ```
 
 
@@ -96,4 +103,3 @@ go run backend/main.go
 | Board Issues list | project/board/:board_id/issue/list | - | GET | YES |
 | Sprint Issues list | project/board/sprint/:sprint_id/issue/list | - | GET | YES |
 | Show Issue | project/board/issue/show/:issue_id | - | GET | YES |
-
