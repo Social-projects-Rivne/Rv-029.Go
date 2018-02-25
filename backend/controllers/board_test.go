@@ -1,26 +1,26 @@
 package controllers
 
 import (
-	"testing"
-	"github.com/golang/mock/gomock"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
-	"net/http/httptest"
-	"net/http"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"github.com/gorilla/mux"
-	"errors"
-	"strings"
 	"encoding/json"
+	"errors"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
 )
 
-func TestDeleteBoardSuccess(t *testing.T)  {
+func TestDeleteBoardSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
 	models.InitBoardDB(mockBoardCRUD)
 	mockBoardCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
-	
+
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
 	req, err := http.NewRequest("DELETE", "/project/board/delete/9325624a-0ba2-22e8-ba34-c06ebf83499a/", nil)
@@ -68,8 +68,7 @@ func TestDeleteBoardBadVariable(t *testing.T) {
 	}
 }
 
-
-func TestDeleteBoardDBError(t *testing.T)  {
+func TestDeleteBoardDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 

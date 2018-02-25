@@ -1,16 +1,16 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
-	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
-	"encoding/json"
+	"log"
+	"net/http"
+	"time"
 )
 
 //StoreIssue creates issue in database
@@ -45,7 +45,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.Estimate = issueRequestData.Estimate
 	issue.SprintID = issueRequestData.SprintID
 
-	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000"{
+	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000" {
 
 		user := &models.User{}
 		user.UUID = issue.UserID
@@ -124,7 +124,6 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UserID = issueRequestData.UserID
 	issue.Estimate = issueRequestData.Estimate
 	issue.Status = issueRequestData.Status
-	issue.SprintID = issueRequestData.SprintID
 	issue.UpdatedAt = time.Now()
 
 	if err = issue.Update(); err != nil {
@@ -139,19 +138,13 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// TODO:
+func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
+
+}
+
 //DeleteIssue controller deletes issue from database
 func DeleteIssue(w http.ResponseWriter, r *http.Request) {
-	// var issueRequestData validator.CreateIssueRequestData
-
-	// err := decodeAndValidate(r, &issueRequestData)
-
-	// if err != nil {
-	// 	log.Printf("Error occured in controllers/issue.go while decoding JSON, method: DeleteIssue where: %s", err.Error())
-	// 	response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while decoding JSON, metod: DeleteIssue, error: %s",err.Error())}
-	// 	response.Failed(w)
-	// 	return
-	// }
-
 	vars := mux.Vars(r)
 	issueID, err := gocql.ParseUUID(vars["issue_id"])
 
@@ -164,6 +157,12 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 
 	issue := &models.Issue{}
 	issue.UUID = issueID
+	if err := issue.FindByID(); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.FindByID, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: UpdateIssue, where: issue.FindByID, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
 
 	if err := issue.Delete(); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.Delete, error: %s", err.Error())
@@ -193,7 +192,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 	issue := models.Issue{}
 	issue.BoardID = id
 
-	boardIssueList, err := issue.GetBoardIssueList()
+	boardIssueList, err := issue.GetBoardBacklogIssuesList()
 
 	if err != nil {
 		log.Printf("Error occured in controllers/issue.go method: BoardIssueslist, where: issue.GetBoardIssueslist, error: %s", err.Error())

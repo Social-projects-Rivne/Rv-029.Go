@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"github.com/gocql/gocql"
 	"context"
 	"encoding/json"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	jwt2 "github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
 	"github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gocql/gocql"
 	"net/http"
 )
 

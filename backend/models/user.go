@@ -22,27 +22,24 @@ const ROLE_OWNER = "Owner"
 //ROLE_USER .
 const ROLE_USER = "User"
 
-
 //Projects queries
-const UPDATE_USER_PROJECT_ROLE  = "UPDATE users SET projects = projects +  ? WHERE id = ?"
-const DELETE_USER_PROJECT_ROLE  = "DELETE projects[?] FROM users WHERE id= ?"
+const UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
+const DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
 
 //User type
 type User struct {
-	UUID      gocql.UUID `cql:"id" key:"primery"`
-	Email     string     `cql:"email"`
-	FirstName string     `cql:"first_name"`
-	LastName  string     `cql:"last_name"`
-	Password  string     `cql:"password"`
-	Salt      string     `cql:"salt"`
-	Role      string     `cql:"role"`
-	Status    int        `cql:"status"`
-	Projects  map[gocql.UUID] string       `cql:"status"`
-	CreatedAt time.Time  `cql:"created_at"`
-	UpdatedAt time.Time  `cql:"updated_at"`
+	UUID      gocql.UUID            `cql:"id" key:"primery"`
+	Email     string                `cql:"email"`
+	FirstName string                `cql:"first_name"`
+	LastName  string                `cql:"last_name"`
+	Password  string                `cql:"password"`
+	Salt      string                `cql:"salt"`
+	Role      string                `cql:"role"`
+	Status    int                   `cql:"status"`
+	Projects  map[gocql.UUID]string `cql:"status"`
+	CreatedAt time.Time             `cql:"created_at"`
+	UpdatedAt time.Time             `cql:"updated_at"`
 }
-
-
 
 //Insert func inserts user object in database
 func (user *User) Insert() error {
@@ -50,7 +47,7 @@ func (user *User) Insert() error {
 	if err := Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,
 		salt,role,status,projects,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
-		user.Salt, user.Role, user.Status,user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+		user.Salt, user.Role, user.Status, user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 
 		log.Printf("Error occured while inserting user %v", err)
 		return err
@@ -88,7 +85,7 @@ func (user *User) Delete() error {
 	if err := Session.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 
-			log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
+		log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -138,12 +135,12 @@ func (user *User) GetClaims() map[string]interface{} {
 
 /*
 * Projects methods
-*/
+ */
 
-func (user *User) AddRoleToProject(projectId gocql.UUID,role string) error  {
+func (user *User) AddRoleToProject(projectId gocql.UUID, role string) error {
 	roleMap := make(map[gocql.UUID]string)
 	roleMap[projectId] = role
-	err := Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,user.UUID).Exec()
+	err := Session.Query(UPDATE_USER_PROJECT_ROLE, roleMap, user.UUID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
@@ -154,9 +151,9 @@ func (user *User) AddRoleToProject(projectId gocql.UUID,role string) error  {
 
 }
 
-func (user *User) DeleteProject(projectId gocql.UUID) error  {
+func (user *User) DeleteProject(projectId gocql.UUID) error {
 
-	err := Session.Query(DELETE_USER_PROJECT_ROLE,projectId,user.UUID).Exec()
+	err := Session.Query(DELETE_USER_PROJECT_ROLE, projectId, user.UUID).Exec()
 
 	if err != nil {
 		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())

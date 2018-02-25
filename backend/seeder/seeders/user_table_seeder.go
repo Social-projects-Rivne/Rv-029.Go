@@ -6,13 +6,12 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"github.com/gocql/gocql"
-	"log"
 	"github.com/icrowley/fake"
+	"log"
 )
 
 //UsersTableSeeder model
 type UsersTableSeeder struct {
-
 }
 
 var users []models.User
@@ -24,7 +23,7 @@ func (UsersTableSeeder) Run() {
 
 	var email string
 
-	for i:=0; i<10; i++ {
+	for i := 0; i < 10; i++ {
 		salt := password.GenerateSalt(8)
 
 		if i == 0 {
@@ -43,7 +42,7 @@ func (UsersTableSeeder) Run() {
 			Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
 			Salt:      salt,
 			Role:      models.ROLE_OWNER,
-			Status:	   1,
+			Status:    1,
 			Projects:  userProjects,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),

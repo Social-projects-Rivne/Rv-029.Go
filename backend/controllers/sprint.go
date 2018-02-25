@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 )
 
 const DBError = "Error while accessing to database"
@@ -97,12 +97,26 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//If you want finish sprint
+	if sprint.Status != sprintRequestData.Status && sprintRequestData.Status == models.SPRINT_STAUS_DONE {
+		inProgressIssues, err := sprint.GetSprintIssuesInProgress()
+		if err != nil {
+			res := helpers.Response{Message: DBError}
+			res.Failed(w)
+			return
+		} else if len(inProgressIssues) > 0 {
+			res := helpers.Response{StatusCode: http.StatusUnprocessableEntity, Message: "Sprint contains not finished issues. Please finish them before finish the sprint"}
+			res.Failed(w)
+			return
+		}
+	}
+
 	sprint.Goal = sprintRequestData.Goal
 	sprint.Desc = sprintRequestData.Desc
 	sprint.Status = sprintRequestData.Status
 	sprint.UpdatedAt = time.Now()
-	err = sprint.Update()
 
+	err = sprint.Update()
 	if err != nil {
 		res := helpers.Response{Message: DBError}
 		res.Failed(w)

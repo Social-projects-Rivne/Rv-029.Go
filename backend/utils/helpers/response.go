@@ -1,16 +1,16 @@
 package helpers
 
 import (
-	"net/http"
 	"encoding/json"
 	"log"
+	"net/http"
 )
 
 type Response struct {
-	Status bool
-	Message string
+	Status     bool
+	Message    string
 	StatusCode int
-	Data interface{}
+	Data       interface{}
 }
 
 func (r *Response) Success(w http.ResponseWriter) {

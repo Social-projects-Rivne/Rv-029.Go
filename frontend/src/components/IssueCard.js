@@ -103,7 +103,8 @@ class IssueCard extends Component  {
 
   render() {
     const { classes } = this.props
-    const { Name, Description, Status, Estimate } = this.props.data
+    const { Name, Description, Status, Estimate, SprintID } = this.props.data
+
     const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
 
     const {
@@ -143,11 +144,16 @@ class IssueCard extends Component  {
               <IconButton onClick={this.handleOpenUpdateIssueClick}>
                 <EditIcon />
               </IconButton>
-              <IconButton
-                aria-label="Delete"
-                onClick={this.deleteIssue}>
-                <DeleteIcon />
-              </IconButton>
+              {/*You can not remove issue if it's in sprint*/}
+              {(SprintID != "00000000-0000-0000-0000-000000000000") ? (
+                  ""
+              ) : (
+                  <IconButton
+                      aria-label="Delete"
+                      onClick={this.deleteIssue}>
+                      <DeleteIcon />
+                  </IconButton>
+              )}
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
@@ -197,7 +203,7 @@ class IssueCard extends Component  {
                   id: 'status-simple',
                 }} >
                 <MenuItem value={"TODO"}>TODO</MenuItem>
-                <MenuItem value={"In process"}>In process</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Done"}>Done</MenuItem>
               </Select>
             </FormControl>
