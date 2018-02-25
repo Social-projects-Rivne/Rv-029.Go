@@ -1,4 +1,4 @@
-CREATE TABLE task_manager.issues (
+CREATE TABLE if NOT EXISTS task_manager.issues (
     id uuid PRIMARY KEY,
     board_id uuid,
     board_name text,

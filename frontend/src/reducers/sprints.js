@@ -30,9 +30,9 @@ export default function (state = initialState, action) {
       return {
         ...state,
         currentSprint: action.payload,
-        sprintGoal: action.payload.goal,
-        sprintDesc: action.payload.description,
-        sprintStatus: action.payload.status
+        sprintGoal: action.payload.Goal,
+        sprintDesc: action.payload.Desc,
+        sprintStatus: action.payload.Status
       }
     case HANDLE_GOAL_UPDATE_SPRINT_INPUT:
       return { ...state, sprintGoal: action.payload }
