@@ -6,6 +6,7 @@ import axios from "axios"
 import { API_URL } from "../constants/global"
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as issuesActions from "../actions/IssuesActions"
+import * as sprintsActions from "../actions/SprintsActions"
 import { withStyles } from 'material-ui/styles'
 import Button from 'material-ui/Button'
 import Chip from 'material-ui/Chip'
@@ -30,6 +31,7 @@ import ExpansionPanel, {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
 } from 'material-ui/ExpansionPanel'
+import messages from "../services/messages";
 
 class IssueCard extends Component  {
   state = {
@@ -141,9 +143,13 @@ class IssueCard extends Component  {
             container
             justify={'flex-end'}>
             <Grid item>
-              <IconButton onClick={this.handleOpenUpdateIssueClick}>
-                <EditIcon />
-              </IconButton>
+                {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
+                    <IconButton onClick={this.handleOpenUpdateIssueClick}>
+                        <EditIcon />
+                    </IconButton>
+                ) : (
+                    ""
+                )}
               {/*You can not remove issue if it's in sprint*/}
               {(SprintID != "00000000-0000-0000-0000-000000000000") ? (
                   ""
@@ -234,6 +240,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     defaultPage: state.defaultPage,
     issues: state.issues,
+    sprints: state.sprints,
     ownProps
   }
 }
@@ -241,6 +248,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
+    sprintsActions: bindActionCreators(sprintsActions, dispatch),
     issuesActions: bindActionCreators(issuesActions, dispatch)
   }
 }

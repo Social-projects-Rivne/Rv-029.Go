@@ -64,7 +64,7 @@ class SprintPage extends Component {
     componentWillMount() {
         axios.get(API_URL + `project/board/sprint/show/${this.props.ownProps.params.id}`)
             .then((response) => {
-                this.props.sprintsActions.setActiveSprint(response.data.Data)
+                this.props.sprintsActions.setCurrentSprint(response.data.Data)
             })
             .catch((error) => {
                 if (error.response && error.response.data.Message) {

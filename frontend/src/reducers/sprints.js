@@ -26,13 +26,13 @@ export default function (state = initialState, action) {
       return { ...state, currentSprints: action.payload }
     case HANDLE_SPRINT_ISSUES_LOADED:
       return { ...state, issues: action.payload }
-    case HANDLE_CURRENT_SPRINT:
+      case HANDLE_CURRENT_SPRINT:
       return {
         ...state,
         currentSprint: action.payload,
-        sprintGoal: action.payload.Goal,
-        sprintDesc: action.payload.Desc,
-        sprintStatus: action.payload.Status
+        sprintGoal: action.payload ? action.payload.Goal : null,
+        sprintDesc: action.payload ? action.payload.Desc : null,
+        sprintStatus: action.payload ? action.payload.Status : null,
       }
     case HANDLE_GOAL_UPDATE_SPRINT_INPUT:
       return { ...state, sprintGoal: action.payload }
