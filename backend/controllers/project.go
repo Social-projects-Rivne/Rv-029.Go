@@ -30,7 +30,7 @@ func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 }
 
-func ShowProjects(w http.ResponseWriter, r *http.Request) {
+func ShowProject(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
@@ -51,7 +51,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := helpers.Response{Message:"Projects list", Data: project}
+	response := helpers.Response{Message:"Project ", Data: project}
 	response.Success(w)
 
 }
@@ -94,7 +94,12 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
 func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
+	//type ProjectRequestData struct {
+	//	Name string `json:"name"`
+	//}
+
 	var projectRequestData validator.ProjectRequestData
+	//var RequestData ProjectRequestData
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
@@ -102,7 +107,29 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 		response.Failed(w)
 		return
 	}
-
+	//
+	//rules := govalidator.MapData{
+	//	"name":    []string{"required"},
+	//}
+	//
+	//opts := govalidator.Options{
+	//	Request: r,
+	//	Data:    &RequestData,
+	//	Rules:   rules,
+	//}
+	//
+	//v := govalidator.New(opts)
+	//e := v.ValidateJSON()
+	//
+	//fmt.Println(RequestData) // your incoming JSON data in Go data struct
+	//fmt.Println("errr0r") // your incoming JSON data in Go data struct
+	//fmt.Println(len(e)) // your incoming JSON data in Go data struct
+	//if len(e) != 0 {
+	//	w.Header().Set("Content-type", "applciation/json")
+	//	json.NewEncoder(w).Encode(e)
+	//	return
+	//}
+	//
 	vars := mux.Vars(r)
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
@@ -114,8 +141,6 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	project := models.Project{}
-
-	fmt.Println(projectId)
 
 	project.UUID = projectId
 	project.Name = projectRequestData.Name
