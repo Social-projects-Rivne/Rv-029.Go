@@ -141,6 +141,55 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 // TODO:
 func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 
+	vars := mux.Vars(r)
+	issueID, err := gocql.ParseUUID(vars["issue_id"])
+
+	if err != nil {
+		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: AddIssueToSprint, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while parsing issue_id, metod: UpdateIssue, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	sprintID, err := gocql.ParseUUID(vars["sprint_id"])
+
+	if err != nil {
+		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: AddIssueToSprint, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while parsing issue_id, metod: UpdateIssue, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	issue := &models.Issue{}
+	issue.UUID = issueID
+	if err := issue.FindByID(); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	sprint := &models.Sprint{}
+	sprint.ID = sprintID
+	if err := sprint.FindById(); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: sprint.FindById, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindById, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	//TODO: remove issue and create new one with sprint id cause it's part of composite primary key
+	issue.SprintID = sprint.ID
+	issue.UpdatedAt = time.Now()
+	if err = issue.Update(); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: issue.Update, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.Update, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "Issue has updated"}
+	response.Success(w)
 }
 
 //DeleteIssue controller deletes issue from database

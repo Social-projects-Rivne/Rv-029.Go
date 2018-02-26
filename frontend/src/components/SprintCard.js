@@ -182,8 +182,8 @@ class SprintCard extends Component {
                 inputProps={{
                   name: 'status',
                   id: 'status-simple', }}>
-                <MenuItem value={"Todo"}>Todo</MenuItem>
-                <MenuItem value={"In process"}>In process</MenuItem>
+                <MenuItem value={"TODO"}>TODO</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Done"}>Done</MenuItem>
               </Select>
             </FormControl>

@@ -131,4 +131,7 @@ func applySprintRoutes(r *mux.Router) {
 
 	r.HandleFunc("/project/board/{board_id}/sprint/list/", controllers.SprintsList).Methods("GET")
 	r.HandleFunc("/project/board/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
+
+	r.HandleFunc(`/project/board/sprint/{sprint_id}/add/issue/{issue_id}`, controllers.AddIssueToSprint).Methods("PUT")
+	r.HandleFunc(`/project/board/sprint/{sprint_id}/add/issue/{issue_id}`, controllers.AddIssueToSprint).Methods("PUT")
 }

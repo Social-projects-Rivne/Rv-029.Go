@@ -11,6 +11,7 @@ import { withStyles } from 'material-ui/styles'
 import Button from 'material-ui/Button'
 import Chip from 'material-ui/Chip'
 import DeleteIcon from 'material-ui-icons/Delete'
+import PlayArrow from 'material-ui-icons/PlayArrow'
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore'
 import { FormControl } from 'material-ui/Form'
 import Grid from 'material-ui/Grid'
@@ -103,10 +104,37 @@ class IssueCard extends Component  {
     })
   }
 
+  addToSprint = () => {
+    const todoSprints = this.props.sprints.currentSprints.filter((sprint, index) => {
+      return sprint.Status == "TODO"
+    })
+
+    if (todoSprints.length == 0) {
+      messages("There is no appropriate sprint to add the issue in. Sprint should have \"TODO\" status", false)
+    } else {
+      const {UUID} = this.props.data
+      const { onUpdate } = this.props
+      const sprint = todoSprints[todoSprints.length-1]
+
+      axios.put(API_URL + `project/board/sprint/${sprint.ID}/add/issue/${ UUID }`, {})
+        .then((response) => {
+          messages(response.data.Message, true)
+          onUpdate()
+        })
+        .catch((err) => {
+          if (response.response && response.response.data.Message) {
+              messages(response.response.data.Message, false)
+          } else {
+              messages("Server error occured", false)
+          }
+          this.handleClose()
+        })
+    }
+  }
+
   render() {
     const { classes } = this.props
     const { Name, Description, Status, Estimate, SprintID } = this.props.data
-
     const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
 
     const {
@@ -143,13 +171,14 @@ class IssueCard extends Component  {
             container
             justify={'flex-end'}>
             <Grid item>
-                {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
-                    <IconButton onClick={this.handleOpenUpdateIssueClick}>
-                        <EditIcon />
-                    </IconButton>
-                ) : (
-                    ""
-                )}
+              {/*You can not update issue if it's already in finished sprint*/}
+              {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
+                  <IconButton onClick={this.handleOpenUpdateIssueClick}>
+                      <EditIcon />
+                  </IconButton>
+              ) : (
+                  ""
+              )}
               {/*You can not remove issue if it's in sprint*/}
               {(SprintID != "00000000-0000-0000-0000-000000000000") ? (
                   ""
@@ -158,6 +187,16 @@ class IssueCard extends Component  {
                       aria-label="Delete"
                       onClick={this.deleteIssue}>
                       <DeleteIcon />
+                  </IconButton>
+              )}
+              {/*You can not remove issue if it's in sprint*/}
+              {(SprintID != "00000000-0000-0000-0000-000000000000" || this.props.sprints.currentSprint != null) ? (
+                  ""
+              ) : (
+                  <IconButton
+                      aria-label="Add To Sprint"
+                      onClick={this.addToSprint}>
+                      <PlayArrow />
                   </IconButton>
               )}
             </Grid>
