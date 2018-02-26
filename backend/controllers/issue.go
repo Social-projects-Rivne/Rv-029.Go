@@ -138,12 +138,12 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TODO:
+// Add issue to active sprint
 func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	issueID, err := gocql.ParseUUID(vars["issue_id"])
 
+	issueID, err := gocql.ParseUUID(vars["issue_id"])
 	if err != nil {
 		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: AddIssueToSprint, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while parsing issue_id, metod: UpdateIssue, error: %s", err.Error())}
@@ -152,7 +152,6 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sprintID, err := gocql.ParseUUID(vars["sprint_id"])
-
 	if err != nil {
 		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: AddIssueToSprint, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while parsing issue_id, metod: UpdateIssue, error: %s", err.Error())}
@@ -178,7 +177,13 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TODO: remove issue and create new one with sprint id cause it's part of composite primary key
+	if err := issue.Delete(); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.Delete, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: DeleteIssue, where: issue.Delete, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
 	issue.SprintID = sprint.ID
 	issue.UpdatedAt = time.Now()
 	if err = issue.Update(); err != nil {
