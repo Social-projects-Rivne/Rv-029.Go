@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
@@ -9,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
+	"bytes"
 )
 
 func TestDeleteBoardSuccess(t *testing.T) {
@@ -105,9 +104,6 @@ func TestCreateBoardSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockInputValidator := mocks.NewMockInputValidation(mockCtrl)
-	mockInputValidator.EXPECT().Validate(gomock.Any()).Return(nil).Times(1)
-
 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
 	models.InitProjectDB(mockProjectCRUD)
 	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
@@ -116,19 +112,11 @@ func TestCreateBoardSuccess(t *testing.T) {
 	models.InitBoardDB(mockBoardCRUD)
 	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
 
-	requestData := &struct {
-		Name string
-		Desc string
-	}{
-		"boardName",
-		"boardDescription",
-	}
-
-	body, _ := json.Marshal(requestData)
+	body := bytes.NewBufferString(`{"name": "boardName", "desc": "boardDescription"}`)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
-	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", strings.NewReader(string(body)))
+	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,3 +136,5 @@ func TestCreateBoardSuccess(t *testing.T) {
 			res.Body.String(), expected)
 	}
 }
+
+
