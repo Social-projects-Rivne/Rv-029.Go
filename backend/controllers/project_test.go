@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"errors"
+	"context"
 )
 
 // show project tests
@@ -281,6 +282,9 @@ func TestProjectsListDBError(t *testing.T)  {
 
 }
 
+
+
+
 // Create Project test
 
 
@@ -294,9 +298,9 @@ func TestCreateProjectSuccess(t *testing.T)  {
 
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
+	// TODO CHeck type each parameter in AddRoleToProject
 	mockUserCRUD.EXPECT().AddRoleToProject(gomock.Any(), gomock.Any() , gomock.Any()).Return(nil).Times(1)
 
-	// TODO add context user to body
 	boby := bytes.NewBufferString(`{"name" : "insert project"}`)
 
 	r := *mux.NewRouter()
@@ -306,6 +310,15 @@ func TestCreateProjectSuccess(t *testing.T)  {
 		t.Fatal(err)
 	}
 
+ 	user , err  := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
 	handler := http.HandlerFunc(CreateProject)
 	r.Handle("/project/create/", handler).Methods("POST")
 	r.ServeHTTP(res, req)
@@ -314,6 +327,234 @@ func TestCreateProjectSuccess(t *testing.T)  {
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
+	}
+
+}
+
+func TestCreateProjectDBInsertError(t *testing.T)  {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	models.InitProjectDB(mockProjectCRUD)
+	customError := errors.New("DB Error")
+	mockProjectCRUD.EXPECT().Insert(gomock.Any()).Return(customError).Times(1)
+
+	boby := bytes.NewBufferString(`{"name" : "insert project"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/project/create/", boby)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user , err  := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(CreateProject)
+	r.Handle("/project/create/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestCreateProjectDBError(t *testing.T)  {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	models.InitProjectDB(mockProjectCRUD)
+	mockProjectCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	customError := errors.New("DB Error")
+	// TODO CHeck type each parameter in AddRoleToProject
+	mockUserCRUD.EXPECT().AddRoleToProject(gomock.Any(), gomock.Any() , gomock.Any()).Return(customError).Times(1)
+
+	boby := bytes.NewBufferString(`{"name" : "insert project"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/project/create/", boby)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user , err  := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(CreateProject)
+	r.Handle("/project/create/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+// Delete Project test
+
+
+func TestDeleteProjectSuccess(t *testing.T)  {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	models.InitProjectDB(mockProjectCRUD)
+	mockProjectCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	mockUserCRUD.EXPECT().DeleteProject(gomock.Any() , gomock.Any()).Return(nil).Times(1)
+
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("DELETE", "/project/delete/77fd6107-1889-11e8-8547-00224d6a96db/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user , err  := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(DeleteProject)
+	r.Handle("/project/delete/{project_id}/", handler).Methods("Delete")
+	r.ServeHTTP(res, req)
+
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestDeleteProjectDBDeleteError(t *testing.T)  {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	mockUserCRUD.EXPECT().DeleteProject(gomock.Any() , gomock.Any()).Return(nil).Times(1)
+
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	models.InitProjectDB(mockProjectCRUD)
+	customError := errors.New("DB Error")
+	mockProjectCRUD.EXPECT().Delete(gomock.Any()).Return(customError).Times(1)
+
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("DELETE", "/project/delete/77fd6107-1889-11e8-8547-00224d6a96db/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user , err  := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(DeleteProject)
+	r.Handle("/project/delete/{project_id}/", handler).Methods("Delete")
+	r.ServeHTTP(res, req)
+
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestDeleteProjectDBError(t *testing.T)  {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	customError := errors.New("DB Error")
+	mockUserCRUD.EXPECT().DeleteProject(gomock.Any() , gomock.Any()).Return(customError).Times(1)
+
+
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("DELETE", "/project/delete/77fd6107-1889-11e8-8547-00224d6a96db/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user , err  := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(DeleteProject)
+	r.Handle("/project/delete/{project_id}/", handler).Methods("DELETE")
+	r.ServeHTTP(res, req)
+
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestDeleteProjectBadVariable(t *testing.T) {
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("DELETE", "/project/delete/invalid-uuid/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(ShowProject)
+	r.Handle("/project/delete/{project_id}/", handler).Methods("DELETE")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
 	}
 
 }
