@@ -1,20 +1,23 @@
 package controllers
 
 import (
+	"fmt"
+	"net/http"
+	"time"
+
+	"log"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"net/http"
-	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
-	"log"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
 
-	req, err := models.BoardRequest.Decode(r, models.BoardCreateRequest{})
-	request := req.(models.BoardCreateRequest)
+	boardRequestData := new(validator.BoardCreateRequestData)
+	err := decodeAndValidate(r, boardRequestData)
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)
@@ -23,21 +26,12 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Fatal("end")
-
-	//err = decodeAndValidate(r, &boardRequestData)
-	//if err != nil {
-	//	response := helpers.Response{Message: err.Error()}
-	//	response.Failed(w)
-	//	return
-	//}
-
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
 	project := models.Project{}
 	project.UUID = projectId
-	err = project.FindByID()
+	err = models.ProjectDB.FindByID(&project)
 
 	if err != nil {
 		response := helpers.Response{Message: "Project ID is not valid",StatusCode: http.StatusInternalServerError}
@@ -49,8 +43,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		gocql.TimeUUID(),
 		project.UUID,
 		project.Name,
-		request.Name,
-		request.Desc,
+		boardRequestData.Name,
+		boardRequestData.Desc,
 		time.Now(),
 		time.Now(),
 	}
@@ -84,7 +78,7 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		log.Printf("Error in controllers/board error: %+v",err)		
+		log.Printf("Error in controllers/board error: %+v", err)
 		response := helpers.Response{Message: "Board ID is not valid"}
 		response.Failed(w)
 		return
@@ -92,15 +86,13 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 
 	board := models.Board{}
 	board.ID = boardId
-	if err = models.BoardDB.FindByID(&board);err != nil{
-		log.Printf("Error in controllers/board error: %+v",err)
-		response := helpers.Response{Message: err.Error(),StatusCode: http.StatusInternalServerError}
-		response.Failed(w)
-		return		
-	}
+	err = models.BoardDB.FindByID(&board)
 
-	if boardRequestData.Name != "" {
-		board.Name = boardRequestData.Name
+	if err != nil {
+		log.Printf("Error in controllers/board error: %+v", err)
+		response := helpers.Response{Message: fmt.Sprintf("Error in controllers/board error: %+v", err)}
+		response.Failed(w)
+		return
 	}
 
 	board.Name = boardRequestData.Name

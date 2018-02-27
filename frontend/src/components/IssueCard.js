@@ -82,11 +82,11 @@ class IssueCard extends Component  {
   }
 
   deleteIssue = () => {
-    const { id } = this.props.data
+    const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
 
-    axios.delete(API_URL + `project/board/issue/delete/${ id }`, {})
+    axios.delete(API_URL + `project/board/issue/delete/${ UUID }`, {})
     .then((res) => {
       setNotificationMessage(res.data.Message)
       onUpdate()
@@ -105,6 +105,7 @@ class IssueCard extends Component  {
     const { classes } = this.props
     const { Name, Description, Status, Estimate } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
+
     const {
       setNameUpdateIssueInput,
       setDescUpdateIssueInput,
@@ -195,7 +196,7 @@ class IssueCard extends Component  {
                   name: 'status',
                   id: 'status-simple',
                 }} >
-                <MenuItem value={"Todo"}>Todo</MenuItem>
+                <MenuItem value={"TODO"}>TODO</MenuItem>
                 <MenuItem value={"In process"}>In process</MenuItem>
                 <MenuItem value={"Done"}>Done</MenuItem>
               </Select>

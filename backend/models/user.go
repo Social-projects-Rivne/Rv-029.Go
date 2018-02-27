@@ -42,14 +42,7 @@ type User struct {
 	UpdatedAt time.Time  `cql:"updated_at"`
 }
 
-//Userer is interface for user struct
-type Userer interface {
-	Insert() error
-	Update() error
-	Delete() error
-	FindByEmail(string) error
-	FindByID(string) error
-}
+
 
 //Insert func inserts user object in database
 func (user *User) Insert() error {

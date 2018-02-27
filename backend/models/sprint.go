@@ -12,6 +12,10 @@ const (
 	SPRINT_STAUS_DONE = "Done"
 )
 
+const (
+	PROJECT_SPRINTS_LIST = `SELECT * FROM sprintslist WHERE board_id = ?;`
+)
+
 type Sprint struct {
 	ID          gocql.UUID `cql:"id" key:"primary"`
 	ProjectId   gocql.UUID `cql:"project_id"`
@@ -26,8 +30,8 @@ type Sprint struct {
 }
 
 func (s *Sprint) Insert() error {
-	err := Session.Query(`INSERT INTO sprints (id, project_id, project_name, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-		s.ID, s.ProjectId, s.ProjectName, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
+	err := Session.Query(`INSERT INTO sprints (id, project_id, project_name, status, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+		s.ID, s.ProjectId, s.ProjectName, s.Status, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/sprint.go error: %+v",err)
@@ -72,14 +76,39 @@ func (s *Sprint) FindById() error {
 	return nil
 }
 
-func (s *Sprint) List(boardId gocql.UUID) ([]map[string]interface{}, error) {
+func (s *Sprint) List(boardId gocql.UUID) ([]Sprint, error) {
 
-	sprintsList, err := Session.Query(`SELECT * FROM sprintslist WHERE board_id = ?;`, boardId).Iter().SliceMap()
+	sprints := []Sprint{}
+	var row map[string]interface{}
 
-	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+	iterator := Session.Query(PROJECT_SPRINTS_LIST, boardId).Iter()
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			sprints = append(sprints, Sprint{
+				ID: row["id"].(gocql.UUID),
+				ProjectId: row["project_id"].(gocql.UUID),
+				ProjectName: row["project_name"].(string),
+				BoardId: row["board_id"].(gocql.UUID),
+				BoardName: row["board_name"].(string),
+				Goal: row["goal"].(string),
+				Desc: row["description"].(string),
+				Status: row["status"].(string),
+				CreatedAt: row["created_at"].(time.Time),
+				UpdatedAt: row["created_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
+		log.Printf("Error in method List inside models/sprint.go: %+v\n", err)
 		return nil, err
 	}
 
-	return sprintsList, nil
+	return sprints, nil
 }

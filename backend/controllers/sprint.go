@@ -197,7 +197,6 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	sprint := models.Sprint{}
 
 	sprintsList, err := sprint.List(boardId)
-
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)		
 		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}

@@ -31,7 +31,7 @@ func (ProjectTableSeeder) Run() {
 			UpdatedAt: time.Now(),
 		}
 
-		err := project.Insert()
+		err := models.ProjectDB.Insert(&project)
 		if err != nil {
 			log.Fatalf("Project was`n inserted during seeding. Error: %+v")
 		}

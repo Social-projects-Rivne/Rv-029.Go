@@ -13,10 +13,12 @@ import (
 )
 
 
+
 func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	project := models.Project{}
 
-	projects , err := project.GetProjectList()
+
+	projects , err := models.ProjectDB.GetProjectList(&project)
 	if err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
@@ -41,7 +43,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 
 	project := models.Project{}
 	project.UUID = projectId
-	if err = project.FindByID();err !=nil{
+	if err = models.ProjectDB.FindByID(&project);err !=nil{
 		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -69,14 +71,27 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 	user := r.Context().Value("user").(models.User)
 
 	project := models.Project{gocql.TimeUUID(),projectRequestData.Name,time.Now(),time.Now()}
-	if err = project.Insert();err != nil{
+	if err = models.ProjectDB.Insert(&project);err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
 
-	user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
+	// TODO some transaction for project Insert
+	err = models.ProjectDB.Insert(&project)
+	if err != nil {
+		response := helpers.Response{Message: "Can't create project",StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
+
+	err = user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
+	if err != nil {
+		response := helpers.Response{Message: "Can't add role to project",StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
 
 	response := helpers.Response{Message: "Project has created"}
 	response.Success(w)
@@ -107,11 +122,13 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 
 	project := models.Project{}
 
+	fmt.Println(projectId)
+
 	project.UUID = projectId
 	project.Name = projectRequestData.Name
 	project.UpdatedAt = time.Now()
 
-	if err = project.Update();err != nil{
+	if err = models.ProjectDB.Update(&project);err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -138,9 +155,14 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	project.UUID = projectId
 
 	user := r.Context().Value("user").(models.User)
-	user.DeleteProject(project.UUID)
+	err = user.DeleteProject(project.UUID)
+	if err != nil {
+		response := helpers.Response{Message: "Can't delete user project access",StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
 
-	if err = project.Delete(); err != nil{
+	if err = models.ProjectDB.Delete(&project); err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
