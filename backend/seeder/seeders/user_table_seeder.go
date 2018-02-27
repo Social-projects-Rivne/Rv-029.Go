@@ -50,8 +50,8 @@ func (UsersTableSeeder) Run() {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+	models.UserDB.Insert(&user)
 
-	user.Insert()
 
 	salt = password.GenerateSalt(8)
 	user = models.User{
@@ -69,7 +69,7 @@ func (UsersTableSeeder) Run() {
 	}
 
 
-	user.Insert()
+	models.UserDB.Insert(&user)
 
 
 }

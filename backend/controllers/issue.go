@@ -43,9 +43,9 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.Status = issueRequestData.Status
 	issue.UserID = issueRequestData.UserID
 
-	user := &models.User{}
+	user := models.User{}
 	user.UUID = issue.UserID
-	if err := user.FindByID(); err != nil {
+	if err := models.UserDB.FindByID(&user); err != nil {
 		log.Printf("Error occured in controllers/issue.go, method:StoreIssue, where: user.FindByID, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go, method:StoreIssue, where: user.FindByID, error: %s", err.Error())}
 		response.Failed(w)

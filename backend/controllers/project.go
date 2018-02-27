@@ -80,7 +80,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	err = user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
+
+	err = models.UserDB.AddRoleToProject(project.UUID,models.ROLE_OWNER,user.UUID)
 	if err != nil {
 		response := helpers.Response{Message: "Can't add role to project",StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -146,7 +147,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	project.UUID = projectId
 
 	user := r.Context().Value("user").(models.User)
-	err = user.DeleteProject(project.UUID)
+	err = models.UserDB.DeleteProject(project.UUID,user.UUID)
 	if err != nil {
 		response := helpers.Response{Message: "Can't delete user project access",StatusCode: http.StatusInternalServerError}
 		response.Failed(w)

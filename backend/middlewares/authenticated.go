@@ -53,7 +53,7 @@ func AuthenticatedMiddleware(next http.Handler) http.Handler {
 
 			currentUser := models.User{}
 			currentUser.UUID = UUID
-			err = currentUser.FindByID()
+			err = models.UserDB.FindByID(&currentUser)
 			if err != nil {
 				response := struct {
 					Status  bool
