@@ -35,9 +35,28 @@ const (
 	GET_BOARD_ISSUE_LIST          = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at FROM board_issues WHERE board_id = ?"
 	GET_BOARD_BACKLOG_ISSUES_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at FROM board_issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000"
 
-	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from sprint_issues WHERE sprint_id = ?;"
+	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from sprint_issues WHERE sprint_id = ? ;"
 )
 
+type IssueCRUD interface {
+	Insert(*Issue) error
+	Update(*Issue) error
+	Delete(*Issue) error
+	FindByID(*Issue) error
+	GetBoardIssueList(*Issue) ([]Issue, error)
+	GetSprintIssueList(*Issue) ([]Issue, error)
+	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
+}
+
+type IssueStorage struct {
+	DB *gocql.Session
+}
+
+var IssueDB IssueCRUD
+
+func InitIssueDB(crud IssueCRUD) {
+	IssueDB = crud
+}
 
 //Issue model
 type Issue struct {
@@ -59,24 +78,24 @@ type Issue struct {
 }
 
 //Insert func inserts user object in database
-func (issue *Issue) Insert() error {
+func (s *IssueStorage) Insert(issue *Issue) error {
 
-	if err := Session.Query(INSERT_iSSUE,
+	if err := s.DB.Query(INSERT_iSSUE,
 
 		issue.UUID, issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName,
 		issue.SprintID, issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName,
 		issue.CreatedAt, issue.UpdatedAt).Exec(); err != nil {
 
-		log.Printf("Error in models/issue.go error: %+v",err)
+		log.Printf("Error in models/issue.go error: %+v", err)
 		return err
 	}
 	return nil
 }
 
 //Update updates issue by UUID
-func (issue *Issue) Update() error {
+func (s *IssueStorage) Update(issue *Issue) error {
 
-	if err := Session.Query(UPDATE_ISSUE,
+	if err := s.DB.Query(UPDATE_ISSUE,
 
 		issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName,
 		issue.BoardName, issue.ProjectName, issue.UpdatedAt, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
@@ -88,9 +107,9 @@ func (issue *Issue) Update() error {
 }
 
 //Delete removes issue by id
-func (issue *Issue) Delete() error {
+func (s *IssueStorage) Delete(issue *Issue) error {
 
-	if err := Session.Query(DELETE_ISSUE,
+	if err := s.DB.Query(DELETE_ISSUE,
 		issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
 		log.Printf("Error occured inside models/issue.go, method: Delete, error: %+v", err)
 		return err
@@ -100,25 +119,25 @@ func (issue *Issue) Delete() error {
 }
 
 //FindByID finds issue by id
-func (issue *Issue) FindByID() error {
+func (s *IssueStorage) FindByID(issue *Issue) error {
 
-	if err := Session.Query(FIND_ISSUE_BY_ID, issue.UUID).Consistency(gocql.One).Scan(&issue.UUID, &issue.Name, &issue.Status, &issue.Description, &issue.Estimate, &issue.UserID,
+	if err := s.DB.Query(FIND_ISSUE_BY_ID, issue.UUID).Consistency(gocql.One).Scan(&issue.UUID, &issue.Name, &issue.Status, &issue.Description, &issue.Estimate, &issue.UserID,
 		&issue.UserFirstName, &issue.UserLastName, &issue.SprintID, &issue.BoardID, &issue.BoardName,
 		&issue.ProjectID, &issue.ProjectName, &issue.CreatedAt, &issue.UpdatedAt); err != nil {
 
-			log.Printf("Error in models/issue.go error: %+v",err)
+		log.Printf("Error in models/issue.go error: %+v", err)
 		return err
 	}
 	return nil
 }
 
 //GetBoardIssueList returns all issues by board_id
-func (issue *Issue) GetBoardIssueList() ([]Issue, error) {
+func (s *IssueStorage) GetBoardIssueList(issue *Issue) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
 
-	iterator := Session.Query(GET_BOARD_ISSUE_LIST, issue.BoardID).Iter()
+	iterator := s.DB.Query(GET_BOARD_ISSUE_LIST, issue.BoardID).Iter()
 
 	if iterator.NumRows() > 0 {
 		for {
@@ -157,7 +176,7 @@ func (issue *Issue) GetBoardIssueList() ([]Issue, error) {
 }
 
 //GetBoardIssueList returns all issues by board_id what is in backlog
-func (issue *Issue) GetBoardBacklogIssuesList() ([]Issue, error) {
+func (s *IssueStorage) GetBoardBacklogIssuesList(issue *Issue) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
@@ -201,12 +220,12 @@ func (issue *Issue) GetBoardBacklogIssuesList() ([]Issue, error) {
 }
 
 //GetSprintIssueList returns all issues by board_id
-func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
+func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
 
-	iterator := Session.Query(GET_SPRINT_ISSUE_LIST, issue.SprintID).Iter()
+	iterator := s.DB.Query(GET_SPRINT_ISSUE_LIST, issue.SprintID).Iter()
 
 	if iterator.NumRows() > 0 {
 		for {
@@ -237,7 +256,7 @@ func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 	}
 
 	if err := iterator.Close(); err != nil {
-		log.Printf("Error in models/issue.go error: %+v",err)
+		log.Printf("Error in models/issue.go error: %+v", err)
 		return nil, err
 	}
 

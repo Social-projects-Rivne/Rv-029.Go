@@ -18,7 +18,7 @@ func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	projects, err := models.ProjectDB.GetProjectList(&project)
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v", err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()), StatusCode: http.StatusInternalServerError}
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -71,6 +71,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 
 	err = models.ProjectDB.Insert(&project)
 	if err != nil {
+		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: "Can't create project", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -116,9 +117,9 @@ func UpdateProject(w http.ResponseWriter, r *http.Request) {
 	project.Name = projectRequestData.Name
 	project.UpdatedAt = time.Now()
 
-	err = models.ProjectDB.Update(&project)
-	if err != nil {
-		response := helpers.Response{Message: "Can't update project", StatusCode: http.StatusInternalServerError}
+	if err = models.ProjectDB.Update(&project);err != nil{
+		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -150,8 +151,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.ProjectDB.Delete(&project)
-	if err != nil {
+	if err = models.ProjectDB.Delete(&project); err != nil{
 		log.Printf("Error in controllers/project error: %+v",err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)

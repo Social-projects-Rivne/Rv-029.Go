@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 	"log"
@@ -17,7 +18,8 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, boardRequestData)
 
 	if err != nil {
-		response := helpers.Response{Message: err.Error()}
+		log.Printf("Error in controllers/board error: %+v",err)
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -83,15 +85,12 @@ func UpdateBoard(w http.ResponseWriter, r *http.Request) {
 	board := models.Board{}
 	board.ID = boardId
 	err = models.BoardDB.FindByID(&board)
+
 	if err != nil {
-		log.Printf("Error in controllers/board error: %+v",err)
-		response := helpers.Response{Message: err.Error(),StatusCode: http.StatusInternalServerError}
+		log.Printf("Error in controllers/board error: %+v", err)
+		response := helpers.Response{Message: fmt.Sprintf("Error in controllers/board error: %+v", err)}
 		response.Failed(w)
 		return
-	}
-
-	if boardRequestData.Name != "" {
-		board.Name = boardRequestData.Name
 	}
 
 	board.Name = boardRequestData.Name
@@ -115,8 +114,8 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		log.Printf("Error in controllers/board error: %+v",err)
-		response := helpers.Response{Message: "Project ID is not valid", StatusCode: http.StatusUnprocessableEntity}
+		log.Printf("Error in controllers/board error: %+v",err)		
+		response := helpers.Response{Message: "Board ID is not valid", StatusCode: http.StatusBadRequest}
 		response.Failed(w)
 		return
 	}
