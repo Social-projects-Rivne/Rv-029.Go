@@ -90,12 +90,12 @@ func TestDeleteBoardDBError(t *testing.T)  {
 	r.Handle("/project/board/delete/{board_id}/", handler).Methods("DELETE")
 	r.ServeHTTP(res, req)
 
-	if status := res.Code; status != http.StatusBadRequest {
+	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusBadRequest)
+			status, http.StatusInternalServerError)
 	}
 
-	expected := `{"Status":false,"Message":"Error while accessing to database","StatusCode":400,"Data":null}`
+	expected := `{"Status":false,"Message":"Error while accessing to database","StatusCode":500,"Data":null}`
 	if res.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)
@@ -106,8 +106,8 @@ func TestCreateBoardSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockInputValidator := mocks.NewMockInputValidation(mockCtrl)
-	mockInputValidator.EXPECT().Validate(gomock.Any()).Return(nil).Times(1)
+	// mockInputValidator := mocks.NewMockInputValidation(mockCtrl)
+	// mockInputValidator.EXPECT().Validate(gomock.Any()).Return(nil).Times(1)
 
 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
 	models.InitProjectDB(mockProjectCRUD)

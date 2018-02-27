@@ -117,7 +117,7 @@ func DeleteBoard(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("Error in controllers/board error: %+v",err)		
-		response := helpers.Response{Message: "Project ID is not valid", StatusCode: http.StatusUnprocessableEntity}
+		response := helpers.Response{Message: "Board ID is not valid", StatusCode: http.StatusBadRequest}
 		response.Failed(w)
 		return
 	}
