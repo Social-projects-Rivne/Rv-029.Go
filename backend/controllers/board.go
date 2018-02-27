@@ -3,13 +3,11 @@ package controllers
 import (
 	"net/http"
 	"time"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"fmt"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -161,7 +159,6 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectId, err := gocql.ParseUUID(vars["project_id"])
 
-	fmt.Println(1)
 	if err != nil {
 		response := helpers.Response{Message: "Project ID is not valid"}
 		response.Failed(w)

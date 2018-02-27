@@ -36,7 +36,8 @@ import messages from "../services/messages";
 
 class IssueCard extends Component  {
   state = {
-    updateIssueOpen: false
+    updateIssueOpen: false,
+    isIssueOpen: false,
   }
 
   static propTypes = {
@@ -88,6 +89,7 @@ class IssueCard extends Component  {
     const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
+    this.setState({ isIssueOpen: false })
 
     axios.delete(API_URL + `project/board/issue/delete/${ UUID }`, {})
     .then((res) => {
@@ -116,6 +118,8 @@ class IssueCard extends Component  {
       const { onUpdate } = this.props
       const sprint = todoSprints[todoSprints.length-1]
 
+      this.setState({ isIssueOpen: false })
+
       axios.put(API_URL + `project/board/sprint/${sprint.ID}/add/issue/${ UUID }`, {})
         .then((response) => {
           messages(response.data.Message, true)
@@ -132,6 +136,10 @@ class IssueCard extends Component  {
     }
   }
 
+  toggleOpened = () => {
+    this.setState({ isIssueOpen: !this.state.isIssueOpen })
+  }
+
   render() {
     const { classes } = this.props
     const { Name, Description, Status, Estimate, SprintID } = this.props.data
@@ -143,10 +151,10 @@ class IssueCard extends Component  {
       setEstimateUpdateIssueInput,
       setStatusUpdateIssueInput
     } = this.props.issuesActions
-      
+
     return (
-      <ExpansionPanel>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+      <ExpansionPanel expanded={this.state.isIssueOpen}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} onClick={this.toggleOpened}>
           <Grid
             container
             alignItems={'center'}>

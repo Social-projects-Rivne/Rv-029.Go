@@ -49,7 +49,7 @@ class SprintCard extends Component {
 
   handleOpenUpdateSprintClick = () => {
     this.setState({ updateSprintOpen: true })
-    this.props.sprintsActions.setCurrentSprint(this.props.data)
+    this.props.sprintsActions.setEditedSprint(this.props.data)
   }
 
   handleClose = () => {

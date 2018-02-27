@@ -1,5 +1,6 @@
 import {
   HANDLE_CURRENT_SPRINT,
+  HANDLE_EDITING_SPRINT,
   HANDLE_SPRINT_OPEN,
   HANDLE_SPRINT_ISSUES_LOADED,
   HANDLE_SPRINTS_LOADED,
@@ -25,6 +26,13 @@ export const setActiveSprint = (sprint) => {
 export const setCurrentSprint = (sprint) => {
   return {
     type: HANDLE_CURRENT_SPRINT,
+    payload: sprint
+  }
+}
+
+export const setEditedSprint = (sprint) => {
+  return {
+    type: HANDLE_EDITING_SPRINT,
     payload: sprint
   }
 }

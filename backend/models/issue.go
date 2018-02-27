@@ -38,6 +38,7 @@ const (
 	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from sprint_issues WHERE sprint_id = ?;"
 )
 
+
 //Issue model
 type Issue struct {
 	UUID          gocql.UUID
@@ -66,7 +67,7 @@ func (issue *Issue) Insert() error {
 		issue.SprintID, issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName,
 		issue.CreatedAt, issue.UpdatedAt).Exec(); err != nil {
 
-		log.Printf("Error occured inside models/issue.go, method:Insert, error: %v", err)
+		log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -79,8 +80,7 @@ func (issue *Issue) Update() error {
 
 		issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName,
 		issue.BoardName, issue.ProjectName, issue.UpdatedAt, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
-
-		log.Printf("Error occured inside models/issue.go, method: Update, error: %v", err)
+		log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
 
@@ -92,7 +92,7 @@ func (issue *Issue) Delete() error {
 
 	if err := Session.Query(DELETE_ISSUE,
 		issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
-		log.Printf("Error occured inside models/issue.go, method: Delete, error: %v", err)
+		log.Printf("Error occured inside models/issue.go, method: Delete, error: %+v", err)
 		return err
 	}
 
@@ -106,7 +106,7 @@ func (issue *Issue) FindByID() error {
 		&issue.UserFirstName, &issue.UserLastName, &issue.SprintID, &issue.BoardID, &issue.BoardName,
 		&issue.ProjectID, &issue.ProjectName, &issue.CreatedAt, &issue.UpdatedAt); err != nil {
 
-		log.Printf("Error occured inside models/issue.go, method:FindByID, error: %v", err)
+			log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -237,7 +237,7 @@ func (issue *Issue) GetSprintIssueList() ([]Issue, error) {
 	}
 
 	if err := iterator.Close(); err != nil {
-		log.Printf("Error in method GetSprintIssueList inside models/issue.go: %s\n", err.Error())
+		log.Printf("Error in models/issue.go error: %+v",err)
 		return nil, err
 	}
 
