@@ -60,7 +60,11 @@ func init()  {
 func main() {
 	models.InitBoardDB(&models.BoardStorage{ APP.DB })
 	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
+<<<<<<< HEAD
 	models.InitIssueDB(&models.IssueStorage{ APP.DB })
+=======
+	models.InitUserDB(&models.UserStorage{APP.DB})
+>>>>>>> origin/f41_test_project
 
 	var cmd string
 

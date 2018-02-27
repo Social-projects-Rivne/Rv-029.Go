@@ -3,9 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
-	"log"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
@@ -41,9 +41,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: err.Error(),
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return 
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
+			return
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -54,18 +54,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	user := models.User{}
 	user.Email = loginRequestData.Email
-	if err := user.FindByEmail();err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
-		return		
-	}
+	err = models.UserDB.FindByEmail(&user)
 
 	if user.Password != password.EncodePassword(loginRequestData.Password, user.Salt) {
 		jsonResponse, err := json.Marshal(errorResponse{
 			Status:  false,
 			Message: "There is no such user with email and password combination.",
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
 			return
 		}
 
@@ -77,9 +74,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// generate jwt token from user claims
 	token, err := jwt.GenerateToken(&user)
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
-		return		
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -90,9 +87,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully authenticated.",
 		Token:   token,
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
-		return		
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
+		return
 	}
 
 	w.Write(jsonResponse)
@@ -107,9 +104,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: err.Error(),
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return			
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
+			return
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -132,8 +129,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now(),
 	}
 
-	if err := user.Insert();err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err := models.UserDB.Insert(&user); err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -145,8 +142,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully registered",
 		User:    user,
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -165,11 +162,10 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: err.Error(),
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return 
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
+			return
 		}
-
 
 		w.WriteHeader(http.StatusBadRequest)
 		w.Header().Set("Content-Type", "application/json")
@@ -180,7 +176,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Status = 1
 	fmt.Println(user)
-	user.Update()
+	models.UserDB.Update(&user)
 
 	jsonResponse, err := json.Marshal(struct {
 		Status  bool
@@ -189,8 +185,8 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "Your account was successfully activated.",
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -210,8 +206,8 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: err.Error(),
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
 			return
 		}
 
@@ -220,9 +216,11 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonResponse)
 		return
 	}
-	user := &models.User{}
+
+	user := models.User{}
 	user.Email = forgotRequestData.Email
-	user.FindByEmail()
+	// TODO err handler
+	err = models.UserDB.FindByEmail(&user)
 
 	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/authorization/new-password/%s\">LINK</a>\n", user.FirstName, user.Password)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
@@ -231,8 +229,8 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "Your link sent",
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -254,8 +252,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: err.Error(),
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
 			return
 		}
 
@@ -266,7 +264,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	user := models.User{}
 	user.Email = resetRequestData.Email
-	user.FindByEmail()
+	err = models.UserDB.FindByEmail(&user)
 
 	// FIXME doesn't work properly
 	if user.Password != resetRequestData.Token {
@@ -274,8 +272,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: "Invalid reset token",
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
 			return
 		}
 
@@ -287,14 +285,14 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = password.EncodePassword(resetRequestData.Password, user.Salt)
 
-	user.Update()
+	models.UserDB.Update(&user)
 
 	jsonResponse, err := json.Marshal(registerResponse{
 		Status:  true,
 		Message: "Your password restored",
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 

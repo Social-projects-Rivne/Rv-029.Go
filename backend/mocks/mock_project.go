@@ -21,7 +21,7 @@ type MockProjectCRUDMockRecorder struct {
 	mock *MockProjectCRUD
 }
 
-// NewMockProjectCRUD creates a new mock instance
+// NewMockdecodeAndValidateProjectCRUD creates a new mock instance
 func NewMockProjectCRUD(ctrl *gomock.Controller) *MockProjectCRUD {
 	mock := &MockProjectCRUD{ctrl: ctrl}
 	mock.recorder = &MockProjectCRUDMockRecorder{mock}

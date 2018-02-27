@@ -49,7 +49,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000" {
 		user := &models.User{}
 		user.UUID = issue.UserID
-		if err := user.FindByID(); err != nil {
+		if err := models.UserDB.FindByID(user); err != nil {
 			log.Printf("Error in controllers/issue error: %+v", err)
 			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 			response.Failed(w)

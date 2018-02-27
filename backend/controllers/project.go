@@ -30,7 +30,7 @@ func ProjectsList(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 }
 
-func ShowProjects(w http.ResponseWriter, r *http.Request) {
+func ShowProject(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	projectId , err := gocql.ParseUUID(vars["project_id"])
@@ -50,7 +50,7 @@ func ShowProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := helpers.Response{Message:"Projects list", Data: project}
+	response := helpers.Response{Message:"Project ", Data: project}
 	response.Success(w)
 
 }
@@ -86,7 +86,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	err = user.AddRoleToProject(project.UUID,models.ROLE_OWNER)
+
+	err = models.UserDB.AddRoleToProject(project.UUID,models.ROLE_OWNER,user.UUID)
 	if err != nil {
 		response := helpers.Response{Message: "Can't add role to project",StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -105,7 +106,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
+		response := helpers.Response{Message: err.Error()}
 		response.Failed(w)
 		return
 	}
@@ -115,14 +116,12 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err), StatusCode: http.StatusUnprocessableEntity}
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err)}
 		response.Failed(w)
 		return
 	}
 
 	project := models.Project{}
-
-	fmt.Println(projectId)
 
 	project.UUID = projectId
 	project.Name = projectRequestData.Name
@@ -155,7 +154,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	project.UUID = projectId
 
 	user := r.Context().Value("user").(models.User)
-	err = user.DeleteProject(project.UUID)
+	err = models.UserDB.DeleteProject(project.UUID,user.UUID)
 	if err != nil {
 		response := helpers.Response{Message: "Can't delete user project access",StatusCode: http.StatusInternalServerError}
 		response.Failed(w)

@@ -48,7 +48,7 @@ func (UsersTableSeeder) Run() {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
-		err := user.Insert()
+		err := models.UserDB.Insert(&user)
 		if err != nil {
 			log.Fatalf("User was`n inserted during seeding. Error: %+v", err)
 		}

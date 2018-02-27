@@ -42,7 +42,7 @@ func (r *Response) Failed(w http.ResponseWriter) {
 
 	jsonResponse, err := json.Marshal(r)
 	if err != nil {
-		log.Printf("Error while json decode: %q", err.Error())
+		log.Printf("Error while json dcode: %q", err.Error())
 	}
 
 	w.WriteHeader(r.StatusCode)
