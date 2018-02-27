@@ -35,7 +35,7 @@ func (s *Sprint) Insert() error {
 		s.ID, s.ProjectId, s.ProjectName, s.Status, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Insert inside models/sprint.go: %q\n", err.Error())
+		log.Printf("Error in models/sprint.go error: %+v",err)
 		return err
 	}
 
@@ -47,7 +47,7 @@ func (s *Sprint) Update() error {
 		s.Goal, s.Desc, s.Status, s.UpdatedAt, s.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Update inside models/sprint.go: %q\n", err.Error())
+		log.Printf("Error in models/sprint.go error: %+v",err)
 		return err
 	}
 
@@ -58,7 +58,7 @@ func (s *Sprint) Delete() error {
 	err := Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Delete inside models/sprint.go: %q\n", err.Error())
+		log.Printf("Error in models/sprint.go error: %+v",err)
 		return err
 	}
 
@@ -70,7 +70,7 @@ func (s *Sprint) FindById() error {
 		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in method FindById inside models/sprint.go: %q\n", err.Error())
+		log.Printf("Error in models/sprint.go error: %+v",err)
 		return err
 	}
 

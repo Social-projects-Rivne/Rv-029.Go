@@ -87,31 +87,37 @@ func (m *SmtpMailer) Send(toEmail, toName, subject, msg string) error {
 
 	// Auth
 	if err = c.Auth(m.auth); err != nil {
+		log.Printf("Error in utils/mail/mail.go error: %+v",err)
 		return err
 	}
 
 	// To && From
 	if err = c.Mail(from.Address); err != nil {
+		log.Printf("Error in utils/mail/mail.go error: %+v",err)
 		return err
 	}
 
 	if err = c.Rcpt(to.Address); err != nil {
+		log.Printf("Error in utils/mail/mail.go error: %+v",err)
 		return err
 	}
 
 	// Data
 	w, err := c.Data()
 	if err != nil {
+		log.Printf("Error in utils/mail/mail.go error: %+v",err)
 		return err
 	}
 
 	_, err = w.Write([]byte(message))
 	if err != nil {
+		log.Printf("Error in utils/mail/mail.go error: %+v",err)
 		return err
 	}
 
 	err = w.Close()
 	if err != nil {
+		log.Printf("Error in utils/mail/mail.go error: %+v",err)
 		return err
 	}
 

@@ -1,6 +1,9 @@
 package validator
 
-import "net/http"
+import (
+	"net/http"
+	"log"
+)
 
 type LoginRequestData struct {
 	*baseValidator
@@ -11,6 +14,7 @@ type LoginRequestData struct {
 func (d *LoginRequestData) Validate(r *http.Request) error {
 	err := d.ValidateEmail(d.Email)
 	if err != nil {
+		log.Printf("Error in utils/validator/login_request_validator.go error: %+v",err)
 		return err
 	}
 

@@ -46,7 +46,7 @@ func (SprintTableSeeder) Run() {
 			}
 
 			if err := sprint.Insert(); err != nil {
-				log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.sprint error: %s", err.Error())
+				log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.sprint error: %+v", err)
 				return
 			}
 

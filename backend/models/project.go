@@ -49,7 +49,7 @@ func (p *ProjectStorage) Insert(project *Project) error {
 	err := Session.Query(INSERT_PROJECT, project.UUID, project.Name, project.CreatedAt, project.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Insert models/project.go: %s\n", err.Error())
+		log.Printf("Error in models/project.go error: %+v",err)
 		return err
 	}
 
@@ -63,7 +63,7 @@ func (p *ProjectStorage) Update(project *Project) error {
 	err := Session.Query(UPDATE_PROJECT, project.Name, project.UpdatedAt, project.UUID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Update models/project.go: %s\n", err.Error())
+		log.Printf("Error in models/project.go error: %+v",err)
 		return err
 	}
 
@@ -77,7 +77,7 @@ func (p *ProjectStorage) Delete(project *Project) error {
 	err := Session.Query(DELETE_PROJECT, project.UUID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Delete models/project.go: %s\n", err.Error())
+		log.Printf("Error in models/project.go error: %+v",err)
 		return err
 	}
 
@@ -91,7 +91,7 @@ func (p *ProjectStorage) FindByID(project *Project) error {
 	err := Session.Query(FIND_PROJECT, project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in method FindByID models/project.go: %s\n", err.Error())
+		log.Printf("Error in models/project.go error: %+v",err)
 		return err
 	}
 
@@ -122,7 +122,7 @@ func (p *ProjectStorage) GetProjectList(project *Project) ([]Project, error) {
 	}
 
 	if err := iterator.Close(); err != nil {
-		log.Printf("Can`t fetch all projects from DB. Error: %s", err.Error())
+		log.Printf("Error in models/project.go error: %+v",err)
 	}
 
 	return projects, nil

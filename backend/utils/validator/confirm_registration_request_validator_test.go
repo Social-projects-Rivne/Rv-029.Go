@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"log"
 	//"fmt"
 )
 
@@ -16,7 +17,10 @@ func TestConfirmRegistrationRequestData_Validate_Success(t *testing.T) {
 	}{
 		Token: "someStringToCheckIfExists",
 	}
-	jsonInput, _ := json.Marshal(input)
+	jsonInput, err := json.Marshal(input)
+	if err != nil{
+		log.Printf("Error in utils/validator/board_update_request_validator_test.go error: %+v",err)
+	}
 
 	request := httptest.NewRequest("GET", "http://localhost/", strings.NewReader(string(jsonInput)))
 
@@ -39,7 +43,10 @@ func TestConfirmRegistrationRequestData_Validate_Error(t *testing.T) {
 	}{
 	//Token: nil,
 	}
-	jsonInput, _ := json.Marshal(input)
+	jsonInput, err := json.Marshal(input)
+	if err != nil{
+		log.Printf("Error in utils/validator/confirm_registration_request_validator_test.go error: %+v",err)
+	}
 
 	request := httptest.NewRequest("GET", "http://localhost/", strings.NewReader(string(jsonInput)))
 

@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+	"log"
 )
 
 const DBError = "Error while accessing to database"
@@ -18,7 +19,8 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		res := helpers.Response{Message: err.Error()}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
 	}
@@ -27,7 +29,8 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		res := helpers.Response{Message: "Board ID is not valid"}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Board ID is not valid", StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
 	}
@@ -37,7 +40,8 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
@@ -58,7 +62,8 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Insert()
 
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
@@ -73,16 +78,17 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		res := helpers.Response{Message: err.Error()}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
 	}
 
 	vars := mux.Vars(r)
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
-
-	if err != nil {
-		res := helpers.Response{Message: "Sprint ID is not valid"}
+	if err != nil{
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
 	}
@@ -90,9 +96,9 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
 	err = sprint.FindById()
-
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
@@ -118,7 +124,8 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	err = sprint.Update()
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
@@ -132,7 +139,8 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		res := helpers.Response{Message: "Sprint ID is not valid"}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Sprint ID is not valid", StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
 	}
@@ -143,7 +151,8 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	err = sprint.Delete()
 
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
@@ -157,8 +166,9 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		response := helpers.Response{Message: "Sprint ID is not valid"}
-		response.Failed(w)
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusUnprocessableEntity}
+		res.Failed(w)
 		return
 	}
 
@@ -167,7 +177,8 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 
 	err = sprint.FindById()
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
@@ -181,7 +192,8 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		res := helpers.Response{Message: "Board ID is not valid"}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Board ID is not valid", StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
 	}
@@ -190,7 +202,8 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 
 	sprintsList, err := sprint.List(boardId)
 	if err != nil {
-		res := helpers.Response{Message: DBError}
+		log.Printf("Error in controllers/sprint error: %+v",err)
+		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
 	}
