@@ -38,7 +38,7 @@ func (IssueTableSeeder) Run() {
 				UpdatedAt: time.Now(),
 			}
 
-			if err := issue.Insert(); err != nil {
+			if err :=  models.IssueDB.Insert(&issue); err != nil {
 				log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 				return
 			}
@@ -63,7 +63,7 @@ func (IssueTableSeeder) Run() {
 				UpdatedAt: time.Now(),
 			}
 
-			if err := issue.Insert(); err != nil {
+			if err := models.IssueDB.Insert(&issue); err != nil {
 				log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 				return
 			}
@@ -85,7 +85,7 @@ func (IssueTableSeeder) Run() {
 				UpdatedAt: time.Now(),
 			}
 
-			if err := issue.Insert(); err != nil {
+			if err := models.IssueDB.Insert(&issue); err != nil {
 				log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 				return
 			}
@@ -107,7 +107,7 @@ func (IssueTableSeeder) Run() {
 				UpdatedAt: time.Now(),
 			}
 
-			if err := issue.Insert(); err != nil {
+			if err := models.IssueDB.Insert(&issue); err != nil {
 				log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 				return
 			}

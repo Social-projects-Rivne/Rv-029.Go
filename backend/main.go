@@ -60,6 +60,7 @@ func init()  {
 func main() {
 	models.InitBoardDB(&models.BoardStorage{ APP.DB })
 	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
+	models.InitIssueDB(&models.IssueStorage{ APP.DB })
 
 	var cmd string
 
