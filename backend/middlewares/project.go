@@ -1,12 +1,12 @@
 package middlewares
 
 import (
-	"net/http"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"github.com/gorilla/mux"
-	"github.com/gocql/gocql"
-	"log"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
+	"github.com/gocql/gocql"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 )
 
 // Check if user have permission in project methods
@@ -19,11 +19,11 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 		//TODO refactor logic middleware
 		if user.Role == models.ROLE_OWNER {
 			next.ServeHTTP(w, r)
-		} else  {
+		} else {
 			//check if project id is not empty
-			if vars["project_id"] != ""{
+			if vars["project_id"] != "" {
 
-				projectId , err := gocql.ParseUUID(vars["project_id"])
+				projectId, err := gocql.ParseUUID(vars["project_id"])
 				if err != nil {
 					log.Printf("Can't parse uuid in project middlaware")
 					// return error response
@@ -33,17 +33,16 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 				}
 
 				//check if user have access
-				if user.Projects[projectId] != ""{
+				if user.Projects[projectId] != "" {
 					next.ServeHTTP(w, r)
-				}else{
+				} else {
 					// return error response
 					response := helpers.Response{Message: "You haven't permission"}
 					response.Failed(w)
 					return
 				}
 
-
-			}else{
+			} else {
 				// return error response
 				response := helpers.Response{Message: "You haven't permission"}
 				response.Failed(w)
@@ -53,4 +52,3 @@ func ProjectAccessMiddleware(next http.Handler) http.Handler {
 		}
 	})
 }
-

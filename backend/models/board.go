@@ -1,9 +1,9 @@
 package models
 
 import (
+	"github.com/gocql/gocql"
 	"log"
 	"time"
-	"github.com/gocql/gocql"
 )
 
 type Board struct {
@@ -42,7 +42,7 @@ func (s *BoardStorage) Insert(b *Board) error {
 		b.ID, b.ProjectID, b.ProjectName, b.Name, b.Desc, b.CreatedAt, b.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Insert inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -55,7 +55,7 @@ func (s *BoardStorage) Update(b *Board) error {
 		b.Name, b.Desc, b.UpdatedAt, b.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Update inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -67,7 +67,7 @@ func (s *BoardStorage) Delete(b *Board) error {
 	err := s.DB.Query(`DELETE FROM boards where id = ?;`, b.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in method Delete inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -80,7 +80,7 @@ func (s *BoardStorage) FindByID(b *Board) error {
 		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.ProjectName, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in method inside models/board.go: %+v\n", err)
+		log.Printf("Error in models/board.go error: %+v",err)
 		return err
 	}
 
@@ -93,7 +93,7 @@ func (s *BoardStorage) List(projectId gocql.UUID) ([]map[string]interface{}, err
 	boardsList, err := s.DB.Query(`SELECT * FROM boardslist WHERE project_id = ?;`, projectId).Iter().SliceMap()
 
 	if err != nil {
-		log.Printf("Error in method List inside models/board.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v",err)
 		return nil, err
 	}
 

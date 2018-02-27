@@ -36,7 +36,7 @@ func ShowProject(w http.ResponseWriter, r *http.Request) {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()) }
+		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
 	}
@@ -51,7 +51,7 @@ func ShowProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := helpers.Response{Message:"Project ", Data: project}
+	response := helpers.Response{Message:"Projects list", Data: project}
 	response.Success(w)
 
 }
@@ -63,7 +63,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
 	err := decodeAndValidate(r, &projectRequestData)
 	if err != nil {
-		response := helpers.Response{Message: err.Error()}
+		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		response.Failed(w)
 		return
 	}
@@ -75,7 +76,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request)  {
 	// TODO some transaction for project Insert
 	err = models.ProjectDB.Insert(&project)
 	if err != nil {
-		response := helpers.Response{Message: "Can't create project",StatusCode: http.StatusInternalServerError}
+		response := helpers.Response{Message: "Can't create project", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -109,7 +110,7 @@ func UpdateProject(w http.ResponseWriter, r *http.Request)  {
 	projectId , err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
 		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
+		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()),StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}

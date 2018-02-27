@@ -6,6 +6,7 @@ import {
   HANDLE_STATUS_UPDATE_SPRINT_INPUT,
   HANDLE_SPRINT_OPEN,
   HANDLE_SPRINT_ISSUES_LOADED,
+  HANDLE_EDITING_SPRINT,
 } from '../constants/sprints'
 
 const initialState = {
@@ -30,9 +31,16 @@ export default function (state = initialState, action) {
       return {
         ...state,
         currentSprint: action.payload,
-        sprintGoal: action.payload.goal,
-        sprintDesc: action.payload.description,
-        sprintStatus: action.payload.status
+        sprintGoal: action.payload ? action.payload.Goal : null,
+        sprintDesc: action.payload ? action.payload.Desc : null,
+        sprintStatus: action.payload ? action.payload.Status : null,
+      }
+    case HANDLE_EDITING_SPRINT:
+      return {
+        ...state,
+        sprintGoal: action.payload ? action.payload.Goal : null,
+        sprintDesc: action.payload ? action.payload.Desc : null,
+        sprintStatus: action.payload ? action.payload.Status : null,
       }
     case HANDLE_GOAL_UPDATE_SPRINT_INPUT:
       return { ...state, sprintGoal: action.payload }

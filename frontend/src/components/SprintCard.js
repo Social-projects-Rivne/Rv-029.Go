@@ -49,7 +49,7 @@ class SprintCard extends Component {
 
   handleOpenUpdateSprintClick = () => {
     this.setState({ updateSprintOpen: true })
-    this.props.sprintsActions.setCurrentSprint(this.props.data)
+    this.props.sprintsActions.setEditedSprint(this.props.data)
   }
 
   handleClose = () => {
@@ -57,12 +57,12 @@ class SprintCard extends Component {
   }
 
   updateSprint = () => {
-    const { id } = this.props.data
+    const { ID } = this.props.data
     const { onUpdate } = this.props
     const { sprintGoal, sprintDesc, sprintStatus } = this.props.sprints
     const { setNotificationMessage, setErrorMessage } = this.props.defaultPageActions
 
-    axios.put(API_URL + `project/board/sprint/update/${ id }`, {
+    axios.put(API_URL + `project/board/sprint/update/${ ID }`, {
       goal: sprintGoal,
       desc: sprintDesc,
       status: sprintStatus
@@ -83,11 +83,11 @@ class SprintCard extends Component {
   }
 
   deleteSprint = () => {
-    const { id } = this.props.data
+    const { ID } = this.props.data
     const { onUpdate } = this.props
     const { setNotificationMessage, setErrorMessage } = this.props.defaultPageActions
 
-    axios.delete(API_URL + `project/board/sprint/delete/${ id }`, {})
+    axios.delete(API_URL + `project/board/sprint/delete/${ ID }`, {})
     .then((response) => {
       setNotificationMessage(response.data.Message)
       onUpdate()
@@ -102,12 +102,12 @@ class SprintCard extends Component {
   }
 
   viewSprint = () => {
-    browserHistory.push('/sprint/' + this.props.data.id);
+    browserHistory.push('/sprint/' + this.props.data.ID);
   }
 
   render() {
     const { classes } = this.props
-    const { id, status, goal, created_at, description } = this.props.data
+    const { ID, Status, Goal, CreatedAt, Desc } = this.props.data
     const { sprintGoal, sprintDesc, sprintStatus } = this.props.sprints
     const {
       setGoalUpdateSprintInput,
@@ -115,26 +115,28 @@ class SprintCard extends Component {
       setStatusUpdateSprintInput
     } = this.props.sprintsActions
 
+    let actionButtons = "";
+    if (Status != "Done") {
+      actionButtons = <Grid>
+              <IconButton onClick={this.handleOpenUpdateSprintClick}>
+                  <EditIcon />
+              </IconButton>
+              <IconButton onClick={this.deleteSprint}>
+              <DeleteIcon />
+              </IconButton>
+      </Grid>
+    }
+
     return (
       <Card className={classes.root}>
         <CardHeader
           className={classes.test}
-          avatar={ <Chip label={status} /> }
-          action={
-            <Grid>
-              {/* FIXME: horizontal scroll cause of this btn WTF? */}
-              <IconButton onClick={this.handleOpenUpdateSprintClick}>
-                <EditIcon />
-              </IconButton>
-              <IconButton onClick={this.deleteSprint}>
-                <DeleteIcon />
-              </IconButton>
-            </Grid>
-          }
-          title={goal}
-          subheader={created_at} />
+          avatar={ <Chip label={Status} /> }
+          action={actionButtons}
+          title={Goal}
+          subheader={CreatedAt} />
         <CardContent>
-          <Typography>{description}</Typography>
+          <Typography>{Desc}</Typography>
         </CardContent>
         <CardActions>
           <Button
@@ -180,8 +182,8 @@ class SprintCard extends Component {
                 inputProps={{
                   name: 'status',
                   id: 'status-simple', }}>
-                <MenuItem value={"Todo"}>Todo</MenuItem>
-                <MenuItem value={"In process"}>In process</MenuItem>
+                <MenuItem value={"TODO"}>TODO</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Done"}>Done</MenuItem>
               </Select>
             </FormControl>

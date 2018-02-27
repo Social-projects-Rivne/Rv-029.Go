@@ -1,6 +1,9 @@
 package validator
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+)
 
 type RegisterRequestData struct {
 	*baseValidator
@@ -14,11 +17,14 @@ func (d *RegisterRequestData) Validate(r *http.Request) error {
 	var err error
 	err = d.ValidateEmail(d.Email)
 	if err != nil {
+		log.Printf("Error in utils/validator/register_request_validator.go error: %+v", err)
 		return err
 	}
 
 	err = d.ValidateEmailUnique(d.Email)
 	if err != nil {
+		log.Printf("Error in utils/validator/register_request_validator.go error: %+v", err)
+		
 		return err
 	}
 
@@ -35,11 +41,13 @@ func (d *RegisterRequestData) Validate(r *http.Request) error {
 
 	err = d.ValidateMinLenght(d.FirstName, 3)
 	if err != nil {
+		log.Printf("Error in utils/validator/register_request_validator.go error: %+v", err)		
 		return err
 	}
 
 	err = d.ValidateMinLenght(d.LastName, 3)
 	if err != nil {
+		log.Printf("Error in utils/validator/register_request_validator.go error: %+v", err)		
 		return err
 	}
 

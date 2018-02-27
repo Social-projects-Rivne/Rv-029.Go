@@ -46,8 +46,9 @@ class BoardPage extends Component{
       createSprintOpen: false,
     });
   };
-
+  
   componentDidMount() {
+    this.props.sprintsActions.setCurrentSprint(null)
     this.getSprintsList()
     this.getIssuesList()
   }
@@ -69,8 +70,7 @@ class BoardPage extends Component{
   getIssuesList = () => {
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
-        this.props.issuesActions.setIssues(response.data)
-        console.log(response.data)
+        this.props.issuesActions.setIssues(response.data.Data)
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -90,7 +90,6 @@ class BoardPage extends Component{
       status: 'Todo'
     })
     .then((response) => {
-      console.log(response)
       this.getIssuesList()
       this.handleClose()
     })

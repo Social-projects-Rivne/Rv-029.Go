@@ -6,10 +6,12 @@ import axios from "axios"
 import { API_URL } from "../constants/global"
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as issuesActions from "../actions/IssuesActions"
+import * as sprintsActions from "../actions/SprintsActions"
 import { withStyles } from 'material-ui/styles'
 import Button from 'material-ui/Button'
 import Chip from 'material-ui/Chip'
 import DeleteIcon from 'material-ui-icons/Delete'
+import PlayArrow from 'material-ui-icons/PlayArrow'
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore'
 import { FormControl } from 'material-ui/Form'
 import Grid from 'material-ui/Grid'
@@ -30,10 +32,12 @@ import ExpansionPanel, {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
 } from 'material-ui/ExpansionPanel'
+import messages from "../services/messages";
 
 class IssueCard extends Component  {
   state = {
-    updateIssueOpen: false
+    updateIssueOpen: false,
+    isIssueOpen: false,
   }
 
   static propTypes = {
@@ -55,12 +59,12 @@ class IssueCard extends Component  {
   }
 
   updateIssue = () => {
-    const { id } = this.props.data
+    const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
-    axios.put(API_URL + `project/board/issue/update/${ id }`, {
+    axios.put(API_URL + `project/board/issue/update/${ UUID }`, {
       name: issueName,
       description: issueDesc,
       estimate: +issueEstimate,
@@ -82,11 +86,12 @@ class IssueCard extends Component  {
   }
 
   deleteIssue = () => {
-    const { id } = this.props.data
+    const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
+    this.setState({ isIssueOpen: false })
 
-    axios.delete(API_URL + `project/board/issue/delete/${ id }`, {})
+    axios.delete(API_URL + `project/board/issue/delete/${ UUID }`, {})
     .then((res) => {
       setNotificationMessage(res.data.Message)
       onUpdate()
@@ -101,10 +106,45 @@ class IssueCard extends Component  {
     })
   }
 
+  addToSprint = () => {
+    const todoSprints = this.props.sprints.currentSprints.filter((sprint, index) => {
+      return sprint.Status == "TODO"
+    })
+
+    if (todoSprints.length == 0) {
+      messages("There is no appropriate sprint to add the issue in. Sprint should have \"TODO\" status", false)
+    } else {
+      const {UUID} = this.props.data
+      const { onUpdate } = this.props
+      const sprint = todoSprints[todoSprints.length-1]
+
+      this.setState({ isIssueOpen: false })
+
+      axios.put(API_URL + `project/board/sprint/${sprint.ID}/add/issue/${ UUID }`, {})
+        .then((response) => {
+          messages(response.data.Message, true)
+          onUpdate()
+        })
+        .catch((err) => {
+          if (response.response && response.response.data.Message) {
+              messages(response.response.data.Message, false)
+          } else {
+              messages("Server error occured", false)
+          }
+          this.handleClose()
+        })
+    }
+  }
+
+  toggleOpened = () => {
+    this.setState({ isIssueOpen: !this.state.isIssueOpen })
+  }
+
   render() {
     const { classes } = this.props
-    const { name, description, status, estimate } = this.props.data
+    const { Name, Description, Status, Estimate, SprintID } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
+
     const {
       setNameUpdateIssueInput,
       setDescUpdateIssueInput,
@@ -113,24 +153,24 @@ class IssueCard extends Component  {
     } = this.props.issuesActions
 
     return (
-      <ExpansionPanel>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+      <ExpansionPanel expanded={this.state.isIssueOpen}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} onClick={this.toggleOpened}>
           <Grid
             container
             alignItems={'center'}>
             <Grid style={{ marginRight: '1em' }}>
-              <Chip label={status} />
+              <Chip label={Status} />
             </Grid>
             <Grid>
-              <Typography>{name}</Typography>
+              <Typography>{Name}</Typography>
             </Grid>
           </Grid>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container >
             <Grid item xs={12}>
-              <Typography type={'title'}>{ `Estimate: ${estimate}` }</Typography>
-              <Typography> {description} </Typography>
+              <Typography type={'title'}>{ `Estimate: ${Estimate}` }</Typography>
+              <Typography> {Description} </Typography>
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
@@ -139,14 +179,34 @@ class IssueCard extends Component  {
             container
             justify={'flex-end'}>
             <Grid item>
-              <IconButton onClick={this.handleOpenUpdateIssueClick}>
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                aria-label="Delete"
-                onClick={this.deleteIssue}>
-                <DeleteIcon />
-              </IconButton>
+              {/*You can not update issue if it's already in finished sprint*/}
+              {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
+                  <IconButton onClick={this.handleOpenUpdateIssueClick}>
+                      <EditIcon />
+                  </IconButton>
+              ) : (
+                  ""
+              )}
+              {/*You can not remove issue if it's in sprint*/}
+              {(SprintID != "00000000-0000-0000-0000-000000000000") ? (
+                  ""
+              ) : (
+                  <IconButton
+                      aria-label="Delete"
+                      onClick={this.deleteIssue}>
+                      <DeleteIcon />
+                  </IconButton>
+              )}
+              {/*You can not remove issue if it's in sprint*/}
+              {(SprintID != "00000000-0000-0000-0000-000000000000" || this.props.sprints.currentSprint != null) ? (
+                  ""
+              ) : (
+                  <IconButton
+                      aria-label="Add To Sprint"
+                      onClick={this.addToSprint}>
+                      <PlayArrow />
+                  </IconButton>
+              )}
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
@@ -195,8 +255,8 @@ class IssueCard extends Component  {
                   name: 'status',
                   id: 'status-simple',
                 }} >
-                <MenuItem value={"Todo"}>Todo</MenuItem>
-                <MenuItem value={"In process"}>In process</MenuItem>
+                <MenuItem value={"TODO"}>TODO</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Done"}>Done</MenuItem>
               </Select>
             </FormControl>
@@ -227,6 +287,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     defaultPage: state.defaultPage,
     issues: state.issues,
+    sprints: state.sprints,
     ownProps
   }
 }
@@ -234,6 +295,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
+    sprintsActions: bindActionCreators(sprintsActions, dispatch),
     issuesActions: bindActionCreators(issuesActions, dispatch)
   }
 }

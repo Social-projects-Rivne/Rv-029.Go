@@ -8,70 +8,38 @@ import (
 	"log"
 
 	"github.com/gocql/gocql"
+	"github.com/icrowley/fake"
 )
 
 //BoardTableSeeder model
 type BoardTableSeeder struct {
 }
 
+var boards []models.Board
+
 //Run .
 func (BoardTableSeeder) Run() {
 
-	id, err := gocql.ParseUUID("9325624a-0ba2-22e8-ba34-c06ebf83499a")
-	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
-		return
+	boards = []models.Board{}
+
+	for _, project := range projects {
+		for i := 0; i < random(2, 5); i++ {
+			board := models.Board{
+				ID:          gocql.TimeUUID(),
+				ProjectID:   project.UUID,
+				ProjectName: project.Name,
+				Name:        fake.WordsN(3),
+				Desc:        fake.Sentences(),
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			}
+
+			if err := models.BoardDB.Insert(&board); err != nil {
+				log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
+				return
+			}
+
+			boards = append(boards, board)
+		}
 	}
-
-	projectID, err := gocql.ParseUUID("fc3a1850-0f46-11e8-b192-d8cb8ac536c8")
-	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
-		return
-	}
-
-	board := &models.Board{
-		ID:          id,
-		ProjectID:   projectID,
-		ProjectName: "project number one",
-		Name:        "Seeder board 1",
-		Desc:        "Some description 1",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}
-
-	if err := models.BoardDB.Insert(board); err != nil {
-		log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
-		return
-	}
-
-
-
-
-	id, err = gocql.ParseUUID("93ab624a-1cb2-228a-ba34-c06ebf83322c")
-	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
-		return
-	}
-
-	projectID, err = gocql.ParseUUID("fc3aab50-0f46-11e8-b194-d8cb8ac536c8")
-	if err != nil {
-		log.Fatal("Can't parse uuid ", err)
-		return
-	}
-
-	board = &models.Board{
-		ID:          id,
-		ProjectID:   projectID,
-		ProjectName: "project number two",
-		Name:        "Seeder board 2",
-		Desc:        "Some description 2",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}
-
-	if err := models.BoardDB.Insert(board); err != nil {
-		log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
-		return
-	}
-
 }

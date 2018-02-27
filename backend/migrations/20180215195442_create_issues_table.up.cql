@@ -1,5 +1,5 @@
-CREATE TABLE task_manager.issues (
-    id uuid PRIMARY KEY,
+CREATE TABLE if NOT EXISTS task_manager.issues (
+    id uuid,
     board_id uuid,
     board_name text,
     created_at timestamp,
@@ -13,6 +13,5 @@ CREATE TABLE task_manager.issues (
     updated_at timestamp,
     user_first_name text,
     user_id uuid,
-    user_last_name text
-
-);
+    user_last_name text,
+    PRIMARY KEY (id, board_id, sprint_id, project_id));
