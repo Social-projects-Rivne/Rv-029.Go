@@ -19,7 +19,6 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &sprintRequestData)
 
 	if err != nil {
-		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
 		return
@@ -29,8 +28,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	boardId, err := gocql.ParseUUID(vars["board_id"])
 
 	if err != nil {
-		log.Printf("Error in controllers/sprint error: %+v",err)
-		res := helpers.Response{Message: "Board ID is not valid", StatusCode: http.StatusUnprocessableEntity}
+		res := helpers.Response{Message: "Board ID is not valid"}
 		res.Failed(w)
 		return
 	}
@@ -40,7 +38,6 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	err = models.BoardDB.FindByID(&board)
 
 	if err != nil {
-		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
@@ -59,7 +56,7 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 		time.Now(),
 	}
 
-	err = sprint.Insert()
+	err = models.SprintDB.Insert(&sprint)
 
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)
@@ -95,7 +92,8 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	err = sprint.FindById()
+	err = models.SprintDB.FindByID(&sprint)
+
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
@@ -105,7 +103,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	//If you want finish sprint
 	if sprint.Status != sprintRequestData.Status && sprintRequestData.Status == models.SPRINT_STAUS_DONE {
-		inProgressIssues, err := sprint.GetSprintIssuesInProgress()
+		inProgressIssues, err := models.SprintDB.GetSprintIssuesInProgress(&sprint)
 		if err != nil {
 			res := helpers.Response{Message: DBError}
 			res.Failed(w)
@@ -122,7 +120,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 	sprint.Status = sprintRequestData.Status
 	sprint.UpdatedAt = time.Now()
 
-	err = sprint.Update()
+	err = models.SprintDB.Update(&sprint)
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
@@ -139,8 +137,7 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 
 	if err != nil {
-		log.Printf("Error in controllers/sprint error: %+v",err)
-		res := helpers.Response{Message: "Sprint ID is not valid", StatusCode: http.StatusUnprocessableEntity}
+		res := helpers.Response{Message: "Sprint ID is not valid"}
 		res.Failed(w)
 		return
 	}
@@ -148,10 +145,9 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
 
-	err = sprint.Delete()
+	err = models.SprintDB.Delete(&sprint)
 
 	if err != nil {
-		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
 		return
@@ -175,7 +171,7 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
 
-	err = sprint.FindById()
+	err = models.SprintDB.FindByID(&sprint)
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}
@@ -198,9 +194,8 @@ func SprintsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sprint := models.Sprint{}
+	sprintsList, err := models.SprintDB.List(boardId)
 
-	sprintsList, err := sprint.List(boardId)
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: "Error in controllers/sprint error", StatusCode: http.StatusInternalServerError}

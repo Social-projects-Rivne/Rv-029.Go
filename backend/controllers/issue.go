@@ -166,9 +166,9 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sprint := &models.Sprint{}
+	sprint := models.Sprint{}
 	sprint.ID = sprintID
-	if err := sprint.FindById(); err != nil {
+	if err := models.SprintDB.FindByID(&sprint); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: sprint.FindById, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindById, error: %s", err.Error())}
 		response.Failed(w)
