@@ -132,6 +132,7 @@ func DeleteSprint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 	if err != nil {
+		log.Printf("Error in controllers/sprint/DeleteSprint error: %+v", err)
 		res := helpers.Response{Message: "Sprint ID is not valid"}
 		res.Failed(w)
 		return
@@ -156,7 +157,7 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sprintId, err := gocql.ParseUUID(vars["sprint_id"])
 	if err != nil {
-		log.Printf("Error in controllers/sprint error: %+v", err)
+		log.Printf("Error in controllers/sprint/SelectSprint error: %+v", err)
 		res := helpers.Response{Message: "Sprint ID is not valid" }
 		res.Failed(w)
 		return
