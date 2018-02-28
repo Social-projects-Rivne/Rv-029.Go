@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-// ######## DELETE BOARD ########
+// ######## DELETE SPRINT ########
 
 func TestDeleteSprintSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -81,4 +81,30 @@ func TestDeleteSprintDBError(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
 	}
+}
+
+func TestCreateSprintSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitSprintDB(mockSprintCRUD)
+	mockSprintCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/project/board/9325624a-0ba2-22e8-ba34-c06ebf83499a/sprint/create/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(DeleteSprint)
+	r.Handle("/project/board/{board_id}/sprint/create/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
 }

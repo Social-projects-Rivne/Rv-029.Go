@@ -14,10 +14,9 @@ import (
 const DBError = "Error while accessing to database"
 
 func CreateSprint(w http.ResponseWriter, r *http.Request) {
+
 	var sprintRequestData validator.SprintCreateRequestData
-
 	err := decodeAndValidate(r, &sprintRequestData)
-
 	if err != nil {
 		res := helpers.Response{Message: err.Error(), StatusCode: http.StatusUnprocessableEntity}
 		res.Failed(w)
@@ -26,7 +25,6 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	boardId, err := gocql.ParseUUID(vars["board_id"])
-
 	if err != nil {
 		res := helpers.Response{Message: "Board ID is not valid"}
 		res.Failed(w)
@@ -36,7 +34,6 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	board := models.Board{}
 	board.ID = boardId
 	err = models.BoardDB.FindByID(&board)
-
 	if err != nil {
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
@@ -57,7 +54,6 @@ func CreateSprint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = models.SprintDB.Insert(&sprint)
-
 	if err != nil {
 		log.Printf("Error in controllers/sprint error: %+v",err)
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
