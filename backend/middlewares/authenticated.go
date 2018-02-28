@@ -15,6 +15,7 @@ import (
 // Check if user authenticated
 func AuthenticatedMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		// check if jwt present & valid
 		err := jwtMiddleware.CheckJWT(w, r)
 		if err != nil {

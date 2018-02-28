@@ -5,10 +5,9 @@
 package mocks
 
 import (
-	reflect "reflect"
-
 	models "github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	gomock "github.com/golang/mock/gomock"
+	reflect "reflect"
 )
 
 // MockIssueCRUD is a mock of IssueCRUD interface
@@ -56,6 +55,19 @@ func (m *MockIssueCRUD) FindByID(arg0 *models.Issue) error {
 // FindByID indicates an expected call of FindByID
 func (mr *MockIssueCRUDMockRecorder) FindByID(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockIssueCRUD)(nil).FindByID), arg0)
+}
+
+// GetBoardBacklogIssuesList mocks base method
+func (m *MockIssueCRUD) GetBoardBacklogIssuesList(arg0 *models.Issue) ([]models.Issue, error) {
+	ret := m.ctrl.Call(m, "GetBoardBacklogIssuesList", arg0)
+	ret0, _ := ret[0].([]models.Issue)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBoardBacklogIssuesList indicates an expected call of GetBoardBacklogIssuesList
+func (mr *MockIssueCRUDMockRecorder) GetBoardBacklogIssuesList(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardBacklogIssuesList", reflect.TypeOf((*MockIssueCRUD)(nil).GetBoardBacklogIssuesList), arg0)
 }
 
 // GetBoardIssueList mocks base method
