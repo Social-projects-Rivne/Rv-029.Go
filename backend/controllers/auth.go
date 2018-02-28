@@ -43,7 +43,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil{
 			log.Printf("Error in controllers/auth error: %+v",err)
-			return 
+			return
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -54,9 +54,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	user := models.User{}
 	user.Email = loginRequestData.Email
-	if err := user.FindByEmail();err != nil{
+	if err := models.UserDB.FindByEmail(&user);err != nil{
 		log.Printf("Error in controllers/auth error: %+v",err)
-		return		
+		return
 	}
 
 	if user.Password != password.EncodePassword(loginRequestData.Password, user.Salt) {
@@ -79,7 +79,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	token, err := jwt.GenerateToken(&user)
 	if err != nil{
 		log.Printf("Error in controllers/auth error: %+v",err)
-		return		
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -92,7 +92,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil{
 		log.Printf("Error in controllers/auth error: %+v",err)
-		return		
+		return
 	}
 
 	w.Write(jsonResponse)
@@ -109,7 +109,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil{
 			log.Printf("Error in controllers/auth error: %+v",err)
-			return			
+			return
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -132,7 +132,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now(),
 	}
 
-	if err := user.Insert();err != nil{
+	if err := models.UserDB.Insert(&user);err != nil{
 		log.Printf("Error in controllers/auth error: %+v",err)
 		return
 	}
@@ -167,7 +167,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil{
 			log.Printf("Error in controllers/auth error: %+v",err)
-			return 
+			return
 		}
 
 
@@ -179,8 +179,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(confirmRegistrationRequestData)
 	user := models.User{}
 	user.Status = 1
-	fmt.Println(user)
-	user.Update()
+	models.UserDB.Update(&user)
 
 	jsonResponse, err := json.Marshal(struct {
 		Status  bool
@@ -220,9 +219,11 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		w.Write(jsonResponse)
 		return
 	}
-	user := &models.User{}
+
+	user := models.User{}
 	user.Email = forgotRequestData.Email
-	user.FindByEmail()
+	// TODO err handler
+	err = models.UserDB.FindByEmail(&user)
 
 	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/authorization/new-password/%s\">LINK</a>\n", user.FirstName, user.Password)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
@@ -266,7 +267,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	user := models.User{}
 	user.Email = resetRequestData.Email
-	user.FindByEmail()
+	err = models.UserDB.FindByEmail(&user)
 
 	// FIXME doesn't work properly
 	if user.Password != resetRequestData.Token {
@@ -287,7 +288,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = password.EncodePassword(resetRequestData.Password, user.Salt)
 
-	user.Update()
+	models.UserDB.Update(&user)
 
 	jsonResponse, err := json.Marshal(registerResponse{
 		Status:  true,

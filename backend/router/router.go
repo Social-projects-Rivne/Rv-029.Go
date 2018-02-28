@@ -67,8 +67,8 @@ func applyProjectsRoutes(r *mux.Router) {
 	r.HandleFunc("/delete/{project_id}/", controllers.DeleteProject).Methods("DELETE")
 	r.HandleFunc("/delete/{project_id}", controllers.DeleteProject).Methods("DELETE")
 
-	r.HandleFunc("/show/{project_id}/", controllers.ShowProjects).Methods("GET")
-	r.HandleFunc("/show/{project_id}", controllers.ShowProjects).Methods("GET")
+	r.HandleFunc("/show/{project_id}/", controllers.ShowProject).Methods("GET")
+	r.HandleFunc("/show/{project_id}", controllers.ShowProject).Methods("GET")
 
 	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")

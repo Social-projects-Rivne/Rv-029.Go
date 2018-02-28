@@ -1,8 +1,9 @@
 package db
 
 import (
-	"github.com/gocql/gocql"
 	"log"
+
+	"github.com/gocql/gocql"
 )
 
 type DBConfig struct {

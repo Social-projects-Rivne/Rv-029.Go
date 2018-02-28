@@ -56,7 +56,7 @@ func (ss *SprintStorage) Insert(s *Sprint) error {
 		s.ID, s.ProjectId, s.ProjectName, s.Status, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
@@ -68,7 +68,7 @@ func (ss *SprintStorage) Update(s *Sprint) error {
 		s.Goal, s.Desc, s.Status, s.UpdatedAt, s.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
@@ -79,7 +79,7 @@ func (ss *SprintStorage) Delete(s *Sprint) error {
 	err := ss.DB.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
@@ -91,7 +91,7 @@ func (ss *SprintStorage) FindById(s *Sprint) error {
 		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 

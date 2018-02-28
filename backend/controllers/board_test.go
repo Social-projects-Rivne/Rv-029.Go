@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"errors"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"bytes"
 )
 
 // ######## DELETE BOARD ########
@@ -90,12 +90,12 @@ func TestDeleteBoardDBError(t *testing.T) {
 	r.Handle("/project/board/delete/{board_id}/", handler).Methods("DELETE")
 	r.ServeHTTP(res, req)
 
-	if status := res.Code; status != http.StatusBadRequest {
+	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusBadRequest)
+			status, http.StatusInternalServerError)
 	}
 
-	expected := `{"Status":false,"Message":"Error while accessing to database","StatusCode":400,"Data":null}`
+	expected := `{"Status":false,"Message":"Error while accessing to database","StatusCode":500,"Data":null}`
 	if res.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)
@@ -306,7 +306,7 @@ func TestSelectBoardSuccess(t *testing.T) {
 func TestSelectBoardBadVariable(t *testing.T) {
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/project/board/select/does-not-valid-variable/", nil)
+	req, err := http.NewRequest("GET", "/project/board/select/does-not-valid-id/", nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -373,6 +373,28 @@ func TestBoardsListSuccess(t *testing.T) {
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
+	}
+}
+
+func TestBoardsListBadVariable(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/project/does-not-valid-id/board/list/", nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(BoardsList)
+	r.Handle("/project/{project_id}/board/list/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
 	}
 }
 
