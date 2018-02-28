@@ -4,6 +4,7 @@ import {withStyles} from 'material-ui/styles';
 import { Link, browserHistory } from 'react-router'
 import Grid from 'material-ui/Grid';
 import * as projectsActions from "../actions/ProjectsActions";
+import * as boardsActions from "../actions/BoardsActions";
 import * as defaultPageActions from "../actions/DefaultPageActions";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -16,7 +17,7 @@ import Button from 'material-ui/Button'
 import FormInput from "../components/FormInput";
 import auth from "../services/auth";
 
-const pageTitle = "Add Project"
+const pageTitle = "Add Board"
 
 const styles = theme => ({
     root: {
@@ -34,12 +35,12 @@ const styles = theme => ({
     }
 });
 
-class CreateProjectsPage extends Component {
+class CreateBoardPage extends Component {
 
     getInitialState = () => {
         return {
-            inputProjectName: '',
-            inputProjectNameValid: false,
+            inputBoardName: '',
+            inputBoardNameValid: false,
         }
     }
 
@@ -47,8 +48,8 @@ class CreateProjectsPage extends Component {
         super(props)
 
         this.state = {
-            inputProjectName: '',
-            inputProjectNameValid: true,
+            inputBoardName: '',
+            inputBoardNameValid: true,
         };
 
         if (props.defaultPage.pageTitle !== pageTitle) {
@@ -60,16 +61,34 @@ class CreateProjectsPage extends Component {
         classes: PropTypes.object.isRequired,
     }
 
-    createProject = (e) => {
+    componentDidMount() {
+        if (this.props.projects.currentProject == null) {
+            axios.get(API_URL + `project/show/${this.props.ownProps.params.id}`)
+                .then((response) => {
+                    this.props.projectsActions.setCurrentProject(response.data.Data)
+                    this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
+                })
+                .catch((error) => {
+                    if (error.response && error.response.data.Message) {
+                        messages(error.response.data.Message)
+                    } else {
+                        messages("Server error occured")
+                    }
+                })
+        }
+    }
+
+    createBoard = (e) => {
         e.preventDefault()
-        if (this.validateProjectName()) {
-            axios.post(API_URL + 'project/create', {
-                name: this.state.inputProjectName,
+        if (this.validateBoardName()) {
+            axios.post(API_URL + 'project/'+ this.props.projects.currentProject.UUID +'/board/create', {
+                name: this.state.inputBoardName,
+                description: this.state.inputBoardName,//TODO:
             })
                 .then((response) => {
                     if (response.data.Status) {
                         messages(response.data.Message, response.data.Status)
-                        browserHistory.push('/projects')
+                        browserHistory.push('/project/' + this.props.projects.currentProject.UUID)
                     }
                 })
                 .catch((error) => {
@@ -82,27 +101,29 @@ class CreateProjectsPage extends Component {
         }
     }
 
-    validateProjectName = () => {
-        if (this.state.inputProjectNameValid && this.state.inputProjectName.length < 3) {
+    validateBoardName = () => {
+        if (this.state.inputBoardNameValid && this.state.inputBoardName.length < 3) {
             this.setState({
-                inputProjectNameValid: false,
+                inputBoardNameValid: false,
             });
 
             return false;
         }
 
-        return this.state.inputProjectNameValid
+        return this.state.inputBoardNameValid
     }
 
-    changeProjectNameInput = (e) => {
+    changeBoardNameInput = (e) => {
         this.setState({
-            inputProjectName: e.target.value,
-            inputProjectNameValid: (e.target.value.length >= 3)
+            inputBoardName: e.target.value,
+            inputBoardNameValid: (e.target.value.length >= 3)
         });
     }
 
     render () {
-        const {classes, projects } = this.props
+
+        const {classes, boards } = this.props
+        const {currentProject} = this.props.projects
 
         return (
             <Grid container
@@ -118,10 +139,10 @@ class CreateProjectsPage extends Component {
                     <Typography
                         type='headline'
                         component='h3'>
-                        Create Project
+                        Create Board
                     </Typography>
 
-                    <FormInput type="text" value={this.state.inputProjectName} name="Project Name" isValid={this.state.inputProjectNameValid} onUserInput={this.changeProjectNameInput}/>
+                    <FormInput type="text" value={this.state.inputBoardName} name="Board Name" isValid={this.state.inputBoardNameValid} onUserInput={this.changeBoardNameInput}/>
 
                     <Grid
                         container
@@ -131,16 +152,18 @@ class CreateProjectsPage extends Component {
                         <Button
                             type='submit'
                             color='primary'
-                            onClick={this.createProject}>
+                            onClick={this.createBoard}>
                             Create
                         </Button>
-                        <Link to={'/projects'}
-                              className={classes.link}>
-                            <Button
-                                color={'secondary'}>
-                                Back
-                            </Button>
-                        </Link>
+                        {(currentProject !== null) ? (
+                            <Link to={'/project/' + currentProject.UUID }
+                                  className={classes.link}>
+                                <Button
+                                    color={'secondary'}>
+                                    Back
+                                </Button>
+                            </Link>
+                        ) : ('')}
                     </Grid>
 
                 </Paper>
@@ -152,6 +175,7 @@ class CreateProjectsPage extends Component {
 const mapStateToProps = (state, ownProps) => {
     return {
         projects: state.projects,
+        boards: state.boards,
         defaultPage: state.defaultPage,
         ownProps
     }
@@ -159,11 +183,12 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        boards: bindActionCreators(boardsActions, dispatch),
         projectsActions: bindActionCreators(projectsActions, dispatch),
         defaultPageActions: bindActionCreators(defaultPageActions, dispatch)
     }
 }
 
 export default withStyles(styles)(
-    connect(mapStateToProps, mapDispatchToProps)(CreateProjectsPage)
+    connect(mapStateToProps, mapDispatchToProps)(CreateBoardPage)
 )
