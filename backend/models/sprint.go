@@ -37,7 +37,7 @@ type SprintCRUD interface {
 	Update(*Sprint) error
 	Delete(*Sprint) error
 	FindByID(*Sprint) error
-	List(gocql.UUID) ([]map[string]interface{}, error)
+	List(gocql.UUID) ([]Sprint, error)
 	GetSprintIssuesInProgress(*Sprint) ([]Issue, error) // todo Sprint argument
 }
 

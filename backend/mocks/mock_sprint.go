@@ -84,9 +84,9 @@ func (mr *MockSprintCRUDMockRecorder) Insert(arg0 interface{}) *gomock.Call {
 }
 
 // List mocks base method
-func (m *MockSprintCRUD) List(arg0 gocql.UUID) ([]map[string]interface{}, error) {
+func (m *MockSprintCRUD) List(arg0 gocql.UUID) ([]models.Sprint, error) {
 	ret := m.ctrl.Call(m, "List", arg0)
-	ret0, _ := ret[0].([]map[string]interface{})
+	ret0, _ := ret[0].([]models.Sprint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
