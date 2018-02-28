@@ -46,8 +46,9 @@ class BoardPage extends Component{
       createSprintOpen: false,
     });
   };
-
+  
   componentDidMount() {
+    this.props.sprintsActions.setCurrentSprint(null)
     this.getSprintsList()
     this.getIssuesList()
   }

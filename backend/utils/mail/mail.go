@@ -32,7 +32,7 @@ type SmtpMailer struct {
 	*SmtpMailerConfig
 }
 
-var	Mailer *SmtpMailer
+var Mailer *SmtpMailer
 
 func InitFromConfig(config *SmtpMailerConfig) *SmtpMailer {
 	mailer := &SmtpMailer{config}

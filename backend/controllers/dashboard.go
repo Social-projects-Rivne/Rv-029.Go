@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Dashboard(w http.ResponseWriter, r *http.Request)  {
+func Dashboard(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user")
 	fmt.Printf("%T\n", user)
 	fmt.Printf("%v\n", user)

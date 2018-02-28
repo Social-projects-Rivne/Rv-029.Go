@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	SPRINT_STAUS_TODO = "TODO"
+	SPRINT_STAUS_TODO        = "TODO"
 	SPRINT_STAUS_IN_PROGRESS = "In Progress"
-	SPRINT_STAUS_DONE = "Done"
+	SPRINT_STAUS_DONE        = "Done"
 )
 
 const (
-	PROJECT_SPRINTS_LIST = `SELECT * FROM sprintslist WHERE board_id = ?;`
+	PROJECT_SPRINTS_LIST               = `SELECT * FROM sprintslist WHERE board_id = ?;`
+	GET_SPRINT_ISSUES_IN_PROGRESS_LIST = `SELECT id,name,status,description,estimate,user_id,user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,project_name,created_at,updated_at FROM sprint_issues WHERE sprint_id = ? AND status IN (?, ?);`
 )
 
 type Sprint struct {
@@ -91,24 +92,66 @@ func (s *Sprint) List(boardId gocql.UUID) ([]Sprint, error) {
 			}
 
 			sprints = append(sprints, Sprint{
-				ID: row["id"].(gocql.UUID),
-				ProjectId: row["project_id"].(gocql.UUID),
+				ID:          row["id"].(gocql.UUID),
+				ProjectId:   row["project_id"].(gocql.UUID),
 				ProjectName: row["project_name"].(string),
-				BoardId: row["board_id"].(gocql.UUID),
-				BoardName: row["board_name"].(string),
-				Goal: row["goal"].(string),
-				Desc: row["description"].(string),
-				Status: row["status"].(string),
-				CreatedAt: row["created_at"].(time.Time),
-				UpdatedAt: row["created_at"].(time.Time),
+				BoardId:     row["board_id"].(gocql.UUID),
+				BoardName:   row["board_name"].(string),
+				Goal:        row["goal"].(string),
+				Desc:        row["description"].(string),
+				Status:      row["status"].(string),
+				CreatedAt:   row["created_at"].(time.Time),
+				UpdatedAt:   row["created_at"].(time.Time),
 			})
 		}
 	}
 
 	if err := iterator.Close(); err != nil {
-		log.Printf("Error in method List inside models/sprint.go: %+v\n", err)
+		log.Printf("Error in method List inside models/sprint.go: %s\n", err.Error())
 		return nil, err
 	}
 
 	return sprints, nil
+}
+
+func (s *Sprint) GetSprintIssuesInProgress() ([]Issue, error) {
+
+	issues := []Issue{}
+	var row map[string]interface{}
+
+	iterator := Session.Query(GET_SPRINT_ISSUES_IN_PROGRESS_LIST, s.ID, SPRINT_STAUS_TODO, SPRINT_STAUS_IN_PROGRESS).Iter()
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			issues = append(issues, Issue{
+				UUID:          row["id"].(gocql.UUID),
+				Name:          row["name"].(string),
+				Status:        row["status"].(string),
+				Description:   row["description"].(string),
+				Estimate:      row["estimate"].(int),
+				UserID:        row["user_id"].(gocql.UUID),
+				UserFirstName: row["user_first_name"].(string),
+				UserLastName:  row["user_last_name"].(string),
+				SprintID:      row["sprint_id"].(gocql.UUID),
+				BoardID:       row["board_id"].(gocql.UUID),
+				BoardName:     row["board_name"].(string),
+				ProjectID:     row["project_id"].(gocql.UUID),
+				ProjectName:   row["project_name"].(string),
+				CreatedAt:     row["created_at"].(time.Time),
+				UpdatedAt:     row["updated_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
+		log.Printf("Error in method List inside models/sprint.go: %s\n", err.Error())
+		return nil, err
+	}
+
+	return issues, nil
 }

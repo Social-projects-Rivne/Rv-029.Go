@@ -22,10 +22,9 @@ const ROLE_OWNER = "Owner"
 //ROLE_USER .
 const ROLE_USER = "User"
 
-
 //Projects queries
-const UPDATE_USER_PROJECT_ROLE  = "UPDATE users SET projects = projects +  ? WHERE id = ?"
-const DELETE_USER_PROJECT_ROLE  = "DELETE projects[?] FROM users WHERE id= ?"
+const UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
+const DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
 
 //User type
 type User struct {
@@ -69,13 +68,13 @@ func InitUserDB(crud UserCRUD) {
 //Insert func inserts user object in database
 func (u *UserStorage) Insert(user *User) error {
 
-	if err := Session.Query(`INSERT INTO users (id,email,first_name,last_name,password,
+	if err := u.DB.Query(`INSERT INTO users (id,email,first_name,last_name,password,
 		salt,role,status,projects,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
-		user.Salt, user.Role, user.Status,user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+		user.Salt, user.Role, user.Status, user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 
-			log.Printf("Error in models/user.go error: %+v",err)
-			return err
+		log.Printf("Error in models/user.go error: %+v",err)
+		return err
 	}
 	return nil
 }
@@ -83,10 +82,10 @@ func (u *UserStorage) Insert(user *User) error {
 //Update func finds user from database
 func (u *UserStorage)  Update(user *User) error {
 
-	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
+	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
-			log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -95,7 +94,7 @@ func (u *UserStorage)  Update(user *User) error {
 //UpdateByID updates user by his id
 func (u *UserStorage) UpdateByID(user *User) error {
 
-	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
+	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
 			log.Printf("Error in models/user.go error: %+v",err)
@@ -107,10 +106,10 @@ func (u *UserStorage) UpdateByID(user *User) error {
 //Delete removes user by his id
 func (u *UserStorage) Delete(user *User) error {
 
-	if err := Session.Query(`DELETE FROM users WHERE id= ? ;`,
+	if err := u.DB.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 
-			log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -118,12 +117,12 @@ func (u *UserStorage) Delete(user *User) error {
 
 //FindByID finds user by id
 func (u *UserStorage) FindByID(user *User) error {
-	if err := Session.Query(`SELECT id, email, first_name, last_name,
+	if err := u.DB.Query(`SELECT id, email, first_name, last_name,
 		 projects, updated_at, created_at, password, salt, role, status FROM users WHERE id = ? LIMIT 1`, user.UUID).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
 		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
 
-			log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -131,12 +130,12 @@ func (u *UserStorage) FindByID(user *User) error {
 
 //FindByEmail finds user by email
 func (u *UserStorage) FindByEmail(user *User) error {
-	if err := Session.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, 
+	if err := u.DB.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, 
 		projects, created_at, updated_at FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`, user.Email).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password,
 		&user.Salt, &user.Role, &user.Status, &user.Projects, &user.CreatedAt, &user.UpdatedAt); err != nil {
 
-			log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v",err)
 		return err
 	}
 	return nil
@@ -156,10 +155,11 @@ func (user *User) GetClaims() map[string]interface{} {
 * Projects methods
 */
 
-func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId gocql.UUID) error  {
+//AddRoleToProject .
+func (u *UserStorage) AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error {
 	roleMap := make(map[gocql.UUID]string)
 	roleMap[projectId] = role
-	err := Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,userId).Exec()
+	err := u.DB.Query(UPDATE_USER_PROJECT_ROLE, roleMap, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/user.go error: %+v",err)
@@ -170,9 +170,9 @@ func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId 
 
 }
 
-func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) error  {
+func (u *UserStorage) DeleteProject(projectId gocql.UUID, userId gocql.UUID) error {
 
-	err := Session.Query(DELETE_USER_PROJECT_ROLE,projectId,userId).Exec()
+	err := u.DB.Query(DELETE_USER_PROJECT_ROLE, projectId, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in models/user.go error: %+v",err)

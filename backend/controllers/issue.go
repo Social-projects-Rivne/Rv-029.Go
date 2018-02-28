@@ -3,15 +3,14 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
-	"time"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"time"
 )
 
 //StoreIssue creates issue in database
@@ -46,7 +45,7 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.Estimate = issueRequestData.Estimate
 	issue.SprintID = issueRequestData.SprintID
 
-	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000" {
+	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000"{
 		user := &models.User{}
 		user.UUID = issue.UserID
 		if err := models.UserDB.FindByID(user); err != nil {
@@ -92,7 +91,6 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	var issueRequestData validator.CreateIssueRequestData
 
 	err := decodeAndValidate(r, &issueRequestData)
-
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusBadRequest}
@@ -101,8 +99,8 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	issueID, err := gocql.ParseUUID(vars["issue_id"])
 
+	issueID, err := gocql.ParseUUID(vars["issue_id"])
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusBadRequest}
@@ -124,7 +122,6 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UserID = issueRequestData.UserID
 	issue.Estimate = issueRequestData.Estimate
 	issue.Status = issueRequestData.Status
-	issue.SprintID = issueRequestData.SprintID
 	issue.UpdatedAt = time.Now()
 
 	if err = models.IssueDB.Update(issue); err != nil {
@@ -139,18 +136,67 @@ func UpdateIssue(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Add issue to active sprint
+func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+
+	issueID, err := gocql.ParseUUID(vars["issue_id"])
+	if err != nil {
+		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: AddIssueToSprint, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while parsing issue_id, metod: UpdateIssue, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	sprintID, err := gocql.ParseUUID(vars["sprint_id"])
+	if err != nil {
+		log.Printf("Error occured in controllers/issue.go while parsing issue_id, method: AddIssueToSprint, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while parsing issue_id, metod: UpdateIssue, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	issue := &models.Issue{}
+	issue.UUID = issueID
+	if err := models.IssueDB.FindByID(issue); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	sprint := &models.Sprint{}
+	sprint.ID = sprintID
+	if err := sprint.FindById(); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: sprint.FindById, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindById, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	if err := models.IssueDB.Delete(issue); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.Delete, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: DeleteIssue, where: issue.Delete, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	issue.SprintID = sprint.ID
+	issue.UpdatedAt = time.Now()
+	if err = models.IssueDB.Update(issue); err != nil {
+		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: issue.Update, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.Update, error: %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "Issue has updated"}
+	response.Success(w)
+}
+
 //DeleteIssue controller deletes issue from database
 func DeleteIssue(w http.ResponseWriter, r *http.Request) {
-	// var issueRequestData validator.CreateIssueRequestData
-
-	// err := decodeAndValidate(r, &issueRequestData)
-
-	// if err != nil {
-	// 	log.Printf("Error occured in controllers/issue.go while decoding JSON, method: DeleteIssue where: %s", err.Error())
-	// 	response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go while decoding JSON, metod: DeleteIssue, error: %s",err.Error())}
-	// 	response.Failed(w)
-	// 	return
-	// }
 	vars := mux.Vars(r)
 	issueID, err := gocql.ParseUUID(vars["issue_id"])
 
@@ -165,8 +211,8 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = issueID
 
 	if err := models.IssueDB.Delete(issue); err != nil {
-		log.Printf("Error in controllers/issue error: %+v", err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.FindByID, error: %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: UpdateIssue, where: issue.FindByID, error: %s", err.Error())}
 		response.Failed(w)
 		return
 	}
@@ -192,8 +238,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 	issue := models.Issue{}
 	issue.BoardID = id
 
-	boardIssueList, err := models.IssueDB.GetBoardIssueList(&issue)
-
+	boardIssueList, err := models.IssueDB.GetBoardBacklogIssuesList(&issue)
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
@@ -209,8 +254,8 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	id, err := gocql.ParseUUID(vars["sprint_id"])
 
+	id, err := gocql.ParseUUID(vars["sprint_id"])
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusBadRequest}

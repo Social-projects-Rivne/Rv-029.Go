@@ -49,7 +49,7 @@ class SprintCard extends Component {
 
   handleOpenUpdateSprintClick = () => {
     this.setState({ updateSprintOpen: true })
-    this.props.sprintsActions.setCurrentSprint(this.props.data)
+    this.props.sprintsActions.setEditedSprint(this.props.data)
   }
 
   handleClose = () => {
@@ -115,22 +115,24 @@ class SprintCard extends Component {
       setStatusUpdateSprintInput
     } = this.props.sprintsActions
 
+    let actionButtons = "";
+    if (Status != "Done") {
+      actionButtons = <Grid>
+              <IconButton onClick={this.handleOpenUpdateSprintClick}>
+                  <EditIcon />
+              </IconButton>
+              <IconButton onClick={this.deleteSprint}>
+              <DeleteIcon />
+              </IconButton>
+      </Grid>
+    }
+
     return (
       <Card className={classes.root}>
         <CardHeader
           className={classes.test}
           avatar={ <Chip label={Status} /> }
-          action={
-            <Grid>
-              {/* FIXME: horizontal scroll cause of this btn WTF? */}
-              <IconButton onClick={this.handleOpenUpdateSprintClick}>
-                <EditIcon />
-              </IconButton>
-              <IconButton onClick={this.deleteSprint}>
-                <DeleteIcon />
-              </IconButton>
-            </Grid>
-          }
+          action={actionButtons}
           title={Goal}
           subheader={CreatedAt} />
         <CardContent>
@@ -180,8 +182,8 @@ class SprintCard extends Component {
                 inputProps={{
                   name: 'status',
                   id: 'status-simple', }}>
-                <MenuItem value={"Todo"}>Todo</MenuItem>
-                <MenuItem value={"In process"}>In process</MenuItem>
+                <MenuItem value={"TODO"}>TODO</MenuItem>
+                <MenuItem value={"In Progress"}>In Progress</MenuItem>
                 <MenuItem value={"Done"}>Done</MenuItem>
               </Select>
             </FormControl>

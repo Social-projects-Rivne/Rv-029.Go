@@ -1,13 +1,12 @@
 package seeder
 
 import (
-	"time"
-
+	"fmt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
-	"log"
 	"github.com/icrowley/fake"
-	"fmt"
+	"log"
+	"time"
 )
 
 //ProjectTableSeeder model
@@ -23,7 +22,7 @@ func (ProjectTableSeeder) Run() {
 	projects = []models.Project{}
 	userProjects = make(map[gocql.UUID]string)
 
-	for i:=0; i<10; i++ {
+	for i := 0; i < 10; i++ {
 		project := models.Project{
 			UUID:      gocql.TimeUUID(),
 			Name:      fmt.Sprintf("%s #%d", fake.WordsN(3), i),

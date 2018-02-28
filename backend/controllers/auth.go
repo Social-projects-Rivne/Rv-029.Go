@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
@@ -37,18 +38,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &loginRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil {
-			log.Printf("Error in controllers/auth error: %+v", err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 
@@ -57,18 +48,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err = models.UserDB.FindByEmail(&user)
 
 	if user.Password != password.EncodePassword(loginRequestData.Password, user.Salt) {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: "There is no such user with email and password combination.",
-		})
-		if err != nil {
-			log.Printf("Error in controllers/auth error: %+v", err)
-			return
-		}
-
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go There is no such user with email and password combination. error: %+v", err), StatusCode: http.StatusUnauthorized}
+		response.Failed(w)
 		return
 	}
 
@@ -81,7 +62,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-
+	//TODO change on helper, than will be not Token: token but Data: token, and change it in frontend
 	jsonResponse, err := json.Marshal(loginResponse{
 		Status:  true,
 		Message: "You was successfully authenticated.",
@@ -100,18 +81,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &registerRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil {
-			log.Printf("Error in controllers/auth error: %+v", err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 
@@ -158,18 +129,8 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &confirmRegistrationRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil {
-			log.Printf("Error in controllers/auth error: %+v", err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 	fmt.Println(confirmRegistrationRequestData)
@@ -202,18 +163,8 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &forgotRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil {
-			log.Printf("Error in controllers/auth error: %+v", err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 
@@ -248,18 +199,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &resetRequestData)
 
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil {
-			log.Printf("Error in controllers/auth error: %+v", err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 	user := models.User{}

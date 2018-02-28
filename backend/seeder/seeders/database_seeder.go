@@ -2,8 +2,8 @@ package seeder
 
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/src"
-	"time"
 	"math/rand"
+	"time"
 )
 
 func Run() {
@@ -16,7 +16,7 @@ func Run() {
 
 func random(min, max int) int {
 	rand.Seed(time.Now().Unix())
-	return rand.Intn(max - min) + min
+	return rand.Intn(max-min) + min
 }
 
 func randomFromArray(array []string) string {
