@@ -45,7 +45,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	user := models.User{}
 	user.Email = loginRequestData.Email
-	err = models.UserDB.FindByEmail(&user)
+	user, err = models.UserDB.CheckUserPassword(user)
 
 	if user.Password != password.EncodePassword(loginRequestData.Password, user.Salt) {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go There is no such user with email and password combination. error: %+v", err), StatusCode: http.StatusUnauthorized}
@@ -54,7 +54,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// generate jwt token from user claims
-	token, err := jwt.GenerateToken(&user)
+	token, err := jwt.GenerateToken(user)
 	if err != nil {
 		log.Printf("Error in controllers/auth error: %+v", err)
 		return
@@ -78,7 +78,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	var registerRequestData validator.RegisterRequestData
-
 	err := decodeAndValidate(r, &registerRequestData)
 	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}

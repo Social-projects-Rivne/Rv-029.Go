@@ -3,28 +3,32 @@ package models
 import (
 	"time"
 
-	"github.com/gocql/gocql"
 	"log"
+
+	"github.com/gocql/gocql"
 )
 
 //Role .
 type Role string
 
-//ROLE_ADMIN .
-const ROLE_ADMIN = "Admin"
+const (
+	//ROLE_ADMIN .
+	ROLE_ADMIN = "Admin"
 
-//ROLE_STAFF .
-const ROLE_STAFF = "Staff"
+	//ROLE_STAFF .
+	ROLE_STAFF = "Staff"
 
-//ROLE_OWNER .
-const ROLE_OWNER = "Owner"
+	//ROLE_OWNER .
+	ROLE_OWNER = "Owner"
 
-//ROLE_USER .
-const ROLE_USER = "User"
+	//ROLE_USER .
+	ROLE_USER = "User"
 
-//Projects queries
-const UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
-const DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
+	//Projects queries
+	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
+	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
+	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1"
+)
 
 //User type
 type User struct {
@@ -36,7 +40,7 @@ type User struct {
 	Salt      string
 	Role      string
 	Status    int
-	Projects  map[gocql.UUID] string
+	Projects  map[gocql.UUID]string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -49,10 +53,10 @@ type UserCRUD interface {
 	Delete(*User) error
 	FindByID(*User) error
 	FindByEmail(*User) error
-	AddRoleToProject(projectId gocql.UUID,role string, userId gocql.UUID) error
-	DeleteProject(projectId gocql.UUID , userId gocql.UUID) error
+	AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error
+	DeleteProject(projectId gocql.UUID, userId gocql.UUID) error
+	CheckUserPassword(User) (User, error)
 }
-
 
 type UserStorage struct {
 	DB *gocql.Session
@@ -64,7 +68,6 @@ func InitUserDB(crud UserCRUD) {
 	UserDB = crud
 }
 
-
 //Insert func inserts user object in database
 func (u *UserStorage) Insert(user *User) error {
 
@@ -73,19 +76,19 @@ func (u *UserStorage) Insert(user *User) error {
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
 		user.Salt, user.Role, user.Status, user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 
-		log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 	return nil
 }
 
 //Update func finds user from database
-func (u *UserStorage)  Update(user *User) error {
+func (u *UserStorage) Update(user *User) error {
 
 	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
-		log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 	return nil
@@ -97,7 +100,7 @@ func (u *UserStorage) UpdateByID(user *User) error {
 	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
-			log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 	return nil
@@ -122,7 +125,7 @@ func (u *UserStorage) FindByID(user *User) error {
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
 		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
 
-		log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 	return nil
@@ -135,15 +138,14 @@ func (u *UserStorage) FindByEmail(user *User) error {
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password,
 		&user.Salt, &user.Role, &user.Status, &user.Projects, &user.CreatedAt, &user.UpdatedAt); err != nil {
 
-		log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 	return nil
 }
 
-
 //GetClaims Return list of claims to generate jwt token
-func (user *User) GetClaims() map[string]interface{} {
+func (user User) GetClaims() map[string]interface{} {
 	claims := make(map[string]interface{})
 
 	claims["UUID"] = user.UUID
@@ -153,7 +155,7 @@ func (user *User) GetClaims() map[string]interface{} {
 
 /*
 * Projects methods
-*/
+ */
 
 //AddRoleToProject .
 func (u *UserStorage) AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error {
@@ -162,7 +164,7 @@ func (u *UserStorage) AddRoleToProject(projectId gocql.UUID, role string, userId
 	err := u.DB.Query(UPDATE_USER_PROJECT_ROLE, roleMap, userId).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 
@@ -175,10 +177,39 @@ func (u *UserStorage) DeleteProject(projectId gocql.UUID, userId gocql.UUID) err
 	err := u.DB.Query(DELETE_USER_PROJECT_ROLE, projectId, userId).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/user.go error: %+v",err)
+		log.Printf("Error in models/user.go error: %+v", err)
 		return err
 	}
 
 	return nil
 
 }
+
+func (u *UserStorage) CheckUserPassword(user User) (User, error) {
+
+	if err := u.DB.Query(CHECK_USER_PASSWORD, user.Email).
+		Consistency(gocql.One).Scan(&user.Password, &user.Salt, &user.UUID); err != nil {
+
+		log.Printf("Error in models/user.go error: %+v", err)
+		user.UUID, err = gocql.ParseUUID(" ")
+	
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (u *UserStorage) CheckUserEmail(user User) (User, error) {
+
+	if err := u.DB.Query(CHECK_USER_PASSWORD, user.Email).
+		Consistency(gocql.One).Scan(&user.Password, &user.Salt, &user.UUID); err != nil {
+
+		log.Printf("Error in models/user.go error: %+v", err)
+		user.UUID, err = gocql.ParseUUID(" ")
+	
+		return user, err
+	}
+
+	return user, nil
+}
+

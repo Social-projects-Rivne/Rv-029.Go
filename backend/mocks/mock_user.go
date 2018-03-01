@@ -46,6 +46,19 @@ func (mr *MockUserCRUDMockRecorder) AddRoleToProject(arg0, arg1, arg2 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddRoleToProject", reflect.TypeOf((*MockUserCRUD)(nil).AddRoleToProject), arg0, arg1, arg2)
 }
 
+// CheckUserPassword mocks base method
+func (m *MockUserCRUD) CheckUserPassword(arg0 models.User) (models.User, error) {
+	ret := m.ctrl.Call(m, "CheckUserPassword", arg0)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckUserPassword indicates an expected call of CheckUserPassword
+func (mr *MockUserCRUDMockRecorder) CheckUserPassword(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserPassword", reflect.TypeOf((*MockUserCRUD)(nil).CheckUserPassword), arg0)
+}
+
 // Delete mocks base method
 func (m *MockUserCRUD) Delete(arg0 *models.User) error {
 	ret := m.ctrl.Call(m, "Delete", arg0)
