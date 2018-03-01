@@ -9,7 +9,7 @@ cp .env.example .env
 
 4. Start containers
 ```sh
-docker-compose up -d cassandra react
+docker-compose up -d cassandra react zoo kafka
 ```
 
 # Install Dependencies

@@ -16,3 +16,4 @@ import:
 - package: gopkg.in/yaml.v2
 - package: github.com/icrowley/fake
 - package: github.com/corpix/uarand
+- package: github.com/Shopify/sarama
