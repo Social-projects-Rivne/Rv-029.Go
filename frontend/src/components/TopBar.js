@@ -52,12 +52,26 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
     let projectBoardsList = null
     if (projects.currentProject !== null) {
         projectBoardsList = <List component="nav">
-            {projects.currentProjectBoards.map((value, index) => (
-                <ListItem button key={value.id}>
-                    <ListItemText primary={value.name} />
-                </ListItem>
-            ))}
-        </List>
+                <Link
+                    to={'project/'+ projects.currentProject.UUID +'/board/create'}
+                    className={classes.link}>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <Icon color="primary">add</Icon>
+                        </ListItemIcon>
+                        <ListItemText primary="Add Board" />
+                    </ListItem>
+                </Link>
+            </List>
+
+            // <Link className={classes.link} to={'project/'+ projects.currentProject.UUID +'/board/create'}>Add Board</Link>
+        // projectBoardsList = <List component="nav">
+        //     {projects.currentProjectBoards.map((value, index) => (
+        //         <ListItem button key={value.id} className={classes.link}>
+        //             <ListItemText primary={value.name} />
+        //         </ListItem>
+        //     ))}
+        // </List>
     }
 
     return (

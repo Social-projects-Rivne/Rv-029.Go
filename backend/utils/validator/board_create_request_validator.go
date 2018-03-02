@@ -8,7 +8,7 @@ import (
 type BoardCreateRequestData struct {
 	*baseValidator
 	Name string `json:"name"`
-	Desc string `json:"desc"`
+	Desc string `json:"description"`
 }
 
 func (b *BoardCreateRequestData) Validate(r *http.Request) error {
