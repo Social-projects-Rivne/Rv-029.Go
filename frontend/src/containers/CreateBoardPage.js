@@ -41,6 +41,8 @@ class CreateBoardPage extends Component {
         return {
             inputBoardName: '',
             inputBoardNameValid: false,
+            inputBoardDesc: '',
+            inputBoardDescValid: false,
         }
     }
 
@@ -50,6 +52,8 @@ class CreateBoardPage extends Component {
         this.state = {
             inputBoardName: '',
             inputBoardNameValid: true,
+            inputBoardDesc: '',
+            inputBoardDescValid: true,
         };
 
         if (props.defaultPage.pageTitle !== pageTitle) {
@@ -79,11 +83,11 @@ class CreateBoardPage extends Component {
     }
 
     createBoard = (e) => {
-        e.preventDefault()
-        if (this.validateBoardName()) {
+        e.preventDefault();
+        if (this.validateBoardName() && this.validateBoardDesc()) {
             axios.post(API_URL + 'project/'+ this.props.projects.currentProject.UUID +'/board/create', {
                 name: this.state.inputBoardName,
-                description: this.state.inputBoardName,//TODO:
+                description: this.state.inputBoardDesc,
             })
                 .then((response) => {
                     if (response.data.Status) {
@@ -113,10 +117,29 @@ class CreateBoardPage extends Component {
         return this.state.inputBoardNameValid
     }
 
+    validateBoardDesc = () => {
+        if (this.state.inputBoardDescValid && this.state.inputBoardDesc.length < 3) {
+            this.setState({
+                inputBoardDescValid: false,
+            });
+
+            return false;
+        }
+
+        return this.state.inputBoardDescValid
+    }
+
     changeBoardNameInput = (e) => {
         this.setState({
             inputBoardName: e.target.value,
-            inputBoardNameValid: (e.target.value.length >= 3)
+            inputBoardNameValid: (e.target.value.length >= 3),
+        });
+    }
+
+    changeBoardDescInput = (e) => {
+        this.setState({
+            inputBoardDesc: e.target.value,
+            inputBoardDescValid: (e.target.value.length >= 3),
         });
     }
 
@@ -143,6 +166,7 @@ class CreateBoardPage extends Component {
                     </Typography>
 
                     <FormInput type="text" value={this.state.inputBoardName} name="Board Name" isValid={this.state.inputBoardNameValid} onUserInput={this.changeBoardNameInput}/>
+                    <FormInput type="text" value={this.state.inputBoardDesc} name="Board Description" isValid={this.state.inputBoardDescValid} onUserInput={this.changeBoardDescInput}/>
 
                     <Grid
                         container
