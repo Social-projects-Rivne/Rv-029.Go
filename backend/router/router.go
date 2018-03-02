@@ -6,9 +6,6 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
-	//"fmt"
-	//"reflect"
-	"fmt"
 )
 
 var Router *mux.Router
@@ -40,22 +37,15 @@ func init() {
 	issueRouter := Router.PathPrefix("/project/board").Subrouter()
 	applyIssueRoutes(issueRouter)
 
-	Router.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println(mux.Vars(r))
-			fmt.Println(mux.CurrentRoute(r))
-			fmt.Println(mux.CurrentRoute(r).GetName())
-			next.ServeHTTP(w, r)
-		})
-	})
+	Router.Use(middlewares.CheckUserPermission)
 }
 
 func applyAuthRoutes(r *mux.Router) {
 	r.HandleFunc("/login/", controllers.Login).Name(`login`)
 	r.HandleFunc("/login", controllers.Login).Name(`login`)
 
-	r.HandleFunc("/register/", controllers.Register)
-	r.HandleFunc("/register", controllers.Register)
+	r.HandleFunc("/register/", controllers.Register).Name(`register`)
+	r.HandleFunc("/register", controllers.Register).Name(`register`)
 
 	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
