@@ -80,7 +80,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	var registerRequestData validator.RegisterRequestData
 	err := decodeAndValidate(r, &registerRequestData)
 	if err != nil {
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err)}
 		response.Failed(w)
 		return
 	}

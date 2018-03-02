@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +13,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	gojwt "github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
@@ -75,28 +77,45 @@ func TestLoginSuccess(t *testing.T) {
 func TestRegisterSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
+	config := &mail.SmtpMailerConfig{
+		Connection: struct {
+			Host     string
+			Port     int
+			Username string
+			Password string
+			Auth     string
+			Tls      bool
+		}{
+			Host:     "smtp.mailtrap.io",
+			Port:     465,
+			Username: "7becbf096c9b34",
+			Password: "deb0640e7fac43",
+			Auth:     "plain",
+			Tls:      true,
+		},
+		Sender: struct {
+			Name  string
+			Email string
+		}{
+			Name:  "Some Sender",
+			Email: "sender@mail.com",
+		},
+	}
+
+	mail.InitFromConfig(config)
+
+	mail.Mailer = &mail.SmtpMailer{config}
 
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
 	mockUserCRUD.EXPECT().FindByEmail(gomock.Any()).Return(nil).Times(1)
+	mockUserCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
 
-	requestData := &struct {
-		FirstName string 
-		LastName  string 
-		Email     string 
-		Password  string 
-	}{
-		"Niggasdsa",
-		"Shitdsd",
-		"owner@gmail.com",
-		password.EncodeMD5("qwerty1234"),
-	}
-
-	body, _ := json.Marshal(requestData)
+	requestData := bytes.NewBufferString(`{"name": "Nigga", "surname": "Petrovich", "email": "assdf@gmail.com", "password": "zzz"}`)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
-	req, err := http.NewRequest("POST", "/auth/register/", strings.NewReader(string(body)))
+	req, err := http.NewRequest("POST", "/auth/register/", requestData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,4 +130,3 @@ func TestRegisterSuccess(t *testing.T) {
 	}
 
 }
-
