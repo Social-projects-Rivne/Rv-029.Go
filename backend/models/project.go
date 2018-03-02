@@ -87,7 +87,6 @@ func (p *ProjectStorage) Delete(project *Project) error {
 
 //FindByID func finds project by id
 func (p *ProjectStorage) FindByID(project *Project) error {
-	log.Fatal("_____________")
 
 	err := Session.Query(FIND_PROJECT, project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
 
