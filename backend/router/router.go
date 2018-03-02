@@ -4,8 +4,11 @@ import (
 	"net/http"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
+	//"fmt"
+	//"reflect"
+	"fmt"
 )
 
 var Router *mux.Router
@@ -37,11 +40,19 @@ func init() {
 	issueRouter := Router.PathPrefix("/project/board").Subrouter()
 	applyIssueRoutes(issueRouter)
 
+	Router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Println(mux.Vars(r))
+			fmt.Println(mux.CurrentRoute(r))
+			fmt.Println(mux.CurrentRoute(r).GetName())
+			next.ServeHTTP(w, r)
+		})
+	})
 }
 
 func applyAuthRoutes(r *mux.Router) {
-	r.HandleFunc("/login/", controllers.Login)
-	r.HandleFunc("/login", controllers.Login)
+	r.HandleFunc("/login/", controllers.Login).Name(`login`)
+	r.HandleFunc("/login", controllers.Login).Name(`login`)
 
 	r.HandleFunc("/register/", controllers.Register)
 	r.HandleFunc("/register", controllers.Register)
@@ -73,10 +84,6 @@ func applyProjectsRoutes(r *mux.Router) {
 	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 }
-
-//func applyAdminRoutes(r *mux.Router)  {
-//	r.HandleFunc("/users", controllers.Users)
-//}
 
 func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")

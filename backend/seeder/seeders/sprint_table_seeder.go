@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"log"
 
 	"github.com/gocql/gocql"
@@ -45,7 +44,8 @@ func (SprintTableSeeder) Run() {
 				UpdatedAt:   time.Now(),
 			}
 
-			if err := sprint.Insert(); err != nil {
+
+			if err := models.SprintDB.Insert(&sprint); err != nil {
 				log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.sprint error: %+v", err)
 				return
 			}
