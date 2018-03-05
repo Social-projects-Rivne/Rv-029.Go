@@ -30,59 +30,80 @@ type Sprint struct {
 	UpdatedAt   time.Time  `cql:"updated_at"`
 }
 
-func (s *Sprint) Insert() error {
+//go:generate mockgen -destination=../mocks/mock_sprint.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models SprintCRUD
+
+type SprintCRUD interface {
+	Insert(*Sprint) error
+	Update(*Sprint) error
+	Delete(*Sprint) error
+	FindByID(*Sprint) error
+	List(gocql.UUID) ([]Sprint, error)
+	GetSprintIssuesInProgress(*Sprint) ([]Issue, error) // todo Sprint argument
+}
+
+type SprintStorage struct {
+	DB *gocql.Session
+}
+
+var SprintDB SprintCRUD
+
+func InitSprintDB(crud SprintCRUD) {
+	SprintDB = crud
+}
+
+func (ss *SprintStorage) Insert(s *Sprint) error {
 	err := Session.Query(`INSERT INTO sprints (id, project_id, project_name, status, board_id, board_name, goal, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
 		s.ID, s.ProjectId, s.ProjectName, s.Status, s.BoardId, s.BoardName, s.Goal, s.Desc, s.CreatedAt, s.UpdatedAt).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
 	return nil
 }
 
-func (s *Sprint) Update() error {
-	err := Session.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
+func (ss *SprintStorage) Update(s *Sprint) error {
+	err := ss.DB.Query(`UPDATE sprints SET goal = ?, description = ?, status = ?, updated_at = ? WHERE id = ?;`,
 		s.Goal, s.Desc, s.Status, s.UpdatedAt, s.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
 	return nil
 }
 
-func (s *Sprint) Delete() error {
-	err := Session.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
+func (ss *SprintStorage) Delete(s *Sprint) error {
+	err := ss.DB.Query(`DELETE FROM sprints WHERE id = ?;`, s.ID).Exec()
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
 	return nil
 }
 
-func (s *Sprint) FindById() error {
-	err := Session.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
+func (ss *SprintStorage) FindById(s *Sprint) error {
+	err := ss.DB.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
 		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
 
 	if err != nil {
-		log.Printf("Error in models/sprint.go error: %+v",err)
+		log.Printf("Error in models/sprint.go error: %+v", err)
 		return err
 	}
 
 	return nil
 }
 
-func (s *Sprint) List(boardId gocql.UUID) ([]Sprint, error) {
+func (ss *SprintStorage) List(boardId gocql.UUID) ([]Sprint, error) {
 
 	sprints := []Sprint{}
 	var row map[string]interface{}
 
-	iterator := Session.Query(PROJECT_SPRINTS_LIST, boardId).Iter()
+	iterator := ss.DB.Query(PROJECT_SPRINTS_LIST, boardId).Iter()
 	if iterator.NumRows() > 0 {
 		for {
 			// New map each iteration
@@ -114,12 +135,12 @@ func (s *Sprint) List(boardId gocql.UUID) ([]Sprint, error) {
 	return sprints, nil
 }
 
-func (s *Sprint) GetSprintIssuesInProgress() ([]Issue, error) {
+func (ss *SprintStorage) GetSprintIssuesInProgress(s *Sprint) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
 
-	iterator := Session.Query(GET_SPRINT_ISSUES_IN_PROGRESS_LIST, s.ID, SPRINT_STAUS_TODO, SPRINT_STAUS_IN_PROGRESS).Iter()
+	iterator := ss.DB.Query(GET_SPRINT_ISSUES_IN_PROGRESS_LIST, s.ID, SPRINT_STAUS_TODO, SPRINT_STAUS_IN_PROGRESS).Iter()
 	if iterator.NumRows() > 0 {
 		for {
 			// New map each iteration

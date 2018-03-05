@@ -12,12 +12,14 @@ import (
 
 //UsersTableSeeder model
 type UsersTableSeeder struct {
+
 }
 
 var users []models.User
 
 //Run .
 func (UsersTableSeeder) Run() {
+
 
 	users = []models.User{}
 
@@ -54,4 +56,5 @@ func (UsersTableSeeder) Run() {
 
 		users = append(users, user)
 	}
+
 }

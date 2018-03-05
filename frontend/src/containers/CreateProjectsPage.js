@@ -16,7 +16,7 @@ import Button from 'material-ui/Button'
 import FormInput from "../components/FormInput";
 import auth from "../services/auth";
 
-const pageTitle = "Projects"
+const pageTitle = "Add Project"
 
 const styles = theme => ({
     root: {

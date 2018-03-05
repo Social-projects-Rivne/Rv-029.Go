@@ -2,33 +2,33 @@ package main
 
 import (
 	"fmt"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
-	"github.com/gocql/gocql"
 	"github.com/rs/cors"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/gocql/gocql"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
+	"path/filepath"
+	"io/ioutil"
+	"gopkg.in/yaml.v2"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 )
 
 type App struct {
 	Config *AppConfig
-	DB     *gocql.Session
+	DB *gocql.Session
 	Mailer *mail.SmtpMailer
 }
 
 type AppConfig struct {
-	DB     db.DBConfig           `yaml:"db"`
+	DB db.DBConfig `yaml:"db"`
 	Mailer mail.SmtpMailerConfig `yaml:"mail"`
-	JWT    jwt.JWTConfig         `yaml:"jwt"`
+	JWT jwt.JWTConfig `yaml:"jwt"`
 }
 
 func (app *App) InitApp(path string) {
@@ -52,7 +52,7 @@ func (app *App) InitApp(path string) {
 
 var APP *App
 
-func init() {
+func init()  {
 	APP = &App{}
 	APP.InitApp("./backend/config/app.yml")
 }

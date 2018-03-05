@@ -43,7 +43,6 @@ class ProjectsPage extends Component {
     }
 
     componentWillMount() {
-        
         axios.get(API_URL + 'project/list')
             .then((response) => {
                 this.props.projectsActions.setProjects(response.data.Data)

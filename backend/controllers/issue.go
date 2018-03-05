@@ -46,9 +46,9 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.SprintID = issueRequestData.SprintID
 
 	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000"{
-		user := &models.User{}
+		user := models.User{}
 		user.UUID = issue.UserID
-		if err := models.UserDB.FindByID(user); err != nil {
+		if err := models.UserDB.FindByID(&user); err != nil {
 			log.Printf("Error in controllers/issue error: %+v", err)
 			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 			response.Failed(w)
@@ -166,9 +166,9 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sprint := &models.Sprint{}
+	sprint := models.Sprint{}
 	sprint.ID = sprintID
-	if err := sprint.FindById(); err != nil {
+	if err := models.SprintDB.FindByID(&sprint); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: sprint.FindById, error: %s", err.Error())
 		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindById, error: %s", err.Error())}
 		response.Failed(w)

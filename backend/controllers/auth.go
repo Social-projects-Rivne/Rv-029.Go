@@ -60,9 +60,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// generate jwt token from user claims
-	token, err := jwt.GenerateToken(user)
-	if err != nil {
-		log.Printf("Error in controllers/auth error: %+v", err)
+	token, err := jwt.GenerateToken(&user)
+	if err != nil{
+		log.Printf("Error in controllers/auth error: %+v",err)
 		return
 	}
 
@@ -74,8 +74,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully authenticated.",
 		Token:   token,
 	})
-	if err != nil {
-		log.Printf("Error in controllers/auth error: %+v", err)
+	if err != nil{
+		log.Printf("Error in controllers/auth error: %+v",err)
 		return
 	}
 

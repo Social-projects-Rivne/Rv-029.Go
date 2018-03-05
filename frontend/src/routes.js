@@ -24,6 +24,7 @@ import SprintPage from "./containers/SprintPage";
 
 import auth from './services/auth'
 import ViewProjectPage from './components/ViewProjectPage'
+import CreateBoardPage from "./containers/CreateBoardPage";
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -79,6 +80,7 @@ export const routes = (
         <Route path="projects" component={ProjectsPage}/>
         <Route path="project/create" component={CreateProjectsPage}/>
         <Route path="project/:id" component={ViewProjectPage}/>
+        <Route path="project/:id/board/create" component={CreateBoardPage}/>
         <Route path="board/:id" component={BoardPage}/>
         <Route path="sprint/:id" component={SprintPage}/>
       </Route>

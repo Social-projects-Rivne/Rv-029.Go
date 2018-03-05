@@ -8,6 +8,8 @@ import (
 	"github.com/gocql/gocql"
 )
 
+//go:generate mockgen -destination=../mocks/mock_issue.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models IssueCRUD
+
 const (
 	//STATUS_TODO uses when issue in TODO list
 	STATUS_TODO = "TODO"
@@ -38,25 +40,6 @@ const (
 	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from sprint_issues WHERE sprint_id = ? ;"
 )
 
-type IssueCRUD interface {
-	Insert(*Issue) error
-	Update(*Issue) error
-	Delete(*Issue) error
-	FindByID(*Issue) error
-	GetBoardIssueList(*Issue) ([]Issue, error)
-	GetSprintIssueList(*Issue) ([]Issue, error)
-	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
-}
-
-type IssueStorage struct {
-	DB *gocql.Session
-}
-
-var IssueDB IssueCRUD
-
-func InitIssueDB(crud IssueCRUD) {
-	IssueDB = crud
-}
 
 //Issue model
 type Issue struct {
@@ -77,6 +60,25 @@ type Issue struct {
 	UpdatedAt     time.Time
 }
 
+type IssueCRUD interface {
+	Insert(*Issue) error
+	Update(*Issue) error
+	Delete(*Issue) error
+	FindByID(*Issue) error
+	GetBoardIssueList(*Issue) ([]Issue, error)
+	GetSprintIssueList(*Issue) ([]Issue, error)
+	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
+}
+
+type IssueStorage struct {
+	DB *gocql.Session
+}
+
+var IssueDB IssueCRUD
+
+func InitIssueDB(crud IssueCRUD) {
+	IssueDB = crud
+}
 //Insert func inserts user object in database
 func (s *IssueStorage) Insert(issue *Issue) error {
 
