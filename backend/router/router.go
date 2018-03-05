@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
@@ -12,84 +10,67 @@ var Router *mux.Router
 
 func init() {
 	Router = mux.NewRouter()
-	Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/public"))))
 
 	authRouter := Router.PathPrefix("/auth").Subrouter()
 	applyAuthRoutes(authRouter)
 
-	authorizedUserRouter := Router.PathPrefix("/dashboard").Subrouter()
-	applyAuthorizedUserRoutes(authorizedUserRouter)
-	authorizedUserRouter.Use(middlewares.AuthenticatedMiddleware)
-
-	boardRouter := Router
-	applyBoardRoutes(boardRouter)
-	//boardRouter.Use(middlewares.AuthenticatedMiddleware)
-
-	sprintRouter := Router
-	applySprintRoutes(sprintRouter)
-	//sprintRouter.Use(middlewares.AuthenticatedMiddleware)
-
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
+	applyBoardRoutes(projectRouter)
+
+	boardRouter := projectRouter.PathPrefix("/board").Subrouter()
+	applyIssueRoutes(boardRouter)
+	applySprintRoutes(boardRouter)
+
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
-	projectRouter.Use(middlewares.ProjectAccessMiddleware)
-
-	issueRouter := Router.PathPrefix("/project/board").Subrouter()
-	applyIssueRoutes(issueRouter)
-
-	Router.Use(middlewares.CheckUserPermission)
+	//projectRouter.Use(middlewares.ProjectAccessMiddleware)
+	projectRouter.Use(middlewares.CheckUserPermission)
 }
 
 func applyAuthRoutes(r *mux.Router) {
-	r.HandleFunc("/login/", controllers.Login).Name(`login`)
-	r.HandleFunc("/login", controllers.Login).Name(`login`)
+	r.HandleFunc("/login/", controllers.Login)
+	r.HandleFunc("/login", controllers.Login)
 
-	r.HandleFunc("/register/", controllers.Register).Name(`register`)
-	r.HandleFunc("/register", controllers.Register).Name(`register`)
+	r.HandleFunc("/register/", controllers.Register)
+	r.HandleFunc("/register", controllers.Register)
 
 	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
 	r.HandleFunc("/new-password", controllers.ResetPassword)
 }
 
-func applyAuthorizedUserRoutes(r *mux.Router) {
-	r.HandleFunc("/", controllers.Dashboard)
-	r.HandleFunc("", controllers.Dashboard)
-}
-
 func applyProjectsRoutes(r *mux.Router) {
+	r.HandleFunc("/create/", controllers.CreateProject).Methods("POST").Name(`project.create`)
+	r.HandleFunc("/create", controllers.CreateProject).Methods("POST").Name(`project.create`)
 
-	r.HandleFunc("/create/", controllers.CreateProject).Methods("POST")
-	r.HandleFunc("/create", controllers.CreateProject).Methods("POST")
+	r.HandleFunc("/update/{project_id}/", controllers.UpdateProject).Methods("PUT").Name(`project.update`)
+	r.HandleFunc("/update/{project_id}", controllers.UpdateProject).Methods("PUT").Name(`project.update`)
 
-	r.HandleFunc("/update/{project_id}/", controllers.UpdateProject).Methods("PUT")
-	r.HandleFunc("/update/{project_id}", controllers.UpdateProject).Methods("PUT")
+	r.HandleFunc("/delete/{project_id}/", controllers.DeleteProject).Methods("DELETE").Name(`project.delete`)
+	r.HandleFunc("/delete/{project_id}", controllers.DeleteProject).Methods("DELETE").Name(`project.delete`)
 
-	r.HandleFunc("/delete/{project_id}/", controllers.DeleteProject).Methods("DELETE")
-	r.HandleFunc("/delete/{project_id}", controllers.DeleteProject).Methods("DELETE")
+	r.HandleFunc("/show/{project_id}/", controllers.ShowProject).Methods("GET").Name(`project.show`)
+	r.HandleFunc("/show/{project_id}", controllers.ShowProject).Methods("GET").Name(`project.show`)
 
-	r.HandleFunc("/show/{project_id}/", controllers.ShowProject).Methods("GET")
-	r.HandleFunc("/show/{project_id}", controllers.ShowProject).Methods("GET")
-
-	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
-	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET").Name(`project.list`)
+	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET").Name(`project.list`)
 }
 
 func applyBoardRoutes(r *mux.Router) {
-	r.HandleFunc("/project/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")
-	r.HandleFunc("/project/{project_id}/board/create", controllers.CreateBoard).Methods("POST")
+	r.HandleFunc("/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")
+	r.HandleFunc("/{project_id}/board/create", controllers.CreateBoard).Methods("POST")
 
-	r.HandleFunc("/project/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
-	r.HandleFunc("/project/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
 
-	r.HandleFunc("/project/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE")
-	r.HandleFunc("/project/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE")
+	r.HandleFunc("/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE")
+	r.HandleFunc("/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE")
 
-	r.HandleFunc("/project/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
-	r.HandleFunc("/project/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
+	r.HandleFunc("/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
+	r.HandleFunc("/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
 
-	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
-	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
+	r.HandleFunc("/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
+	r.HandleFunc("/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }
 
 func applyIssueRoutes(r *mux.Router) {
@@ -114,10 +95,10 @@ func applyIssueRoutes(r *mux.Router) {
 }
 
 func applySprintRoutes(r *mux.Router) {
-	r.HandleFunc("/project/board/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
-	r.HandleFunc("/project/board/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT")
-	r.HandleFunc("/project/board/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET")
-	r.HandleFunc("/project/board/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE")
-	r.HandleFunc("/project/board/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
-	r.HandleFunc(`/project/board/sprint/{sprint_id}/add/issue/{issue_id}`, controllers.AddIssueToSprint).Methods("PUT")
+	r.HandleFunc("/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
+	r.HandleFunc("/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT")
+	r.HandleFunc("/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET")
+	r.HandleFunc("/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE")
+	r.HandleFunc("/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
+	r.HandleFunc("/sprint/{sprint_id}/add/issue/{issue_id}", controllers.AddIssueToSprint).Methods("PUT")
 }

@@ -87,7 +87,7 @@ func UpdateSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	err = models.SprintDB.FindByID(&sprint)
+	err = models.SprintDB.FindById(&sprint)
 	if err != nil {
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)
@@ -165,7 +165,7 @@ func SelectSprint(w http.ResponseWriter, r *http.Request) {
 
 	sprint := models.Sprint{}
 	sprint.ID = sprintId
-	err = models.SprintDB.FindByID(&sprint)
+	err = models.SprintDB.FindById(&sprint)
 	if err != nil {
 		res := helpers.Response{Message: DBError, StatusCode: http.StatusInternalServerError}
 		res.Failed(w)

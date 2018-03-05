@@ -2,25 +2,35 @@ package middlewares
 
 import (
 	"net/http"
-	"fmt"
+	//"fmt"
 	"github.com/gorilla/mux"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 )
 
 type rules map[string][]string
 
 var rulesMap = rules{
-	"login": []string{"asfa11sf", "a22sfasf", "a33sfasfsa"},
-	"register": []string{"a44sfasf", "asfa55sf", "as66fasfsa"},
-	"test": []string{"as77fasf", "asf88asf", "as999fasfsa"},
-	"test2": []string{"as000fasf", "asf**asf", "asfas^^fsa"},
+	"project.create":    []string{"project.create"},
 }
 
 func CheckUserPermission(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(mux.Vars(r))
-		fmt.Println(mux.CurrentRoute(r))
-		fmt.Println(mux.CurrentRoute(r).GetName())
-		fmt.Println(rulesMap)
+		if mux.CurrentRoute(r).GetName() != "" {
+			user := r.Context().Value("user").(models.User)
+			routePermissions := rulesMap[mux.CurrentRoute(r).GetName()]
+
+			if len(routePermissions) > 0 {
+				for _, permission := range routePermissions {
+					if !user.HasPermission(permission) {
+						response := helpers.Response{Message: "Action denied. No permission", StatusCode: http.StatusForbidden}
+						response.Failed(w)
+						return
+					}
+				}
+			}
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }

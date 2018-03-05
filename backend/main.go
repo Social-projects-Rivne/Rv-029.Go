@@ -61,6 +61,7 @@ func main() {
 	models.InitBoardDB(&models.BoardStorage{ APP.DB })
 	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
 	models.InitIssueDB(&models.IssueStorage{ APP.DB })
+	models.InitSprintDB(&models.SprintStorage{ APP.DB })
 	models.InitUserDB(&models.UserStorage{APP.DB})
 
 	var cmd string

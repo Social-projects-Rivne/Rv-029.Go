@@ -38,6 +38,7 @@ type User struct {
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID] string
+	Permissions []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -181,4 +182,32 @@ func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) er
 
 	return nil
 
+}
+
+func (u *User) HasPermission(permission string) bool {
+	for _, value := range u.Permissions {
+		if value == permission {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (u *User) AddPermission (permission string) {
+	if !u.HasPermission(permission) {
+		u.Permissions = append(u.Permissions, permission)
+	}
+}
+
+func (u *User) RemovePermission (permission string) {
+	for index, value := range u.Permissions {
+		if value == permission {
+			u.Permissions = append(u.Permissions[:index], u.Permissions[index+1:]...)
+		}
+	}
+}
+
+func (u *User) SetPermissions (permissions []string) {
+	u.Permissions = permissions
 }
