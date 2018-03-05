@@ -24,18 +24,11 @@ const (
 	//ROLE_USER .
 	ROLE_USER = "User"
 
-<<<<<<< HEAD
 	//Projects queries
 	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
 	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
-	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1"
+	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING"
 )
-=======
-
-//Projects queries
-const UPDATE_USER_PROJECT_ROLE  = "UPDATE users SET projects = projects +  ? WHERE id = ?"
-const DELETE_USER_PROJECT_ROLE  = "DELETE projects[?] FROM users WHERE id= ?"
->>>>>>> origin/sprint3
 
 //User type
 type User struct {
