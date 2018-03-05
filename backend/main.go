@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"gopkg.in/yaml.v2"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 )
 
 type App struct {
@@ -62,6 +63,11 @@ func main() {
 	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
 	models.InitIssueDB(&models.IssueStorage{ APP.DB })
 	models.InitUserDB(&models.UserStorage{APP.DB})
+
+	// ---
+	controllers.Producer()
+	controllers.Consumer()
+	// ---
 
 	var cmd string
 
