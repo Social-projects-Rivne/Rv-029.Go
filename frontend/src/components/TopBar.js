@@ -111,6 +111,9 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         <Divider />
                         <List component="nav">
                             <ListItem button>
+                                <ListItemText primary="Profile" onClick={auth.logOut} />
+                            </ListItem>
+                            <ListItem button>
                                 <ListItemText primary="Logout" onClick={auth.logOut} />
                             </ListItem>
                         </List>
