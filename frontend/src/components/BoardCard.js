@@ -4,6 +4,7 @@ import { withStyles } from 'material-ui/styles';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
 import Button from 'material-ui/Button';
+import TextField from 'material-ui/TextField'
 import Dialog, {
     DialogActions,
     DialogContent,
@@ -17,13 +18,20 @@ import { Link, browserHistory } from 'react-router'
 class ProjectCard extends Component {
 
 
-  // handleClickOpenAddUserToBoard = () => {
-  //     this.props.boardsActions.resetInput()
-  //     this.setState({ createSprintOpen: true })
-  // }
+    state = {
+        AddUserOpen: false,
+    }
+
+    handleClose = () => {
+        this.setState({ AddUserOpen: false })
+    }
+
+    handleClickOpenAddUser = () => {
+        this.setState({ AddUserOpen: true })
+    };
 
   render() {
-    const { classes, board } = props;
+      const { classes, board } = this.props;
     return (
         <div>
             <Card className={classes.card}>
@@ -37,11 +45,12 @@ class ProjectCard extends Component {
                         className={classes.link}>
                         <Button
                             size="small"
-                            color={'secondary'}>
+                            color={'secondary'}
+                            >
                             View
                         </Button>
                     </Link>
-                    <Button variant="raised" color="primary" className={classes.button}>
+                    <Button variant="raised" color="primary" className={classes.button} onClick={this.handleClickOpenAddUser}>
                         Add user
                     </Button>
 
@@ -49,46 +58,22 @@ class ProjectCard extends Component {
             </Card>
 
             {/*/!* #################### MODAL ISSUE #################### *!/*/}
-            <Dialog>
-                {/*open={this.state.createIssueOpen}*/}
-                {/*onClose={this.handleClose}*/}
-                {/*aria-labelledby="form-dialog-title" >*/}
-                {/*<DialogTitle id="form-dialog-title">Create Issue</DialogTitle>*/}
-                {/*<DialogContent>*/}
-                {/*<DialogContentText>*/}
-                {/*Please, fill required fields.*/}
-                {/*</DialogContentText>*/}
-                {/*<TextField*/}
-                {/*autoFocus*/}
-                {/*margin="dense"*/}
-                {/*id="name"*/}
-                {/*label="Name"*/}
-                {/*type="text"*/}
-                {/*onChange={(e) => {this.props.boardsActions.setName(e.target.value)}}*/}
-                {/*fullWidth />*/}
-                {/*<TextField*/}
-                {/*margin="dense"*/}
-                {/*id="desc"*/}
-                {/*label="Description"*/}
-                {/*type="text"*/}
-                {/*onChange={(e) => {this.props.boardsActions.setDesc(e.target.value)}}*/}
-                {/*fullWidth />*/}
-                {/*<TextField*/}
-                {/*margin="dense"*/}
-                {/*id="est"*/}
-                {/*label="Estimation"*/}
-                {/*onChange={(e) => {this.props.boardsActions.setEstimation(e.target.value)}}*/}
-                {/*type="text"*/}
-                {/*fullWidth />*/}
-                {/*</DialogContent>*/}
-                {/*<DialogActions>*/}
-                {/*<Button onClick={this.handleClose} color="primary">*/}
-                {/*Cancel*/}
-                {/*</Button>*/}
-                {/*<Button onClick={this.createIssue} color="primary">*/}
-                {/*Ok*/}
-                {/*</Button>*/}
-                {/*</DialogActions>*/}
+            <Dialog
+                open={this.state.AddUserOpen}
+                onClose={this.handleClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Add user</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please, fill required fields.
+                    </DialogContentText>
+
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.handleClose} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
             </Dialog>
         </div>
     )
