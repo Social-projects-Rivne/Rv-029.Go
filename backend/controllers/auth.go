@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
@@ -47,7 +49,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	user.Email = loginRequestData.Email
 	user, err = models.UserDB.CheckUserPassword(user)
 
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -61,8 +63,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// generate jwt token from user claims
 	token, err := jwt.GenerateToken(&user)
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -74,8 +76,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully authenticated.",
 		Token:   token,
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -143,7 +145,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Status = 1
 	fmt.Println(user)
-	if err = models.UserDB.Update(&user); err != nil{
+	if err = models.UserDB.Update(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -181,7 +183,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Email = forgotRequestData.Email
 	// TODO err handler
-	if err = models.UserDB.FindByEmail(&user); err != nil{
+	if err = models.UserDB.FindByEmail(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -220,7 +222,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Email = resetRequestData.Email
 	user, err = models.UserDB.CheckUserPassword(user)
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -263,3 +265,25 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//GetUserInfo gives frontend information about user
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	user_id, err := gocql.ParseUUID(vars["user_id"])
+	if err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
+		return
+	}
+	user := &models.User{UUID: user_id}
+	if err = models.UserDB.FindByID(user); err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
+	response.Success(w)
+	return
+
+}
