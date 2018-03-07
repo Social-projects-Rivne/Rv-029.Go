@@ -38,7 +38,7 @@ type SprintCRUD interface {
 	Delete(*Sprint) error
 	FindById(*Sprint) error
 	List(gocql.UUID) ([]Sprint, error)
-	GetSprintIssuesInProgress(*Sprint) ([]Issue, error) // todo Sprint argument
+	GetSprintIssuesInProgress(*Sprint) ([]Issue, error)
 }
 
 type SprintStorage struct {

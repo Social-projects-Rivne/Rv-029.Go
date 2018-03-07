@@ -211,3 +211,13 @@ func (u *User) RemovePermission (permission string) {
 func (u *User) SetPermissions (permissions []string) {
 	u.Permissions = permissions
 }
+
+/***************************************************************************************/
+
+const PERMISSION_MANAGE_USER_PERMISSIONS  = `user.permissions.manage`
+
+func GetPermissionsList() []string {
+	return []string{
+		PERMISSION_MANAGE_USER_PERMISSIONS,
+	}
+}

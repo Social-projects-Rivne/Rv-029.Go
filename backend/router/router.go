@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/gorilla/mux"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 )
 
@@ -13,6 +13,11 @@ func init() {
 
 	authRouter := Router.PathPrefix("/auth").Subrouter()
 	applyAuthRoutes(authRouter)
+
+	userRouter := Router.PathPrefix("/user").Subrouter()
+	applyUserRoutes(userRouter)
+	userRouter.Use(middlewares.AuthenticatedMiddleware)
+	//userRouter.Use(middlewares.OwenrMiddleware)//TODO:owner middleware
 
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
@@ -37,6 +42,12 @@ func applyAuthRoutes(r *mux.Router) {
 	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
 	r.HandleFunc("/forget-password", controllers.ForgotPassword)
 	r.HandleFunc("/new-password", controllers.ResetPassword)
+}
+
+func applyUserRoutes(r *mux.Router) {
+	r.HandleFunc("/{user_id}/add/permission", controllers.AddUserPermission).Name(`user.permissions.add`)
+	r.HandleFunc("/{user_id}/remove/permission", controllers.RemoveUserPermissions).Name(`user.permissions.remove`)
+	r.HandleFunc("/{user_id}/set/permissions", controllers.SetUserPermissions).Name(`user.permissions.update`)
 }
 
 func applyProjectsRoutes(r *mux.Router) {
