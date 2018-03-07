@@ -84,7 +84,7 @@ export const routes = (
         <Route path="project/:id/board/create" component={CreateBoardPage}/>
         <Route path="board/:id" component={BoardPage}/>
         <Route path="sprint/:id" component={SprintPage}/>
-        <Route path="profile/:id" component={VeiwUserProfile}/>
+        <Route path="profile" component={VeiwUserProfile}/>
       </Route>
 
       <Route path="home-page" component={HomePage}/>

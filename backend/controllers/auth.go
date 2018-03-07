@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
@@ -267,20 +265,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 //GetUserInfo gives frontend information about user
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	user_id, err := gocql.ParseUUID(vars["user_id"])
-	if err != nil {
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
-		response.Failed(w)
-		return
-	}
-	user := &models.User{UUID: user_id}
-	if err = models.UserDB.FindByID(user); err != nil{
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
-		response.Failed(w)
-		return
-	}
+	user := r.Context().Value("user").(models.User)
 
 	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
 	response.Success(w)

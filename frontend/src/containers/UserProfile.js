@@ -16,12 +16,12 @@ import Typography from 'material-ui/Typography'
 
 class ViewUserProfile extends Component {
 
-  // componentDidMount() {
-  //   this.getUserInfo()
-  // }
+  componentDidMount() {
+    this.getUserInfo()
+  }
 
   getUserInfo = () => {
-    axios.get(API_URL + `profile/${this.props.ownProps.params.id}`)
+    axios.get(API_URL + `profile`)
       .then((response) => {
         this.props.userActions.setCurrentUser(response.data.Data)
       })
@@ -40,7 +40,9 @@ class ViewUserProfile extends Component {
 
   render () {
 
-    const {classes, boards} = this.props
+    const {classes, user} = this.props
+
+    
     return (
       <Grid container
             allignitems={"center"}
@@ -54,7 +56,7 @@ class ViewUserProfile extends Component {
                   <li>
                     <Grid Item>
                         <Typography variant="headline" gutterBottom component="h2">
-                          Nigga Shit
+                          {(user.userInfo) ? (user.userInfo.UUID) : ('')}
                         </Typography>
                     </Grid>
                   </li>
@@ -123,7 +125,7 @@ const styles = theme => ({
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    profiles: state.profiles,
+    user: state.user,
     defaultPage: state.defaultPage,
     ownProps
   }
