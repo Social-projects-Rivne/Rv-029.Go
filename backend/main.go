@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/rs/cors"
 	"log"
 	"net/http"
@@ -62,6 +63,9 @@ func main() {
 	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
 	models.InitIssueDB(&models.IssueStorage{ APP.DB })
 	models.InitUserDB(&models.UserStorage{APP.DB})
+
+	//controllers.Producer()
+	//controllers.Consumer()
 
 	var cmd string
 
