@@ -12,7 +12,7 @@ type PermissionRequestData struct {
 }
 
 func (p *PermissionRequestData) Validate(r *http.Request) error {
-	if stringInSlice(p.Permission, models.GetPermissionsList()) {
+	if !stringInSlice(p.Permission, models.GetPermissionsList()) {
 		return errors.New("Invalid Permission")
 	}
 

@@ -62,9 +62,8 @@ func SetUserPermissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	user := r.Context().Value("user").(models.User)
-	user.RemovePermission(setPermissionsRequestData.Permission)
+	user.SetPermissions(setPermissionsRequestData.Permissions)
 
 	err = models.UserDB.Update(&user)
 	if err != nil {

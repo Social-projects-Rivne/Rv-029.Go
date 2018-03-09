@@ -17,7 +17,7 @@ func init() {
 	userRouter := Router.PathPrefix("/user").Subrouter()
 	applyUserRoutes(userRouter)
 	userRouter.Use(middlewares.AuthenticatedMiddleware)
-	//userRouter.Use(middlewares.OwenrMiddleware)//TODO:owner middleware
+	userRouter.Use(middlewares.OwenrMiddleware)
 
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)

@@ -84,8 +84,8 @@ func (u *UserStorage) Insert(user *User) error {
 //Update func finds user from database
 func (u *UserStorage)  Update(user *User) error {
 
-	if err := Session.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
-		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
+	if err := Session.Query(`Update users SET password = ? ,updated_at = ?, permissions = ? WHERE id= ? ;`,
+		user.Password, user.UpdatedAt, user.Permissions, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
 		return err
@@ -214,10 +214,12 @@ func (u *User) SetPermissions (permissions []string) {
 
 /***************************************************************************************/
 
+const PERMISSION_CREATE_PROJECTS  = `project.create`
 const PERMISSION_MANAGE_USER_PERMISSIONS  = `user.permissions.manage`
 
 func GetPermissionsList() []string {
 	return []string{
 		PERMISSION_MANAGE_USER_PERMISSIONS,
+		PERMISSION_CREATE_PROJECTS,
 	}
 }
