@@ -3,33 +3,34 @@ package main
 import (
 	"fmt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
-	"github.com/rs/cors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
+
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/seeder/seeders"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/db"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"github.com/gocql/gocql"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
-	"path/filepath"
-	"io/ioutil"
+	"github.com/gocql/gocql"
+	"github.com/rs/cors"
 	"gopkg.in/yaml.v2"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
 )
 
 type App struct {
 	Config *AppConfig
-	DB *gocql.Session
+	DB     *gocql.Session
 	Mailer *mail.SmtpMailer
 }
 
 type AppConfig struct {
-	DB db.DBConfig `yaml:"db"`
+	DB     db.DBConfig           `yaml:"db"`
 	Mailer mail.SmtpMailerConfig `yaml:"mail"`
-	JWT jwt.JWTConfig `yaml:"jwt"`
+	JWT    jwt.JWTConfig         `yaml:"jwt"`
 }
 
 func (app *App) InitApp(path string) {
@@ -53,19 +54,31 @@ func (app *App) InitApp(path string) {
 
 var APP *App
 
-func init()  {
+func init() {
 	APP = &App{}
 	APP.InitApp("./backend/config/app.yml")
 }
 
 func main() {
-	models.InitBoardDB(&models.BoardStorage{ APP.DB })
-	models.InitProjectDB(&models.ProjectStorage{ APP.DB })
-	models.InitIssueDB(&models.IssueStorage{ APP.DB })
+	models.InitBoardDB(&models.BoardStorage{APP.DB})
+	models.InitProjectDB(&models.ProjectStorage{APP.DB})
+	models.InitIssueDB(&models.IssueStorage{APP.DB})
 	models.InitUserDB(&models.UserStorage{APP.DB})
 
-	//controllers.Producer()
-	//controllers.Consumer()
+	// Initialize Kafka producer connection
+	controllers.KafkaProducerInit()
+	defer func() {
+		if err := controllers.Producer.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	controllers.KafkaConsumerInit()
+	defer func() {
+		if err := controllers.Master.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	var cmd string
 

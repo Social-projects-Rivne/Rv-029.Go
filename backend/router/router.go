@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
@@ -12,7 +10,10 @@ var Router *mux.Router
 
 func init() {
 	Router = mux.NewRouter()
-	Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/public"))))
+
+	// TMP
+	testrouter := Router
+	applySocketRouter(testrouter)
 
 	authRouter := Router.PathPrefix("/auth").Subrouter()
 	applyAuthRoutes(authRouter)
@@ -37,6 +38,10 @@ func init() {
 	issueRouter := Router.PathPrefix("/project/board").Subrouter()
 	applyIssueRoutes(issueRouter)
 
+}
+
+func applySocketRouter(r *mux.Router) {
+	r.HandleFunc("/socketserver", controllers.KafkaSocket)
 }
 
 func applyAuthRoutes(r *mux.Router) {
@@ -73,10 +78,6 @@ func applyProjectsRoutes(r *mux.Router) {
 	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
 }
-
-//func applyAdminRoutes(r *mux.Router)  {
-//	r.HandleFunc("/users", controllers.Users)
-//}
 
 func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")

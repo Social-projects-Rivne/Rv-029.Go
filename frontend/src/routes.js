@@ -26,6 +26,8 @@ import auth from './services/auth'
 import ViewProjectPage from './components/ViewProjectPage'
 import CreateBoardPage from "./containers/CreateBoardPage";
 
+import Socket from './components/Socket'
+
 // TODO move these out of here
 // e.g. routeEvents.js
 const reset = () => {
@@ -84,6 +86,8 @@ export const routes = (
         <Route path="board/:id" component={BoardPage}/>
         <Route path="sprint/:id" component={SprintPage}/>
       </Route>
+
+      <Route path="socket" component={Socket}/>
 
       <Route path="home-page" component={HomePage}/>
     </Route>
