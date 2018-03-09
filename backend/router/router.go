@@ -72,6 +72,9 @@ func applyProjectsRoutes(r *mux.Router) {
 
 	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET")
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET")
+
+	r.HandleFunc("/{project_id}/users/", controllers.ProjectUsersList).Methods("GET")
+	r.HandleFunc("/{project_id}/users", controllers.ProjectUsersList).Methods("GET")
 }
 
 //func applyAdminRoutes(r *mux.Router)  {
