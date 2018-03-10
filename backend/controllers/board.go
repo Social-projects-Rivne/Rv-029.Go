@@ -45,6 +45,7 @@ func CreateBoard(w http.ResponseWriter, r *http.Request) {
 		project.Name,
 		boardRequestData.Name,
 		boardRequestData.Desc,
+		nil,
 		time.Now(),
 		time.Now(),
 	}
@@ -170,4 +171,37 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 
 	response := helpers.Response{Data: boardsList}
 	response.Success(w)
+}
+
+func AssignUserToBoard(w http.ResponseWriter, r *http.Request)  {
+
+	var UserBoardRequestData validator.UserBoardRequestData
+	err := decodeAndValidate(r, &UserBoardRequestData)
+	if err != nil {
+		response := helpers.Response{Message: err.Error()}
+		response.Failed(w)
+		return
+	}
+
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+	if err != nil {
+		log.Printf("Error in controllers/board: %v", err)
+		response := helpers.Response{Message: "Board ID is not valid"}
+		response.Failed(w)
+		return
+	}
+
+
+	err = models.BoardDB.AddUserToBoard(UserBoardRequestData.Email,boardId)
+	if err != nil {
+		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "User successfully added to the board"}
+	response.Success(w)
+
+
 }

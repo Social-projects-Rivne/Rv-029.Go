@@ -12,9 +12,12 @@ type Board struct {
 	ProjectName string     `cql:"project_name"`
 	Name        string     `cql:"name"`
 	Desc        string     `cql:"description"`
+	Users  	    map[gocql.UUID]string
 	CreatedAt   time.Time  `cql:"created_at"`
 	UpdatedAt   time.Time  `cql:"updated_at"`
 }
+
+const UPDATE_USER = "UPDATE boards SET users = users +  ? WHERE id = ?"
 
 //go:generate mockgen -destination=../mocks/mock_board.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models BoardCRUD
 
@@ -23,6 +26,7 @@ type BoardCRUD interface {
 	Update(*Board) error
 	Delete(*Board) error
 	FindByID(*Board) error
+	AddUserToBoard(email string, boardId gocql.UUID)  error
 	List(gocql.UUID) ([]map[string]interface{}, error)
 }
 
@@ -98,4 +102,21 @@ func (s *BoardStorage) List(projectId gocql.UUID) ([]map[string]interface{}, err
 	}
 
 	return boardsList, nil
+}
+
+
+func (s *BoardStorage) AddUserToBoard(email string, boardId gocql.UUID) error  {
+
+	userMap := make(map[string]string)
+	userMap["email"] = email
+
+	err := Session.Query(UPDATE_USER, userMap, boardId).Exec()
+
+	if err != nil {
+		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
+		return err
+	}
+
+	return nil
+
 }

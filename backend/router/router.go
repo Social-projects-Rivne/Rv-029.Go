@@ -94,6 +94,9 @@ func applyBoardRoutes(r *mux.Router) {
 	r.HandleFunc("/project/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
 	r.HandleFunc("/project/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
 
+	r.HandleFunc("/project/board/assign-user/{board_id}/", controllers.AssignUserToBoard).Methods("POST")
+	r.HandleFunc("/project/board/assign-user/{board_id}", controllers.AssignUserToBoard).Methods("POST")
+
 	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
 }

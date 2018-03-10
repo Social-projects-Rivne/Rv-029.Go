@@ -7,9 +7,9 @@ import (
 )
 
 func Run() {
-	//seeders.Call(ProjectTableSeeder{})
-	//seeders.Call(UsersTableSeeder{})
-	//seeders.Call(BoardTableSeeder{})
+	seeders.Call(ProjectTableSeeder{})
+	seeders.Call(UsersTableSeeder{})
+	seeders.Call(BoardTableSeeder{})
 	seeders.Call(SprintTableSeeder{})
 	seeders.Call(IssueTableSeeder{})
 }
