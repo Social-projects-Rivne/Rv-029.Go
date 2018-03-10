@@ -33,15 +33,15 @@ func init() {
 }
 
 func applyAuthRoutes(r *mux.Router) {
-	r.HandleFunc("/login/", controllers.Login)
-	r.HandleFunc("/login", controllers.Login)
+	r.HandleFunc("/login/", controllers.Login).Name(`user.login`)
+	r.HandleFunc("/login", controllers.Login).Name(`user.login`)
 
-	r.HandleFunc("/register/", controllers.Register)
-	r.HandleFunc("/register", controllers.Register)
+	r.HandleFunc("/register/", controllers.Register).Name(`user.register`)
+	r.HandleFunc("/register", controllers.Register).Name(`user.register`)
 
-	r.HandleFunc("/confirm", controllers.ConfirmRegistration)
-	r.HandleFunc("/forget-password", controllers.ForgotPassword)
-	r.HandleFunc("/new-password", controllers.ResetPassword)
+	r.HandleFunc("/confirm", controllers.ConfirmRegistration).Name(`user.confirm`)
+	r.HandleFunc("/forget-password", controllers.ForgotPassword).Name(`us	er.password.forget`)
+	r.HandleFunc("/new-password", controllers.ResetPassword).Name(`user.password.reset`)
 }
 
 func applyUserRoutes(r *mux.Router) {
@@ -68,48 +68,47 @@ func applyProjectsRoutes(r *mux.Router) {
 }
 
 func applyBoardRoutes(r *mux.Router) {
-	r.HandleFunc("/{project_id}/board/create/", controllers.CreateBoard).Methods("POST")
-	r.HandleFunc("/{project_id}/board/create", controllers.CreateBoard).Methods("POST")
+	r.HandleFunc("/{project_id}/board/create/", controllers.CreateBoard).Methods("POST").Name(`board.create`)
+	r.HandleFunc("/{project_id}/board/create", controllers.CreateBoard).Methods("POST").Name(`board.create`)
 
-	r.HandleFunc("/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT")
-	r.HandleFunc("/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT")
+	r.HandleFunc("/board/update/{board_id}/", controllers.UpdateBoard).Methods("PUT").Name(`board.update`)
+	r.HandleFunc("/board/update/{board_id}", controllers.UpdateBoard).Methods("PUT").Name(`board.update`)
 
-	r.HandleFunc("/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE")
-	r.HandleFunc("/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE")
+	r.HandleFunc("/board/delete/{board_id}/", controllers.DeleteBoard).Methods("DELETE").Name(`board.delete`)
+	r.HandleFunc("/board/delete/{board_id}", controllers.DeleteBoard).Methods("DELETE").Name(`board.delete`)
 
-	r.HandleFunc("/board/select/{board_id}/", controllers.SelectBoard).Methods("GET")
-	r.HandleFunc("/board/select/{board_id}", controllers.SelectBoard).Methods("GET")
+	r.HandleFunc("/board/select/{board_id}/", controllers.SelectBoard).Methods("GET").Name(`board.show`)
+	r.HandleFunc("/board/select/{board_id}", controllers.SelectBoard).Methods("GET").Name(`board.show`)
 
-	r.HandleFunc("/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
-	r.HandleFunc("/{project_id}/board/list", controllers.BoardsList).Methods("GET")
+	r.HandleFunc("/{project_id}/board/list/", controllers.BoardsList).Methods("GET").Name(`board.list`)
+	r.HandleFunc("/{project_id}/board/list", controllers.BoardsList).Methods("GET").Name(`board.list`)
 }
 
 func applyIssueRoutes(r *mux.Router) {
-	r.HandleFunc("/{board_id}/issue/create/", controllers.StoreIssue).Methods("POST")
-	r.HandleFunc("/{board_id}/issue/create", controllers.StoreIssue).Methods("POST")
+	r.HandleFunc("/{board_id}/issue/create/", controllers.StoreIssue).Methods("POST").Name(`issue.create`)
+	r.HandleFunc("/{board_id}/issue/create", controllers.StoreIssue).Methods("POST").Name(`issue.create`)
 
-	r.HandleFunc("/issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT")
-	r.HandleFunc("/issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT")
+	r.HandleFunc("/issue/update/{issue_id}/", controllers.UpdateIssue).Methods("PUT").Name(`issue.update`)
+	r.HandleFunc("/issue/update/{issue_id}", controllers.UpdateIssue).Methods("PUT").Name(`issue.update`)
 
-	r.HandleFunc("/issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE")
-	r.HandleFunc("/issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE")
+	r.HandleFunc("/issue/delete/{issue_id}/", controllers.DeleteIssue).Methods("DELETE").Name(`issue.delete`)
+	r.HandleFunc("/issue/delete/{issue_id}", controllers.DeleteIssue).Methods("DELETE").Name(`issue.delete`)
 
-	r.HandleFunc("/{board_id}/issue/list/", controllers.BoardIssueslist).Methods("GET")
-	r.HandleFunc("/{board_id}/issue/list", controllers.BoardIssueslist).Methods("GET")
+	r.HandleFunc("/{board_id}/issue/list/", controllers.BoardIssueslist).Methods("GET").Name(`issue.backlog.list`)
+	r.HandleFunc("/{board_id}/issue/list", controllers.BoardIssueslist).Methods("GET").Name(`issue.backlog.list`)
 
-	r.HandleFunc("/sprint/{sprint_id}/issue/list/", controllers.SprintIssueslist).Methods("GET")
-	r.HandleFunc("/sprint/{sprint_id}/issue/list", controllers.SprintIssueslist).Methods("GET")
+	r.HandleFunc("/sprint/{sprint_id}/issue/list/", controllers.SprintIssueslist).Methods("GET").Name(`issue.sprint.list`)
+	r.HandleFunc("/sprint/{sprint_id}/issue/list", controllers.SprintIssueslist).Methods("GET").Name(`issue.sprint.list`)
 
-	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
-	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
-
+	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET").Name(`issue.show`)
+	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET").Name(`issue.show`)
 }
 
 func applySprintRoutes(r *mux.Router) {
-	r.HandleFunc("/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST")
-	r.HandleFunc("/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT")
-	r.HandleFunc("/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET")
-	r.HandleFunc("/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE")
-	r.HandleFunc("/{board_id}/sprint/list", controllers.SprintsList).Methods("GET")
-	r.HandleFunc("/sprint/{sprint_id}/add/issue/{issue_id}", controllers.AddIssueToSprint).Methods("PUT")
+	r.HandleFunc("/{board_id}/sprint/create", controllers.CreateSprint).Methods("POST").Name(`sprint.create`)
+	r.HandleFunc("/sprint/update/{sprint_id}", controllers.UpdateSprint).Methods("PUT").Name(`sprint.update`)
+	r.HandleFunc("/sprint/show/{sprint_id}", controllers.SelectSprint).Methods("GET").Name(`sprint.show`)
+	r.HandleFunc("/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE").Name(`sprint.delete`)
+	r.HandleFunc("/{board_id}/sprint/list", controllers.SprintsList).Methods("GET").Name(`sprint.list`)
+	r.HandleFunc("/sprint/{sprint_id}/add/issue/{issue_id}", controllers.AddIssueToSprint).Methods("PUT").Name(`sprint.issue.add`)
 }
