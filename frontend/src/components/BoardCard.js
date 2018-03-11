@@ -18,18 +18,6 @@ import { Link, browserHistory } from 'react-router'
 class ProjectCard extends Component {
 
 
-    state = {
-        AddUserOpen: false,
-    }
-
-    handleClose = () => {
-        this.setState({ AddUserOpen: false })
-    }
-
-    handleClickOpenAddUser = () => {
-        this.setState({ AddUserOpen: true })
-    };
-
   render() {
       const { classes, board } = this.props;
     return (
@@ -50,31 +38,10 @@ class ProjectCard extends Component {
                             View
                         </Button>
                     </Link>
-                    <Button variant="raised" color="primary" className={classes.button} onClick={this.handleClickOpenAddUser}>
-                        Add user
-                    </Button>
-
                 </CardActions>
             </Card>
 
-            {/*/!* #################### MODAL ISSUE #################### *!/*/}
-            <Dialog
-                open={this.state.AddUserOpen}
-                onClose={this.handleClose}
-                aria-labelledby="form-dialog-title" >
-                <DialogTitle id="form-dialog-title">Add user</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Please, fill required fields.
-                    </DialogContentText>
 
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={this.handleClose} color="primary">
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     )
   }

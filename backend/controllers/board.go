@@ -192,8 +192,15 @@ func AssignUserToBoard(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
+	userId, err := gocql.ParseUUID(UserBoardRequestData.UserId)
+	if err != nil {
+		log.Printf("Error in controllers/board: %v", err)
+		response := helpers.Response{Message: "User ID is not valid"}
+		response.Failed(w)
+		return
+	}
 
-	err = models.BoardDB.AddUserToBoard(UserBoardRequestData.Email,boardId)
+	err = models.BoardDB.AddUserToBoard(userId,UserBoardRequestData.Email,boardId)
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)

@@ -1,2 +1,2 @@
 ALTER TABLE boards
-    ADD (users map<text,text>);
+    ADD (users map<uuid,text>);

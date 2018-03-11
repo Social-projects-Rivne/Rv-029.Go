@@ -4,11 +4,13 @@ import {
   HANDLE_NAME_INPUT,
   HANDLE_DESC_INPUT,
   HANDLE_ESTIMATION,
+  HANDLE_BOARD_LOADED,
   RESET
 } from '../constants/boards'
 
 const initialState = {
   currentBoards: [],
+  currentBoard: null,
   goalInput: "",
   nameInput: "",
   descInput: "",
@@ -25,8 +27,10 @@ export default (state = initialState, action) => {
       return { ...state, nameInput: action.payload }
     case HANDLE_DESC_INPUT:
       return { ...state, descInput: action.payload }
+    case HANDLE_BOARD_LOADED:
+      return { ...state, currentBoard: action.payload }
     case HANDLE_ESTIMATION:
-      return { ...state, estimation: action.payload }
+        return { ...state, estimation: action.payload }
     case RESET:
       return {
         ...state,

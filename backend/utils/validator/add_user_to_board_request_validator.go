@@ -7,7 +7,8 @@ import (
 
 type UserBoardRequestData struct {
 	*baseValidator
-	Email string `json:"email"`
+	Email string  `json:"email"`
+	UserId string `json:"user_id"`
 }
 
 func (d *UserBoardRequestData) Validate(r *http.Request) error {
@@ -17,7 +18,7 @@ func (d *UserBoardRequestData) Validate(r *http.Request) error {
 		return err
 	}
 
-	err = d.ValidateEmail(d.Email)
+	err = d.ValidateRequired(d.UserId)
 	if err != nil {
 		log.Printf("Error in utils/validator/register_request_validator.go error: %+v", err)
 

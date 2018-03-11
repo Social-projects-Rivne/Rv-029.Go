@@ -26,7 +26,7 @@ type BoardCRUD interface {
 	Update(*Board) error
 	Delete(*Board) error
 	FindByID(*Board) error
-	AddUserToBoard(email string, boardId gocql.UUID)  error
+	AddUserToBoard(userId gocql.UUID, email string, boardId gocql.UUID)  error
 	List(gocql.UUID) ([]map[string]interface{}, error)
 }
 
@@ -80,8 +80,8 @@ func (s *BoardStorage) Delete(b *Board) error {
 
 //FindByID func finds board by id
 func (s *BoardStorage) FindByID(b *Board) error {
-	err := s.DB.Query(`SELECT id, project_id, name, description, project_name, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
-		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.ProjectName, &b.CreatedAt, &b.UpdatedAt)
+	err := s.DB.Query(`SELECT id, project_id, name, description, project_name, users, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
+		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.ProjectName, &b.Users, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
 		log.Printf("Error in models/board.go error: %+v", err)
@@ -105,10 +105,10 @@ func (s *BoardStorage) List(projectId gocql.UUID) ([]map[string]interface{}, err
 }
 
 
-func (s *BoardStorage) AddUserToBoard(email string, boardId gocql.UUID) error  {
+func (s *BoardStorage) AddUserToBoard(userId gocql.UUID,email string, boardId gocql.UUID) error  {
 
-	userMap := make(map[string]string)
-	userMap["email"] = email
+	userMap := make(map[gocql.UUID]string)
+	userMap[userId] = email
 
 	err := Session.Query(UPDATE_USER, userMap, boardId).Exec()
 
