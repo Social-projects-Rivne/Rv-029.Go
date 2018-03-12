@@ -26,6 +26,7 @@ import auth from './services/auth'
 import ViewProjectPage from './components/ViewProjectPage'
 import CreateBoardPage from "./containers/CreateBoardPage"
 import VeiwUserProfile from "./containers/UserProfile"
+// import VeiwUserProfile from "./containers/ChangeUserInformation"
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -85,6 +86,7 @@ export const routes = (
         <Route path="board/:id" component={BoardPage}/>
         <Route path="sprint/:id" component={SprintPage}/>
         <Route path="profile" component={VeiwUserProfile}/>
+        {/* <Route path="profile/update" component={ChangeUserInformation}/> */}
       </Route>
 
       <Route path="home-page" component={HomePage}/>

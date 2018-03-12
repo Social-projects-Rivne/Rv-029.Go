@@ -8,5 +8,6 @@ CREATE TABLE task_manager.users (
     status int,
     role text,
     salt text,
+    photo text,
     updated_at timestamp
 );

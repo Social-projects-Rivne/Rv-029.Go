@@ -63,6 +63,9 @@ func applyAuthorizedUserRoutes(r *mux.Router) {
 func applyUserRoutes(r *mux.Router) {
 	r.HandleFunc("/", controllers.GetUserInfo).Methods("GET")
 	r.HandleFunc("", controllers.GetUserInfo).Methods("GET")
+
+	r.HandleFunc("/update/", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/update", controllers.UpdateUserInfo).Methods("POST")
 }
 
 func applyProjectsRoutes(r *mux.Router) {

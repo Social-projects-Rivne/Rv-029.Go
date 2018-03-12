@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import InjectObjSize from '../decorators/objSize'
 import {withStyles} from 'material-ui/styles'
 import Grid from 'material-ui/Grid'
 import ProjectCard from '../components/ProjectCard'
@@ -13,6 +14,11 @@ import axios from "axios"
 import * as userActions from "../actions/UserActions"
 import Paper from 'material-ui/Paper'
 import Typography from 'material-ui/Typography'
+import Button from 'material-ui/Button'
+import AppBar from 'material-ui/AppBar'
+import Tabs, { Tab } from 'material-ui/Tabs'
+import Divider from 'material-ui/Divider'
+import List, { ListItem, ListItemText } from 'material-ui/List'
 
 class ViewUserProfile extends Component {
 
@@ -40,9 +46,19 @@ class ViewUserProfile extends Component {
 
   render () {
 
-    const {classes, user} = this.props
+    const {classes, user, objSize} = this.props
+    let projectsArr = []
 
-    
+    if (user.userInfo) {
+      let projects = user.userInfo.Projects
+
+      for (let key in user.userInfo.Projects) {
+        projectsArr.push({ID: key, role: projects[key]})
+      }
+
+      console.log(projectsArr)
+    }
+
     return (
       <Grid container
             allignitems={"center"}
@@ -54,34 +70,55 @@ class ViewUserProfile extends Component {
               <Grid container wrap="nowrap">
                 <ul className={classes.list}>
                   <li>
-                    <Grid Item>
+                    <Grid item>
                         <Typography variant="headline" gutterBottom component="h2">
-                          {(user.userInfo) ? (user.userInfo.UUID) : ('')}
+                          {(user.userInfo) ? (user.userInfo.FirstName) : ('')}    {(user.userInfo) ? (user.userInfo.LastName) : ('')}  
                         </Typography>
                     </Grid>
                   </li>
                     <br/>
                   <li>
-                    <Grid Item>
+                    <Grid item>
                         <Typography variant="headline" gutterBottom component="h2">
-                          owner@gmail.com
+                        {(user.userInfo) ? (user.userInfo.Email) : ('')}
                         </Typography>
                     </Grid>
                   </li>
                     <br/>
                   <li>
-                    <Grid Item>
+                    <Grid item>
                         <Typography variant="headline" gutterBottom component="h2">
-                          User
+                        {(user.userInfo) ? (user.userInfo.Role) : ('')}
                         </Typography>
                     </Grid>
                   </li>
                     <br/>
                   <li>
-                    <Grid Item>
-                        <Typography variant="headline" gutterBottom component="h2">
-                          Projects:
-                        </Typography>
+                    <Typography variant="headline" gutterBottom component="h2">
+                        Projects: 
+                    </Typography>
+                    <div className={classes.projects}>
+                      <List component="nav">
+
+                        {
+                          (user.userInfo) ? (
+                            projectsArr.map((item, i) => (
+                              <ListItem button key={i}>
+                                <ListItemText primary={item.role} />
+                              </ListItem>
+                            ))
+                          ) : (<h1>loh</h1>)
+                        }
+
+                      </List>
+                    </div>
+                  </li>
+                    <br/>
+                  <li>
+                    <Grid item>
+                      <Button variant="raised" color="primary">
+                        Change information
+                      </Button>
                     </Grid>
                   </li>
                     <br/>
@@ -101,6 +138,11 @@ const styles = theme => ({
     overflow: 'hidden',
     padding: `0 ${theme.spacing.unit * 3}px`,
   },
+  projects: {
+    width: '100%',
+    maxWidth: '360px',
+    backgroundColor: theme.palette.background.paper,
+  },
   wrapper: {
     maxWidth: 400,
   },
@@ -111,7 +153,7 @@ const styles = theme => ({
   },
   greed:{
     width:"100%",
-    height: "100vh",
+    minHeight: "100vh",
     paddingTop:"2em",
   },
   pos: {
@@ -138,6 +180,8 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default withStyles(styles)(
-  connect(mapStateToProps, mapDispatchToProps)(ViewUserProfile)
-)
+export default InjectObjSize(
+  withStyles(styles)(
+    connect(mapStateToProps, mapDispatchToProps)(ViewUserProfile)
+  )
+) 
