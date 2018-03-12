@@ -12,6 +12,7 @@ func Run() {
 	seeders.Call(BoardTableSeeder{})
 	seeders.Call(SprintTableSeeder{})
 	seeders.Call(IssueTableSeeder{})
+	seeders.Call(RolesTableSeeder{})
 }
 
 func random(min, max int) int {

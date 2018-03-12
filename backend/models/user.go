@@ -7,9 +7,6 @@ import (
 	"log"
 )
 
-//Role .
-type Role string
-
 //ROLE_ADMIN .
 const ROLE_ADMIN = "Admin"
 
@@ -38,7 +35,6 @@ type User struct {
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID] string
-	Permissions []string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -84,8 +80,8 @@ func (u *UserStorage) Insert(user *User) error {
 //Update func finds user from database
 func (u *UserStorage)  Update(user *User) error {
 
-	if err := Session.Query(`Update users SET password = ? ,updated_at = ?, permissions = ? WHERE id= ? ;`,
-		user.Password, user.UpdatedAt, user.Permissions, user.UUID).Exec(); err != nil {
+	if err := Session.Query(`Update users SET password = ? ,updated_at = ?, WHERE id= ? ;`,
+		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
 		return err
@@ -182,52 +178,4 @@ func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) er
 
 	return nil
 
-}
-
-func (u *User) HasPermission(permission string) bool {
-	for _, value := range u.Permissions {
-		if value == permission {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (u *User) AddPermission (permission string) {
-	if !u.HasPermission(permission) {
-		u.Permissions = append(u.Permissions, permission)
-	}
-}
-
-func (u *User) RemovePermission (permission string) {
-	for index, value := range u.Permissions {
-		if value == permission {
-			u.Permissions = append(u.Permissions[:index], u.Permissions[index+1:]...)
-		}
-	}
-}
-
-func (u *User) SetPermissions (permissions []string) {
-	u.Permissions = permissions
-}
-
-
-func GetPermissionsList() []string {
-	return []string{
-		PERMISSION_CREATE_PROJECTS,
-		PERMISSION_UPDATE_PROJECTS,
-		PERMISSION_DELETE_PROJECTS,
-		PERMISSION_CREATE_BOARDS,
-		PERMISSION_UPDATE_BOARDS,
-		PERMISSION_DELETE_BOARDS,
-		PERMISSION_CREATE_ISSUES,
-		PERMISSION_UPDATE_ISSUES,
-		PERMISSION_DELETE_ISSUES,
-		PERMISSION_CREATE_SPRINTS,
-		PERMISSION_UPDATE_SPRINTS,
-		PERMISSION_DELETE_SPRINTS,
-		PERMISSION_ADD_ISSUES_TO_SPRINTS,
-		PERMISSION_MANAGE_USER_PERMISSIONS,
-	}
 }
