@@ -26,18 +26,19 @@ const (
 	//STATUS_DONE uses when issue done
 	STATUS_DONE = "Done"
 
-	INSERT_iSSUE = "INSERT INTO issues (id,name,status,description,estimate,user_id,user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,project_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+	INSERT_iSSUE = "INSERT INTO issues (id,name,status,description,estimate,user_id,user_first_name,user_last_name,sprint_id,board_id,board_name,project_id,project_name,parent,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
 
-	UPDATE_ISSUE = "Update issues SET name = ?, status = ?, description = ?,estimate = ?, user_id = ?,user_first_name = ?,user_last_name = ?, board_name = ?, project_name = ?, updated_at = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;"
+	UPDATE_ISSUE = "Update issues SET name = ?, status = ?, description = ?,estimate = ?, user_id = ?,user_first_name = ?,user_last_name = ?, board_name = ?, project_name = ?, parent = ?, updated_at = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;"
 
 	DELETE_ISSUE = "DELETE FROM issues WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ? ;"
 
-	FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id,project_name, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
+	FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
 
-	GET_BOARD_ISSUE_LIST          = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at FROM board_issues WHERE board_id = ?"
-	GET_BOARD_BACKLOG_ISSUES_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id,project_name,created_at, updated_at FROM board_issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000"
+	GET_BOARD_ISSUE_LIST          = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM board_issues WHERE board_id = ?"
 
-	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name,created_at, updated_at from sprint_issues WHERE sprint_id = ? ;"
+	GET_BOARD_BACKLOG_ISSUES_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM board_issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000"
+
+	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at from sprint_issues WHERE sprint_id = ? ;"
 )
 
 
@@ -56,6 +57,7 @@ type Issue struct {
 	BoardName     string
 	ProjectID     gocql.UUID
 	ProjectName   string
+	Parent	      gocql.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
@@ -85,7 +87,7 @@ func (s *IssueStorage) Insert(issue *Issue) error {
 	if err := s.DB.Query(INSERT_iSSUE,
 
 		issue.UUID, issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName,
-		issue.SprintID, issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName,
+		issue.SprintID, issue.BoardID, issue.BoardName, issue.ProjectID, issue.ProjectName, issue.Parent,
 		issue.CreatedAt, issue.UpdatedAt).Exec(); err != nil {
 
 		log.Printf("Error in models/issue.go error: %+v", err)
@@ -100,7 +102,7 @@ func (s *IssueStorage) Update(issue *Issue) error {
 	if err := s.DB.Query(UPDATE_ISSUE,
 
 		issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName,
-		issue.BoardName, issue.ProjectName, issue.UpdatedAt, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
+		issue.BoardName, issue.ProjectName, issue.Parent, issue.UpdatedAt, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
 		log.Printf("Error in models/issue.go error: %+v",err)
 		return err
 	}
@@ -125,7 +127,7 @@ func (s *IssueStorage) FindByID(issue *Issue) error {
 
 	if err := s.DB.Query(FIND_ISSUE_BY_ID, issue.UUID).Consistency(gocql.One).Scan(&issue.UUID, &issue.Name, &issue.Status, &issue.Description, &issue.Estimate, &issue.UserID,
 		&issue.UserFirstName, &issue.UserLastName, &issue.SprintID, &issue.BoardID, &issue.BoardName,
-		&issue.ProjectID, &issue.ProjectName, &issue.CreatedAt, &issue.UpdatedAt); err != nil {
+		&issue.ProjectID, &issue.ProjectName, &issue.Parent, &issue.CreatedAt, &issue.UpdatedAt); err != nil {
 
 		log.Printf("Error in models/issue.go error: %+v", err)
 		return err
@@ -163,6 +165,7 @@ func (s *IssueStorage) GetBoardIssueList(issue *Issue) ([]Issue, error) {
 				BoardName:     row["board_name"].(string),
 				ProjectID:     row["project_id"].(gocql.UUID),
 				ProjectName:   row["project_name"].(string),
+				Parent:        row["parent"].(gocql.UUID),
 				CreatedAt:     row["created_at"].(time.Time),
 				UpdatedAt:     row["updated_at"].(time.Time),
 			})
@@ -207,6 +210,7 @@ func (s *IssueStorage) GetBoardBacklogIssuesList(issue *Issue) ([]Issue, error) 
 				BoardName:     row["board_name"].(string),
 				ProjectID:     row["project_id"].(gocql.UUID),
 				ProjectName:   row["project_name"].(string),
+				Parent:        row["parent"].(gocql.UUID),
 				CreatedAt:     row["created_at"].(time.Time),
 				UpdatedAt:     row["updated_at"].(time.Time),
 			})
@@ -251,6 +255,7 @@ func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 				BoardName:     row["board_name"].(string),
 				ProjectID:     row["project_id"].(gocql.UUID),
 				ProjectName:   row["project_name"].(string),
+				Parent:        row["parent"].(gocql.UUID),
 				CreatedAt:     row["created_at"].(time.Time),
 				UpdatedAt:     row["updated_at"].(time.Time),
 			})

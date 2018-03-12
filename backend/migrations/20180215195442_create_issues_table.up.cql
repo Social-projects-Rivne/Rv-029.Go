@@ -8,6 +8,7 @@ CREATE TABLE if NOT EXISTS task_manager.issues (
     name text,
     project_id uuid,
     project_name text,
+    parent uuid,
     sprint_id uuid,
     status text,
     updated_at timestamp,

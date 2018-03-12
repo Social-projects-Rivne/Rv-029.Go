@@ -34,11 +34,12 @@ func (IssueTableSeeder) Run() {
 				BoardName:   board.Name,
 				ProjectID:   board.ProjectID,
 				ProjectName: board.ProjectName,
+				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
 
-			if err :=  models.IssueDB.Insert(&issue); err != nil {
+			if err := models.IssueDB.Insert(&issue); err != nil {
 				log.Printf("Error occured in seeder/seeders/issue_table_seeder.go method: Run,where: board.Insert error: %s", err.Error())
 				return
 			}
@@ -59,6 +60,7 @@ func (IssueTableSeeder) Run() {
 				ProjectID:   sprint.ProjectId,
 				ProjectName: sprint.ProjectName,
 				SprintID:    sprint.ID,
+				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
@@ -81,6 +83,7 @@ func (IssueTableSeeder) Run() {
 				ProjectID:   sprint.ProjectId,
 				ProjectName: sprint.ProjectName,
 				SprintID:    sprint.ID,
+				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
@@ -103,6 +106,7 @@ func (IssueTableSeeder) Run() {
 				ProjectID:   sprint.ProjectId,
 				ProjectName: sprint.ProjectName,
 				SprintID:    sprint.ID,
+				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
