@@ -41,7 +41,7 @@ type User struct {
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID]string
-	Photo	  string
+	Photo     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -113,7 +113,7 @@ func (u *UserStorage) Delete(user *User) error {
 	if err := u.DB.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 
-			log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
+		log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -158,10 +158,10 @@ func (user User) GetClaims() map[string]interface{} {
 * Projects methods
  */
 
-func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId gocql.UUID) error  {
+func (u *UserStorage) AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error {
 	roleMap := make(map[gocql.UUID]string)
 	roleMap[projectId] = role
-	err := Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,userId).Exec()
+	err := Session.Query(UPDATE_USER_PROJECT_ROLE, roleMap, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
@@ -172,9 +172,9 @@ func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId 
 
 }
 
-func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) error  {
+func (u *UserStorage) DeleteProject(projectId gocql.UUID, userId gocql.UUID) error {
 
-	err := Session.Query(DELETE_USER_PROJECT_ROLE,projectId,userId).Exec()
+	err := Session.Query(DELETE_USER_PROJECT_ROLE, projectId, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
@@ -192,7 +192,7 @@ func (u *UserStorage) CheckUserPassword(user User) (User, error) {
 
 		log.Printf("Error in models/user.go error: %+v", err)
 		user.UUID, err = gocql.ParseUUID(" ")
-	
+
 		return user, err
 	}
 
@@ -206,7 +206,7 @@ func (u *UserStorage) CheckUserEmail(user User) (User, error) {
 
 		log.Printf("Error in models/user.go error: %+v", err)
 		user.UUID, err = gocql.ParseUUID(" ")
-	
+
 		return user, err
 	}
 

@@ -53,7 +53,7 @@ class ViewUserProfile extends Component {
       let projects = user.userInfo.Projects
 
       for (let key in user.userInfo.Projects) {
-        projectsArr.push({ID: key, role: projects[key]})
+        projectsArr.push({ID: key, name: projects[key]})
       }
 
       console.log(projectsArr)
@@ -103,9 +103,11 @@ class ViewUserProfile extends Component {
                         {
                           (user.userInfo) ? (
                             projectsArr.map((item, i) => (
-                              <ListItem button key={i}>
-                                <ListItemText primary={item.role} />
-                              </ListItem>
+                              <a className={classes.a} href={"http://localhost/project/"+item.ID}>
+                                <ListItem button key={i}>
+                                  <ListItemText primary={item.name} />
+                                </ListItem>
+                              </a>
                             ))
                           ) : (<h1>loh</h1>)
                         }
@@ -150,6 +152,9 @@ const styles = theme => ({
     padding: theme.spacing.unit * 2,
     height: "100%",
     width: "300px",
+  },
+  a: {
+    textDecoration: 'none',
   },
   greed:{
     width:"100%",

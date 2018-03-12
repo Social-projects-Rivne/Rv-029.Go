@@ -21,8 +21,7 @@ import auth from '../services/auth'
 
 const styles = {
     a: {
-        color: '#FFFFFF',
-        textdecoration: 'none'
+        textDecoration: 'none',
     },
     root: {
         width: '100%'
