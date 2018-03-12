@@ -57,6 +57,7 @@ type UserCRUD interface {
 	AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error
 	DeleteProject(projectId gocql.UUID, userId gocql.UUID) error
 	CheckUserPassword(User) (User, error)
+	UpdateFirstAndLastName(*User) error
 }
 
 type UserStorage struct {
@@ -88,6 +89,18 @@ func (u *UserStorage) Update(user *User) error {
 
 	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
+
+		log.Printf("Error occured while updating user %v", err)
+		return err
+	}
+	return nil
+}
+
+//UpdateUserFull
+func (u *UserStorage) UpdateFirstAndLastName(user *User) error {
+
+	if err := u.DB.Query(`Update users SET first_name = ?, last_name = ?, updated_at = ? WHERE id= ? ;`,
+		user.FirstName, user.LastName, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
 		return err

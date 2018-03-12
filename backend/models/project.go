@@ -157,7 +157,6 @@ func (p *ProjectStorage) GetProjectsNamesList(list []gocql.UUID) ([]ProjectName,
 	var projects []ProjectName
 	var row map[string]interface{}
 	query := fmt.Sprintln(GET_PROJECTS_WHERE_IN + tail)
-	fmt.Println(query)
 	iterator := p.DB.Query(query).Consistency(gocql.One).Iter()
 
 	if iterator.NumRows() > 0 {

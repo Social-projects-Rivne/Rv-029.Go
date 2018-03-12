@@ -66,7 +66,6 @@ func applyUserRoutes(r *mux.Router) {
 
 	r.HandleFunc("/update/", controllers.UpdateUserInfo).Methods("POST")
 	r.HandleFunc("/update", controllers.UpdateUserInfo).Methods("POST")
-
 }
 
 func applyProjectsRoutes(r *mux.Router) {

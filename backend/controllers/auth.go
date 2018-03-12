@@ -273,7 +273,6 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		a = append(a, b)
 	}
 	c, _ := models.ProjectDB.GetProjectsNamesList(a)
-	fmt.Println(c)
 	var i = 0
 	for k := range user.Projects {
 		user.Projects[k] = c[i].Name
@@ -288,16 +287,10 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 
 //UpdateUserInfo gives frontend information about user
 func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(models.User)
 	var updateRequestData validator.UpdateUserRequestData
-	fmt.Println(updateRequestData)
 	err := decodeAndValidate(r, &updateRequestData)
 	if err != nil {
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
-		response.Failed(w)
-		return
-	}
-	user := &models.User{Email: updateRequestData.Email}
-	if err = models.UserDB.FindByEmail(user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
 		response.Failed(w)
 		return
@@ -305,11 +298,12 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	user.FirstName = updateRequestData.FirstName
 	user.LastName = updateRequestData.LastName
 	user.UpdatedAt = time.Now()
-	if err = models.UserDB.Update(user); err != nil {
+	if err = models.UserDB.UpdateFirstAndLastName(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
 		response.Failed(w)
 		return
 	}
+	
 
 	response := helpers.Response{Message: "Done", StatusCode: http.StatusOK}
 	response.Success(w)

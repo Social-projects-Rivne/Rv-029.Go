@@ -7,6 +7,7 @@ import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import {connect} from 'react-redux'
+import { Link, browserHistory} from 'react-router'
 import {bindActionCreators} from 'redux'
 import {API_URL} from "../constants/global"
 import messages from "../services/messages"
@@ -24,6 +25,7 @@ class ViewUserProfile extends Component {
 
   componentDidMount() {
     this.getUserInfo()
+    this.props.defaultPageActions.changePageTitle("Profile")
   }
 
   getUserInfo = () => {
@@ -103,11 +105,11 @@ class ViewUserProfile extends Component {
                         {
                           (user.userInfo) ? (
                             projectsArr.map((item, i) => (
-                              <a className={classes.a} href={"http://localhost/project/"+item.ID}>
+                              <Link className={classes.a} to={'/project/'+item.ID}>     
                                 <ListItem button key={i}>
                                   <ListItemText primary={item.name} />
                                 </ListItem>
-                              </a>
+                              </Link>
                             ))
                           ) : (<h1>loh</h1>)
                         }
@@ -118,9 +120,11 @@ class ViewUserProfile extends Component {
                     <br/>
                   <li>
                     <Grid item>
-                      <Button variant="raised" color="primary">
-                        Change information
-                      </Button>
+                      <Link className={classes.a} to={'/profile/update'}>                    
+                        <Button variant="raised" color="primary">
+                          Change information
+                        </Button>
+                      </Link>
                     </Grid>
                   </li>
                     <br/>
