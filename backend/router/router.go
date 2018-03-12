@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/kafka"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 	"github.com/gorilla/mux"
 )
@@ -41,7 +42,8 @@ func init() {
 }
 
 func applySocketRouter(r *mux.Router) {
-	r.HandleFunc("/socketserver", controllers.KafkaSocket)
+	r.HandleFunc("/socketserver", kafka.SocketHandler)
+	r.HandleFunc("/socket.io/", kafka.SocketHandler)
 }
 
 func applyAuthRoutes(r *mux.Router) {

@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/kafka"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
@@ -65,17 +66,10 @@ func main() {
 	models.InitIssueDB(&models.IssueStorage{APP.DB})
 	models.InitUserDB(&models.UserStorage{APP.DB})
 
-	// Initialize Kafka producer connection
-	controllers.KafkaProducerInit()
-	defer func() {
-		if err := controllers.Producer.Close(); err != nil {
-			panic(err)
-		}
-	}()
+	kafka.InitProducer()
 
-	controllers.KafkaConsumerInit()
 	defer func() {
-		if err := controllers.Master.Close(); err != nil {
+		if err := kafka.Producer.Close(); err != nil {
 			panic(err)
 		}
 	}()
@@ -104,7 +98,8 @@ func main() {
 		seeder.Run()
 	default:
 		handler := cors.New(cors.Options{
-			AllowedOrigins: []string{"*"},
+			AllowedOrigins: []string{"http://localhost"},
+			AllowCredentials: true,
 			AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},
 			AllowedHeaders: []string{"*"},
 		}).Handler(router.Router)
