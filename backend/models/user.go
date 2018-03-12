@@ -27,7 +27,7 @@ const (
 	//Projects queries
 	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
 	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
-	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1"
+	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING"
 )
 
 //User type
@@ -41,6 +41,7 @@ type User struct {
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID]string
+	Photo	  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -72,9 +73,9 @@ func InitUserDB(crud UserCRUD) {
 func (u *UserStorage) Insert(user *User) error {
 
 	if err := u.DB.Query(`INSERT INTO users (id,email,first_name,last_name,password,
-		salt,role,status,projects,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?);	`,
+		salt,role,status,projects,photo,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
-		user.Salt, user.Role, user.Status,user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+		user.Salt, user.Role, user.Status, user.Projects, user.Photo, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 
 		log.Printf("Error occured while inserting user %v", err)
 		return err

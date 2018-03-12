@@ -47,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	user.Email = loginRequestData.Email
 	user, err = models.UserDB.CheckUserPassword(user)
 
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -61,8 +61,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// generate jwt token from user claims
 	token, err := jwt.GenerateToken(&user)
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -74,8 +74,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully authenticated.",
 		Token:   token,
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -143,7 +143,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Status = 1
 	fmt.Println(user)
-	if err = models.UserDB.Update(&user); err != nil{
+	if err = models.UserDB.Update(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -181,7 +181,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Email = forgotRequestData.Email
 	// TODO err handler
-	if err = models.UserDB.FindByEmail(&user); err != nil{
+	if err = models.UserDB.FindByEmail(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -220,7 +220,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Email = resetRequestData.Email
 	user, err = models.UserDB.CheckUserPassword(user)
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -259,6 +259,47 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
+	return
+
+}
+
+//GetUserInfo gives frontend information about user
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(models.User)
+
+	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
+	response.Success(w)
+	return
+
+}
+
+//UpdateUserInfo gives frontend information about user
+func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	var updateRequestData validator.UpdateUserRequestData
+	fmt.Println(updateRequestData)
+	err := decodeAndValidate(r, &updateRequestData)
+	if err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
+		return
+	}
+	user := &models.User{Email: updateRequestData.Email}
+	if err = models.UserDB.FindByEmail(user); err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
+		return
+	}
+	user.FirstName = updateRequestData.FirstName
+	user.LastName = updateRequestData.LastName
+	user.UpdatedAt = time.Now()
+	if err = models.UserDB.Update(user);  err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "Done", StatusCode: http.StatusOK}
+	response.Success(w)
 	return
 
 }

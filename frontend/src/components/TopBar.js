@@ -20,6 +20,10 @@ import { bindActionCreators } from 'redux';
 import auth from '../services/auth'
 
 const styles = {
+    a: {
+        color: '#FFFFFF',
+        textdecoration: 'none'
+    },
     root: {
         width: '100%'
     },
@@ -110,6 +114,11 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         {projectBoardsList}
                         <Divider />
                         <List component="nav">
+                            <a className = {classes.a} href="http://localhost/profile/">
+                                <ListItem button>
+                                    <ListItemText primary="Profile" />
+                                </ListItem>
+                            </a>
                             <ListItem button>
                                 <ListItemText primary="Logout" onClick={auth.logOut} />
                             </ListItem>
