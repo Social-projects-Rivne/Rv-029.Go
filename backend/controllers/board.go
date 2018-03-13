@@ -212,3 +212,35 @@ func AssignUserToBoard(w http.ResponseWriter, r *http.Request)  {
 
 
 }
+
+func DeleteUserFromBoard(w http.ResponseWriter, r *http.Request)  {
+
+	vars := mux.Vars(r)
+	boardId, err := gocql.ParseUUID(vars["board_id"])
+	if err != nil {
+		log.Printf("Error in controllers/board: %v", err)
+		response := helpers.Response{Message: "Board ID is not valid"}
+		response.Failed(w)
+		return
+	}
+
+	userId, err := gocql.ParseUUID(vars["user_id"])
+	if err != nil {
+		log.Printf("Error in controllers/board: %v", err)
+		response := helpers.Response{Message: "User ID is not valid"}
+		response.Failed(w)
+		return
+	}
+
+	err = models.BoardDB.DeleteUserFromBoard(userId, boardId)
+	if err != nil {
+		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "User successfully delete from board"}
+	response.Success(w)
+
+
+}

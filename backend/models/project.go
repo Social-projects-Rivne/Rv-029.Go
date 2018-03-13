@@ -31,7 +31,6 @@ type Project struct {
 	UpdatedAt time.Time
 }
 
-
 //go:generate mockgen -destination=../mocks/mock_project.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models ProjectCRUD
 
 type ProjectCRUD interface {
@@ -95,7 +94,7 @@ func (p *ProjectStorage) Delete(project *Project) error {
 
 }
 
-
+//FindByID func finds project by id
 func (p *ProjectStorage) FindByID(project *Project) error {
 
 	err := Session.Query(FIND_PROJECT, project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)

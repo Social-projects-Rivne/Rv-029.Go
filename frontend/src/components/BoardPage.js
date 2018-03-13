@@ -20,10 +20,7 @@ import AddIcon from 'material-ui-icons/Add'
 import TextField from 'material-ui/TextField';
 import Avatar from 'material-ui/Avatar';
 import PersonIcon from 'material-ui-icons/Person';
-import ImageIcon from 'material-ui-icons/Image';
-import Divider from 'material-ui/Divider';
-import WorkIcon from 'material-ui-icons/Work';
-import BeachAccessIcon from 'material-ui-icons/BeachAccess';
+import DeleteIcon from 'material-ui-icons/Delete';
 import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List';
 import Dialog, {
   DialogActions,
@@ -33,13 +30,13 @@ import Dialog, {
 } from 'material-ui/Dialog';
 
 class BoardPage extends Component{
+
   state = {
     createIssueOpen: false,
     createSprintOpen: false,
     addUserOpen: false,
     selectedEmail : null
   }
-
 
   handleClickOpenAddUser = () => {
       this.setState({ addUserOpen: true })
@@ -61,10 +58,6 @@ class BoardPage extends Component{
       createSprintOpen: false,
       addUserOpen: false
     });
-  };
-
-  handleListItemClick = value => {
-      this.addUserToBoard(value)
   };
   
   componentDidMount() {
@@ -144,8 +137,24 @@ class BoardPage extends Component{
             user_id: user.UUID,
         })
             .then(() => {
+                // TODO append to redux
                 this.getCurrentBoard()
                 this.handleClose()
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
+    deleteUserFromBoard = (userId) => () => {
+        axios.delete(API_URL + `project/board/${this.props.ownProps.params.id}/user/${userId}`)
+            .then(() => {
+                // TODO append to redux
+                this.getCurrentBoard()
             })
             .catch((error) => {
                 if (error.response && error.response.data.Message) {
@@ -160,11 +169,11 @@ class BoardPage extends Component{
     axios.post(API_URL + `project/board/${this.props.ownProps.params.id}/issue/create`, {
       name: this.props.boards.nameInput,
       description: this.props.boards.descInput,
-      user_id:'9646324a-0aa2-11e8-ba34-b06ebf83499f', // debug
       estimate: +this.props.boards.estimation,
       status: 'Todo'
     })
     .then((response) => {
+        // TODO append to redux
       this.getIssuesList()
       this.handleClose()
     })
@@ -185,6 +194,7 @@ class BoardPage extends Component{
     })
     .then((response) => {
       this.props.defaultPageActions.setNotificationMessage(response.data.Message)
+      // TODO append to redux
       this.getSprintsList()
       this.handleClose()
     })
@@ -199,6 +209,28 @@ class BoardPage extends Component{
   }
 
   render() {
+
+      // TODO refactor
+      let usersArr = []
+      let freeUsers = []
+
+      if (this.props.boards.currentBoard && this.props.projects.currentProjectUsers) {
+
+          freeUsers = this.props.projects.currentProjectUsers
+          let users = this.props.boards.currentBoard.Users
+          for (let key in users) {
+              usersArr.push({ID: key, email: users[key]})
+          }
+
+          freeUsers.forEach((freeUser, i) => {
+              usersArr.forEach((assignedUser) => {
+                  if (freeUser.UUID === assignedUser.ID) {
+                      freeUsers.splice(i, 1)
+                  }
+              })
+          })
+      }
+
     const { classes } = this.props
     return (
       <Grid
@@ -231,24 +263,23 @@ class BoardPage extends Component{
 
               </Grid>
 
-              {/*<div className={classes.list}>*/}
-                  {/*<List>*/}
-                      {/*{*/}
-                          {/*(this.props.boards.currentBoard) ?*/}
-                              {/*// (this.props.boards.currentBoard.Users.map((item, i) => (*/}
-                                  {/*<ListItem >*/}
-                                      {/*<ListItemText primary={this.props.boards.currentBoard.Users}  />*/}
-                                      {/*<li>*/}
-                                          {/*<Divider inset />*/}
-                                      {/*</li>*/}
-                                  {/*</ListItem>*/}
-                              {/*// // (console.log(this.props.boards.currentBoard.Users.email))*/}
-                              {/*// )))*/}
-                          {/*: ("null")*/}
-                      {/*}*/}
+              <div className={classes.list}>
+                  <List>
+                      {
+                          (usersArr) ?
+                              (usersArr.map((item, i) => (
+                                  <ListItem key={i}>
+                                      <ListItemText primary={item.email}  />
+                                      <Button fab raised={true} onClick={this.deleteUserFromBoard(item.ID)} className={classes.button}>
+                                          <DeleteIcon />
+                                      </Button>
+                                  </ListItem>
+                              )))
+                          : ("null")
+                      }
 
-                  {/*</List>*/}
-              {/*</div>*/}
+                  </List>
+              </div>
 
           </Grid>
 
@@ -410,8 +441,8 @@ class BoardPage extends Component{
             <DialogTitle id="form-dialog-title">Add user</DialogTitle>
             <DialogContent>
                 <List>
-                    {this.props.projects.currentProjectUsers.map((item, i) => (
-                        <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                    {(freeUsers) ? (freeUsers.map((item, i) => (
+                        <ListItem button onClick={() => this.addUserToBoard(item)} key={i}>
                             <ListItemAvatar>
                                 <Avatar className={classes.avatar}>
                                     <PersonIcon />
@@ -419,7 +450,7 @@ class BoardPage extends Component{
                             </ListItemAvatar>
                             <ListItemText primary={item.Email}  />
                         </ListItem>
-                    ))}
+                    ))) : (null)}
                 </List>
             </DialogContent>
             <DialogActions>

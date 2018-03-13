@@ -8,7 +8,9 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import Drawer from 'material-ui/Drawer';
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import List, { ListItem, ListItemIcon, ListItemText, ListItemAvatar } from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
+import PersonIcon from 'material-ui-icons/Person';
 import Divider from 'material-ui/Divider';
 import Icon from 'material-ui/Icon';
 import SnackBar from './SnackBar'

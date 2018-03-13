@@ -101,6 +101,9 @@ func applyBoardRoutes(r *mux.Router) {
 
 	r.HandleFunc("/board/assign-user/{board_id}/", controllers.AssignUserToBoard).Methods("POST")
 	r.HandleFunc("/board/assign-user/{board_id}", controllers.AssignUserToBoard).Methods("POST")
+
+	r.HandleFunc("/board/{board_id}/user/{user_id}/", controllers.DeleteUserFromBoard).Methods("DELETE")
+	r.HandleFunc("/board/{board_id}/user/{user_id}", controllers.DeleteUserFromBoard).Methods("DELETE")
 }
 
 func applyIssueRoutes(r *mux.Router) {

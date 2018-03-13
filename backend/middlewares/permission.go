@@ -70,7 +70,7 @@ func CheckUserPermission(next http.Handler) http.Handler {
 						return
 					}
 					sprint := models.Sprint{ID: sprintUUID}
-					models.SprintDB.FindById(&sprint)
+					models.SprintDB.FindByID(&sprint)
 
 					projectId = sprint.ProjectId
 				} else if IssueId, ok := vars["issue_id"]; ok {
