@@ -46,16 +46,16 @@ func (mr *MockSprintCRUDMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSprintCRUD)(nil).Delete), arg0)
 }
 
-// FindByID mocks base method
-func (m *MockSprintCRUD) FindByID(arg0 *models.Sprint) error {
-	ret := m.ctrl.Call(m, "FindByID", arg0)
+// FindById mocks base method
+func (m *MockSprintCRUD) FindById(arg0 *models.Sprint) error {
+	ret := m.ctrl.Call(m, "FindById", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// FindByID indicates an expected call of FindByID
-func (mr *MockSprintCRUDMockRecorder) FindByID(arg0 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockSprintCRUD)(nil).FindByID), arg0)
+// FindById indicates an expected call of FindById
+func (mr *MockSprintCRUDMockRecorder) FindById(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindById", reflect.TypeOf((*MockSprintCRUD)(nil).FindById), arg0)
 }
 
 // GetSprintIssuesInProgress mocks base method

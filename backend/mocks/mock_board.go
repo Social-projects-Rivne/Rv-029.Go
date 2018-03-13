@@ -34,6 +34,18 @@ func (m *MockBoardCRUD) EXPECT() *MockBoardCRUDMockRecorder {
 	return m.recorder
 }
 
+// AddUserToBoard mocks base method
+func (m *MockBoardCRUD) AddUserToBoard(arg0 gocql.UUID, arg1 string, arg2 gocql.UUID) error {
+	ret := m.ctrl.Call(m, "AddUserToBoard", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddUserToBoard indicates an expected call of AddUserToBoard
+func (mr *MockBoardCRUDMockRecorder) AddUserToBoard(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddUserToBoard", reflect.TypeOf((*MockBoardCRUD)(nil).AddUserToBoard), arg0, arg1, arg2)
+}
+
 // Delete mocks base method
 func (m *MockBoardCRUD) Delete(arg0 *models.Board) error {
 	ret := m.ctrl.Call(m, "Delete", arg0)

@@ -107,6 +107,19 @@ func (mr *MockUserCRUDMockRecorder) FindByID(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockUserCRUD)(nil).FindByID), arg0)
 }
 
+// GetProjectUsersList mocks base method
+func (m *MockUserCRUD) GetProjectUsersList(arg0 gocql.UUID) ([]models.User, error) {
+	ret := m.ctrl.Call(m, "GetProjectUsersList", arg0)
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProjectUsersList indicates an expected call of GetProjectUsersList
+func (mr *MockUserCRUDMockRecorder) GetProjectUsersList(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectUsersList", reflect.TypeOf((*MockUserCRUD)(nil).GetProjectUsersList), arg0)
+}
+
 // Insert mocks base method
 func (m *MockUserCRUD) Insert(arg0 *models.User) error {
 	ret := m.ctrl.Call(m, "Insert", arg0)
