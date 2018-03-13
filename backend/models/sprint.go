@@ -86,7 +86,7 @@ func (ss *SprintStorage) Delete(s *Sprint) error {
 	return nil
 }
 
-func (ss *SprintStorage) FindById(s *Sprint) error {
+func (ss *SprintStorage) FindByID(s *Sprint) error {
 	err := ss.DB.Query(`SELECT id, board_id, goal, description, status, created_at, updated_at FROM sprints WHERE id = ?;`, s.ID).
 		Consistency(gocql.One).Scan(&s.ID, &s.BoardId, &s.Goal, &s.Desc, &s.Status, &s.CreatedAt, &s.UpdatedAt)
 

@@ -65,6 +65,7 @@ func main() {
 	models.InitProjectDB(&models.ProjectStorage{APP.DB})
 	models.InitIssueDB(&models.IssueStorage{APP.DB})
 	models.InitUserDB(&models.UserStorage{APP.DB})
+	models.InitSprintDB(&models.SprintStorage{APP.DB})
 
 	kafka.InitProducer()
 
