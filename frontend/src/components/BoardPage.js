@@ -144,6 +144,7 @@ class BoardPage extends Component{
             user_id: user.UUID,
         })
             .then(() => {
+                // TODO append to redux
                 this.getCurrentBoard()
                 this.handleClose()
             })
@@ -165,6 +166,7 @@ class BoardPage extends Component{
       status: 'Todo'
     })
     .then((response) => {
+        // TODO append to redux
       this.getIssuesList()
       this.handleClose()
     })
@@ -185,6 +187,7 @@ class BoardPage extends Component{
     })
     .then((response) => {
       this.props.defaultPageActions.setNotificationMessage(response.data.Message)
+      // TODO append to redux
       this.getSprintsList()
       this.handleClose()
     })
@@ -199,6 +202,27 @@ class BoardPage extends Component{
   }
 
   render() {
+
+      let usersArr = []
+      let freeUsers = []
+
+      if (this.props.boards.currentBoard && this.props.projects.currentProjectUsers) {
+
+          freeUsers = this.props.projects.currentProjectUsers
+          let users = this.props.boards.currentBoard.Users
+          for (let key in users) {
+              usersArr.push({ID: key, email: users[key]})
+          }
+
+          freeUsers.forEach((freeUser, i) => {
+              usersArr.forEach((assignedUser) => {
+                  if (freeUser.UUID === assignedUser.ID) {
+                      freeUsers.splice(i, 1)
+                  }
+              })
+          })
+      }
+
     const { classes } = this.props
     return (
       <Grid
@@ -231,24 +255,21 @@ class BoardPage extends Component{
 
               </Grid>
 
-              {/*<div className={classes.list}>*/}
-                  {/*<List>*/}
-                      {/*{*/}
-                          {/*(this.props.boards.currentBoard) ?*/}
-                              {/*// (this.props.boards.currentBoard.Users.map((item, i) => (*/}
-                                  {/*<ListItem >*/}
-                                      {/*<ListItemText primary={this.props.boards.currentBoard.Users}  />*/}
-                                      {/*<li>*/}
-                                          {/*<Divider inset />*/}
-                                      {/*</li>*/}
-                                  {/*</ListItem>*/}
-                              {/*// // (console.log(this.props.boards.currentBoard.Users.email))*/}
-                              {/*// )))*/}
-                          {/*: ("null")*/}
-                      {/*}*/}
+              <div className={classes.list}>
+                  <List>
+                      {
+                          (usersArr) ?
+                              (usersArr.map((item, i) => (
+                                  <ListItem key={i}>
+                                      <ListItemText primary={item.email}  />
+                                      {/*<button className={classes.right}>1</button>*/}
+                                  </ListItem>
+                              )))
+                          : ("null")
+                      }
 
-                  {/*</List>*/}
-              {/*</div>*/}
+                  </List>
+              </div>
 
           </Grid>
 
@@ -410,7 +431,7 @@ class BoardPage extends Component{
             <DialogTitle id="form-dialog-title">Add user</DialogTitle>
             <DialogContent>
                 <List>
-                    {this.props.projects.currentProjectUsers.map((item, i) => (
+                    {(freeUsers) ? (freeUsers.map((item, i) => (
                         <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
                             <ListItemAvatar>
                                 <Avatar className={classes.avatar}>
@@ -419,7 +440,7 @@ class BoardPage extends Component{
                             </ListItemAvatar>
                             <ListItemText primary={item.Email}  />
                         </ListItem>
-                    ))}
+                    ))) : (null)}
                 </List>
             </DialogContent>
             <DialogActions>
