@@ -66,6 +66,7 @@ func main() {
 	models.InitIssueDB(&models.IssueStorage{APP.DB})
 	models.InitUserDB(&models.UserStorage{APP.DB})
 	models.InitSprintDB(&models.SprintStorage{APP.DB})
+	models.InitRoleDB(&models.RoleStorage{APP.DB})
 
 	kafka.InitProducer()
 
@@ -99,8 +100,7 @@ func main() {
 		seeder.Run()
 	default:
 		handler := cors.New(cors.Options{
-			AllowedOrigins: []string{"http://localhost"},
-			AllowCredentials: true,
+			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},
 			AllowedHeaders: []string{"*"},
 		}).Handler(router.Router)

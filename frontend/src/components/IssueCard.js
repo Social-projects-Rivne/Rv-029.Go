@@ -188,7 +188,8 @@ class IssueCard extends Component  {
             container
             justify={'flex-end'}>
             <Grid item>
-              {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
+
+              {(SprintID === "00000000-0000-0000-0000-000000000000") ? (
                 <div className={classes.settings}>
                   <IconButton
                     aria-haspopup="true"
@@ -206,9 +207,8 @@ class IssueCard extends Component  {
                     <MenuItem onClick={setSubTaskClick(UUID)}>sub tasks</MenuItem>
                   </Menu>
                 </div>
-              ) : (
-                ""
-              )}
+              ) : ( "" )}
+
               {/*You can not update issue if it's already in finished sprint*/}
               {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
                   <IconButton onClick={this.handleOpenUpdateIssueClick}>

@@ -8,7 +8,9 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from 'material-ui-icons/Menu';
 import Drawer from 'material-ui/Drawer';
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import List, { ListItem, ListItemIcon, ListItemText, ListItemAvatar } from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
+import PersonIcon from 'material-ui-icons/Person';
 import Divider from 'material-ui/Divider';
 import Icon from 'material-ui/Icon';
 import SnackBar from './SnackBar'
@@ -18,14 +20,20 @@ import * as defaultAction from '../actions/DefaultPageActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import auth from '../services/auth'
+import Dialog, {
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from 'material-ui/Dialog';
+
 
 const styles = {
-    a: {
-        color: '#FFFFFF',
-        textdecoration: 'none'
-    },
     root: {
         width: '100%'
+    },
+    a: {
+        textDecoration: 'none',
     },
     flex: {
         flex: 1,
@@ -43,6 +51,7 @@ const styles = {
     }
 };
 
+//TODO: rewrite to component
 const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, ...decorator }) => {
 
     if (!sessionStorage.getItem('token')) {
@@ -51,7 +60,15 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
 
     const toggleDrawer = () => {
         defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
-    }
+    };
+
+    //
+    const handleClickOpenAddUser = () => {
+        defaultPageActions.toggleAddUserToProject(true)
+    };
+    const handleClose = () => {
+        defaultPageActions.toggleAddUserToProject(false);
+    };
 
     let projectBoardsList = null
     if (projects.currentProject !== null) {
@@ -66,16 +83,16 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         <ListItemText primary="Add Board" />
                     </ListItem>
                 </Link>
+                <Link onClick={handleClickOpenAddUser}
+                    className={classes.link}>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <Icon color="primary">add</Icon>
+                        </ListItemIcon>
+                        <ListItemText primary="Add User To Project" />
+                    </ListItem>
+                </Link>
             </List>
-
-            // <Link className={classes.link} to={'project/'+ projects.currentProject.UUID +'/board/create'}>Add Board</Link>
-        // projectBoardsList = <List component="nav">
-        //     {projects.currentProjectBoards.map((value, index) => (
-        //         <ListItem button key={value.id} className={classes.link}>
-        //             <ListItemText primary={value.name} />
-        //         </ListItem>
-        //     ))}
-        // </List>
     }
 
     return (
@@ -114,11 +131,11 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         {projectBoardsList}
                         <Divider />
                         <List component="nav">
-                            <a className = {classes.a} href="http://localhost/profile/">
+                            <Link className={classes.a} to={'/profile/'}>
                                 <ListItem button>
                                     <ListItemText primary="Profile" />
                                 </ListItem>
-                            </a>
+                            </Link>
                             <ListItem button>
                                 <ListItemText primary="Logout" onClick={auth.logOut} />
                             </ListItem>
@@ -145,7 +162,38 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                 title='Notification'
                 content={defaultPage.notificationMessage}
                 setNotificationMessage={defaultPageActions.setNotificationMessage}/>
+
+            {/* ADD USER TO PROJECT DIALOG */}
+            <Dialog
+                open={defaultPage.isUserToProjectOpen}
+                onClose={handleClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Add user</DialogTitle>
+                <DialogContent>
+                    <List>
+                        {(projects.currentProjectUsers.length > 0) ? (
+                            projects.currentProjectUsers.map((item, i) => (
+                                <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                                    <ListItemAvatar>
+                                        <Avatar className={classes.avatar}>
+                                            <PersonIcon />
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={item.Email}  />
+                                </ListItem>
+                            ))
+                        ) : ("No Users")}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
+
+
     );
 }
 

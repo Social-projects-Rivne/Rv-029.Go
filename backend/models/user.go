@@ -8,9 +8,6 @@ import (
 	"github.com/gocql/gocql"
 )
 
-//Role .
-type Role string
-
 const (
 	//ROLE_ADMIN .
 	ROLE_ADMIN = "Admin"
@@ -24,10 +21,10 @@ const (
 	//ROLE_USER .
 	ROLE_USER = "User"
 
-	//Projects queries
+	CHECK_USER_PASSWORD      = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, role, status FROM users WHERE email = ? LIMIT 1 allow filtering"
 	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
 	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
-	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING"
+	GET_PROJECT_USERS_LIST   = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, role, status from users WHERE projects CONTAINS KEY ?"
 )
 
 //User type
@@ -41,7 +38,7 @@ type User struct {
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID]string
-	Photo	  string
+	Photo     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -56,7 +53,9 @@ type UserCRUD interface {
 	FindByEmail(*User) error
 	AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error
 	DeleteProject(projectId gocql.UUID, userId gocql.UUID) error
+	GetProjectUsersList(projectId gocql.UUID)  ([]User, error)
 	CheckUserPassword(User) (User, error)
+	UpdateFirstAndLastName(*User) error
 }
 
 type UserStorage struct {
@@ -95,6 +94,18 @@ func (u *UserStorage) Update(user *User) error {
 	return nil
 }
 
+//UpdateUserFull
+func (u *UserStorage) UpdateFirstAndLastName(user *User) error {
+
+	if err := u.DB.Query(`Update users SET first_name = ?, last_name = ?, updated_at = ? WHERE id= ? ;`,
+		user.FirstName, user.LastName, user.UpdatedAt, user.UUID).Exec(); err != nil {
+
+		log.Printf("Error occured while updating user %v", err)
+		return err
+	}
+	return nil
+}
+
 //UpdateByID updates user by his id
 func (u *UserStorage) UpdateByID(user *User) error {
 
@@ -113,7 +124,7 @@ func (u *UserStorage) Delete(user *User) error {
 	if err := u.DB.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 
-			log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
+		log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -154,14 +165,11 @@ func (user User) GetClaims() map[string]interface{} {
 	return claims
 }
 
-/*
-* Projects methods
- */
-
-func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId gocql.UUID) error  {
+// PROJECTS METHODS
+func (u *UserStorage) AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error  {
 	roleMap := make(map[gocql.UUID]string)
 	roleMap[projectId] = role
-	err := Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,userId).Exec()
+	err := Session.Query(UPDATE_USER_PROJECT_ROLE, roleMap, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
@@ -172,9 +180,9 @@ func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId 
 
 }
 
-func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) error  {
+func (u *UserStorage) DeleteProject(projectId gocql.UUID, userId gocql.UUID) error {
 
-	err := Session.Query(DELETE_USER_PROJECT_ROLE,projectId,userId).Exec()
+	err := Session.Query(DELETE_USER_PROJECT_ROLE, projectId, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
@@ -185,14 +193,53 @@ func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) er
 
 }
 
+func (u *UserStorage) GetProjectUsersList(projectId gocql.UUID) ([]User, error)  {
+
+
+	var users []User
+	var row map[string]interface{}
+	var pageState []byte
+
+	iterator := Session.Query(GET_PROJECT_USERS_LIST,projectId).Consistency(gocql.One).PageState(pageState).PageSize(5).Iter()
+
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			users = append(users, User{
+				UUID:      row["id"].(gocql.UUID),
+				Email:     row["email"].(string),
+				FirstName: row["first_name"].(string),
+				LastName:  row["last_name"].(string),
+				//Projects:  row["projects"].(map[gocql.UUID]string),
+				CreatedAt: row["created_at"].(time.Time),
+				UpdatedAt: row["updated_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
+		log.Printf("Error in models/user.go error: %+v",err)
+	}
+
+	return users, nil
+
+}
+
+// END PROJECTS METHODS
 func (u *UserStorage) CheckUserPassword(user User) (User, error) {
 
 	if err := u.DB.Query(CHECK_USER_PASSWORD, user.Email).
-		Consistency(gocql.One).Scan(&user.Password, &user.Salt, &user.UUID); err != nil {
+		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
+		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
 
 		log.Printf("Error in models/user.go error: %+v", err)
 		user.UUID, err = gocql.ParseUUID(" ")
-	
+
 		return user, err
 	}
 
@@ -206,7 +253,7 @@ func (u *UserStorage) CheckUserEmail(user User) (User, error) {
 
 		log.Printf("Error in models/user.go error: %+v", err)
 		user.UUID, err = gocql.ParseUUID(" ")
-	
+
 		return user, err
 	}
 

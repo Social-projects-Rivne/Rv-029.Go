@@ -25,6 +25,7 @@ type loginResponse struct {
 	Status  bool
 	Message string
 	Token   string
+	User    models.User
 }
 
 type registerResponse struct {
@@ -73,6 +74,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "You was successfully authenticated.",
 		Token:   token,
+		User:    user,
 	})
 	if err != nil {
 		log.Printf("Error in controllers/auth error: %+v", err)
@@ -101,6 +103,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
 		Status:    0,
+		Photo:     "../static/nigga.png",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -266,6 +269,19 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 //GetUserInfo gives frontend information about user
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(models.User)
+	var b gocql.UUID
+	a := make([]gocql.UUID, 0)
+	for k := range user.Projects {
+		b, _ = gocql.ParseUUID(fmt.Sprintf("%s", k))
+		a = append(a, b)
+	}
+	c, _ := models.ProjectDB.GetProjectsNamesList(a)
+	var i = 0
+	for k := range user.Projects {
+		user.Projects[k] = c[i].Name
+		i++
+	}
+	user.Photo = "static/nigga.png"
 
 	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
 	response.Success(w)
@@ -275,16 +291,10 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 
 //UpdateUserInfo gives frontend information about user
 func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(models.User)
 	var updateRequestData validator.UpdateUserRequestData
-	fmt.Println(updateRequestData)
 	err := decodeAndValidate(r, &updateRequestData)
 	if err != nil {
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
-		response.Failed(w)
-		return
-	}
-	user := &models.User{Email: updateRequestData.Email}
-	if err = models.UserDB.FindByEmail(user); err != nil{
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
 		response.Failed(w)
 		return
@@ -292,7 +302,7 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	user.FirstName = updateRequestData.FirstName
 	user.LastName = updateRequestData.LastName
 	user.UpdatedAt = time.Now()
-	if err = models.UserDB.Update(user);  err != nil{
+	if err = models.UserDB.UpdateFirstAndLastName(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
 		response.Failed(w)
 		return
@@ -303,4 +313,3 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
-

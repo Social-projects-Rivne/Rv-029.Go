@@ -7,6 +7,7 @@ import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
 import * as sprintsActions from "../actions/SprintsActions"
 import * as issuesActions from "../actions/IssuesActions"
+import * as projectsActions from "../actions/ProjectsActions"
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import messages from "../services/messages"
@@ -16,9 +17,13 @@ import { withStyles } from 'material-ui/styles'
 import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'
 import AddIcon from 'material-ui-icons/Add'
-import TextField from 'material-ui/TextField'
 import { FormGroup, FormControlLabel } from 'material-ui/Form'
 import Checkbox from 'material-ui/Checkbox'
+import TextField from 'material-ui/TextField';
+import Avatar from 'material-ui/Avatar';
+import PersonIcon from 'material-ui-icons/Person';
+import DeleteIcon from 'material-ui-icons/Delete';
+import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List';
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -27,13 +32,20 @@ import Dialog, {
 } from 'material-ui/Dialog'
 
 class BoardPage extends Component{
+
   state = {
     createIssueOpen: false,
     createSprintOpen: false,
     setSubTaskOpen: false,
     checkedSubTasks: [],
     parent: null,
+    addUserOpen: false,
+    selectedEmail : null
   }
+
+  handleClickOpenAddUser = () => {
+      this.setState({ addUserOpen: true })
+  };
 
   handleClickOpenCreateIssue = () => {
     this.props.boardsActions.resetInput()
@@ -90,19 +102,28 @@ class BoardPage extends Component{
       createSprintOpen: false,
       setSubTaskOpen: false,
       checkedSubTasks: [],
-      parent: null
-    })
-  }
-  
+      parent: null,
+      addUserOpen: false
+    });
+  };
+
   componentDidMount() {
     this.props.sprintsActions.setCurrentSprint(null)
     this.getSprintsList()
     this.getIssuesList()
+    this.getCurrentBoard()
+
   }
 
   getSprintsList = () => {
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/sprint/list`)
-      .then((response) => {
+      .then((response) => {{this.props.issues.currentIssues.map((item, i) => (
+                  <IssueCard
+                      key={i}
+                      data={item}
+                      onUpdate={this.getIssuesList}
+                  />
+              ))}
         this.props.sprintsActions.setSprints(response.data.Data)
       })
       .catch((error) => {
@@ -128,14 +149,78 @@ class BoardPage extends Component{
       })
   }
 
+  getCurrentBoard = () => {
+      axios.get(API_URL + `project/board/select/${this.props.ownProps.params.id}`)
+          .then((response) => {
+              this.props.boardsActions.setCurrentBoard(response.data.Data)
+              this.getProjectUsers()
+          })
+          .catch((error) => {
+              if (error.response && error.response.data.Message) {
+                  messages(error.response.data.Message)
+              } else {
+                  messages("Server error occured")
+              }
+          });
+  }
+
+  getProjectUsers = () => {
+      axios.get(API_URL + `project/${this.props.boards.currentBoard.ProjectID}/users`)
+          .then((response) => {
+              this.props.projectsActions.setProjectUsers(response.data.Data)
+          })
+          .catch((error) => {
+              if (error.response && error.response.data.Message) {
+                  messages(error.response.data.Message)
+              } else {
+                  messages("Server error occured")
+              }
+          });
+  }
+
+   addUserToBoard = (user) => {
+        axios.post(API_URL + `project/board/assign-user/${this.props.ownProps.params.id}`,{
+            email: user.Email,
+            user_id: user.UUID,
+        })
+            .then(() => {
+                // TODO append to redux
+                this.getCurrentBoard()
+                this.handleClose()
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
+    deleteUserFromBoard = (userId) => () => {
+        axios.delete(API_URL + `project/board/${this.props.ownProps.params.id}/user/${userId}`)
+            .then(() => {
+                // TODO append to redux
+                this.getCurrentBoard()
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
   createIssue = () => {
     axios.post(API_URL + `project/board/${this.props.ownProps.params.id}/issue/create`, {
       name: this.props.boards.nameInput,
       description: this.props.boards.descInput,
       estimate: +this.props.boards.estimation,
-      status: 'Todo'
+      status: 'TODO'
     })
     .then((response) => {
+        // TODO append to redux
       this.getIssuesList()
       this.handleClose()
     })
@@ -156,6 +241,7 @@ class BoardPage extends Component{
     })
     .then((response) => {
       this.props.defaultPageActions.setNotificationMessage(response.data.Message)
+      // TODO append to redux
       this.getSprintsList()
       this.handleClose()
     })
@@ -170,6 +256,28 @@ class BoardPage extends Component{
   }
 
   render() {
+
+      // TODO refactor
+      let usersArr = []
+      let freeUsers = []
+
+      if (this.props.boards.currentBoard && this.props.projects.currentProjectUsers) {
+
+          freeUsers = this.props.projects.currentProjectUsers
+          let users = this.props.boards.currentBoard.Users
+          for (let key in users) {
+              usersArr.push({ID: key, email: users[key]})
+          }
+
+          freeUsers.forEach((freeUser, i) => {
+              usersArr.forEach((assignedUser) => {
+                  if (freeUser.UUID === assignedUser.ID && freeUser.Role === "Owner") {
+                      freeUsers.splice(i, 1)
+                  }
+              })
+          })
+      }
+
     const { classes } = this.props
     return (
       <Grid
@@ -177,7 +285,53 @@ class BoardPage extends Component{
         spacing={0}>
 
         <Grid
-          item xs={6}
+              item xs={3}
+              className={classes.left}>
+              <Grid
+                  container
+                  spacing={0}
+                  alignItems={'flex-end'}
+                  className={classes.titleGrid}>
+
+                  <Grid>
+                      <Button
+                          fab
+                          raised={true}
+                          mini={true}
+                          onClick={this.handleClickOpenAddUser}
+                          className={classes.button}>
+                          <AddIcon />
+                      </Button>
+                  </Grid>
+
+                  <Grid>
+                      <Typography type={"headline"} className={classes.pageTitle}>Users</Typography>
+                  </Grid>
+
+              </Grid>
+
+              <div className={classes.list}>
+                  <List>
+                      {
+                          (usersArr) ?
+                              (usersArr.map((item, i) => (
+                                  <ListItem key={i}>
+                                      <ListItemText primary={item.email}  />
+                                      <Button fab raised={true} onClick={this.deleteUserFromBoard(item.ID)} className={classes.button}>
+                                          <DeleteIcon />
+                                      </Button>
+                                  </ListItem>
+                              )))
+                          : ("null")
+                      }
+
+                  </List>
+              </div>
+
+          </Grid>
+
+        <Grid
+          item xs={3}
           className={classes.left}>
 
           <Grid
@@ -377,6 +531,33 @@ class BoardPage extends Component{
             </Button>
           </DialogActions>
         </Dialog>
+        {/*/!* #################### MODAL USER #################### *!/*/}
+        <Dialog
+            open={this.state.addUserOpen}
+            onClose={this.handleClose}
+            aria-labelledby="form-dialog-title" >
+            <DialogTitle id="form-dialog-title">Add user</DialogTitle>
+            <DialogContent>
+                <List>
+                    {(freeUsers) ? (freeUsers.map((item, i) => (
+                        <ListItem button onClick={() => this.addUserToBoard(item)} key={i}>
+                            <ListItemAvatar>
+                                <Avatar className={classes.avatar}>
+                                    <PersonIcon />
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={item.Email}  />
+                        </ListItem>
+                    ))) : (null)}
+                </List>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={this.handleClose} color="primary">
+                    Cancel
+                </Button>
+            </DialogActions>
+        </Dialog>
+
 
       </Grid>
     )
@@ -401,7 +582,15 @@ const styles = {
   },
   button: {
     marginRight: '1em'
-  }
+  },
+  list: {
+      backgroundColor: '#fff'
+  },
+
+  // avatar: {
+  //     backgroundColor: "1E88E5",
+  //     color: "#1e88e5",
+  // }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -410,6 +599,7 @@ const mapStateToProps = (state, ownProps) => {
     sprints: state.sprints,
     boards: state.boards,
     issues: state.issues,
+    projects: state.projects,
     ownProps
   }
 }
@@ -419,7 +609,8 @@ const mapDispatchToProps = (dispatch) => {
     defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
     sprintsActions: bindActionCreators(sprintsActions, dispatch),
     issuesActions: bindActionCreators(issuesActions, dispatch),
-    boardsActions: bindActionCreators(boardsActions, dispatch)
+    boardsActions: bindActionCreators(boardsActions, dispatch),
+    projectsActions: bindActionCreators(projectsActions, dispatch)
   }
 }
 

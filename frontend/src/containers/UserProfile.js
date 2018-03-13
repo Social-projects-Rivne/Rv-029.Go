@@ -7,6 +7,7 @@ import ProjectCard from '../components/ProjectCard'
 import BoardCard from '../components/BoardCard'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import {connect} from 'react-redux'
+import { Link, browserHistory} from 'react-router'
 import {bindActionCreators} from 'redux'
 import {API_URL} from "../constants/global"
 import messages from "../services/messages"
@@ -24,6 +25,7 @@ class ViewUserProfile extends Component {
 
   componentDidMount() {
     this.getUserInfo()
+    this.props.defaultPageActions.changePageTitle("Profile")
   }
 
   getUserInfo = () => {
@@ -53,7 +55,7 @@ class ViewUserProfile extends Component {
       let projects = user.userInfo.Projects
 
       for (let key in user.userInfo.Projects) {
-        projectsArr.push({ID: key, role: projects[key]})
+        projectsArr.push({ID: key, name: projects[key]})
       }
 
       console.log(projectsArr)
@@ -69,6 +71,12 @@ class ViewUserProfile extends Component {
             <Paper className={classes.paper}>
               <Grid container wrap="nowrap">
                 <ul className={classes.list}>
+                  <li>
+                    <Grid item>
+                        <img className={classes.img}src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
+                    </Grid>
+                  </li>
+                    <br/>
                   <li>
                     <Grid item>
                         <Typography variant="headline" gutterBottom component="h2">
@@ -103,9 +111,11 @@ class ViewUserProfile extends Component {
                         {
                           (user.userInfo) ? (
                             projectsArr.map((item, i) => (
-                              <ListItem button key={i}>
-                                <ListItemText primary={item.role} />
-                              </ListItem>
+                              <Link className={classes.a} to={'/project/'+item.ID}>     
+                                <ListItem button key={i}>
+                                  <ListItemText primary={item.name} />
+                                </ListItem>
+                              </Link>
                             ))
                           ) : (<h1>loh</h1>)
                         }
@@ -116,9 +126,11 @@ class ViewUserProfile extends Component {
                     <br/>
                   <li>
                     <Grid item>
-                      <Button variant="raised" color="primary">
-                        Change information
-                      </Button>
+                      <Link className={classes.a} to={'/profile/update'}>                    
+                        <Button variant="raised" color="primary">
+                          Change information
+                        </Button>
+                      </Link>
                     </Grid>
                   </li>
                     <br/>
@@ -151,10 +163,15 @@ const styles = theme => ({
     height: "100%",
     width: "300px",
   },
+  a: {
+    textDecoration: 'none',
+  },
   greed:{
     width:"100%",
     minHeight: "100vh",
     paddingTop:"2em",
+    paddingBottom: '2em',
+    alignItems: 'center',
   },
   pos: {
     marginBottom: 12,
@@ -162,6 +179,9 @@ const styles = theme => ({
   },
   list: {
     listStyleType: "none",  
+  },
+  img: {
+    height: '20vh', 
   },
 });
 

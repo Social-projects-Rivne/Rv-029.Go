@@ -56,6 +56,30 @@ func ShowProject(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ProjectUsersList(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	projectId , err := gocql.ParseUUID(vars["project_id"])
+	if err != nil {
+		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
+		response.Failed(w)
+		return
+	}
+
+	users , err := models.UserDB.GetProjectUsersList(projectId)
+	if err != nil {
+		log.Printf("Error in controllers/project error: %+v",err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()) ,StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message:"List of users to assigned to current project", Data: users}
+	response.Success(w)
+
+}
+
 
 func CreateProject(w http.ResponseWriter, r *http.Request)  {
 
@@ -165,4 +189,5 @@ func DeleteProject(w http.ResponseWriter, r *http.Request)  {
 	response := helpers.Response{Message: "Project has deleted"}
 	response.Success(w)
 }
+
 

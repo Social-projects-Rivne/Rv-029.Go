@@ -12,9 +12,15 @@ type Board struct {
 	ProjectName string     `cql:"project_name"`
 	Name        string     `cql:"name"`
 	Desc        string     `cql:"description"`
+	Users  	    map[gocql.UUID]string
 	CreatedAt   time.Time  `cql:"created_at"`
 	UpdatedAt   time.Time  `cql:"updated_at"`
 }
+
+const (
+	UPDATE_USER = "UPDATE boards SET users = users +  ? WHERE id = ?"
+	DELETE_USER_FROM_BOARD = "DELETE users[?] FROM boards WHERE id= ?"
+)
 
 //go:generate mockgen -destination=../mocks/mock_board.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models BoardCRUD
 
@@ -23,6 +29,8 @@ type BoardCRUD interface {
 	Update(*Board) error
 	Delete(*Board) error
 	FindByID(*Board) error
+	AddUserToBoard(userId gocql.UUID, email string, boardId gocql.UUID)  error
+	DeleteUserFromBoard(userId gocql.UUID, boardId gocql.UUID) error
 	List(gocql.UUID) ([]map[string]interface{}, error)
 }
 
@@ -76,8 +84,8 @@ func (s *BoardStorage) Delete(b *Board) error {
 
 //FindByID func finds board by id
 func (s *BoardStorage) FindByID(b *Board) error {
-	err := s.DB.Query(`SELECT id, project_id, name, description, project_name, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
-		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.ProjectName, &b.CreatedAt, &b.UpdatedAt)
+	err := s.DB.Query(`SELECT id, project_id, name, description, project_name, users, created_at, updated_at FROM boards WHERE id = ? LIMIT 1`,
+		b.ID).Consistency(gocql.One).Scan(&b.ID, &b.ProjectID, &b.Name, &b.Desc, &b.ProjectName, &b.Users, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
 		log.Printf("Error in models/board.go error: %+v", err)
@@ -98,4 +106,34 @@ func (s *BoardStorage) List(projectId gocql.UUID) ([]map[string]interface{}, err
 	}
 
 	return boardsList, nil
+}
+
+
+func (s *BoardStorage) AddUserToBoard(userId gocql.UUID,email string, boardId gocql.UUID) error  {
+
+	userMap := make(map[gocql.UUID]string)
+	userMap[userId] = email
+
+	err := Session.Query(UPDATE_USER, userMap, boardId).Exec()
+
+	if err != nil {
+		log.Printf("Error in models/board.go error: %+v", err)
+		return err
+	}
+
+	return nil
+
+}
+
+func (s *BoardStorage) DeleteUserFromBoard(userId gocql.UUID, boardId gocql.UUID) error  {
+
+	err := Session.Query(DELETE_USER_FROM_BOARD, userId, boardId).Exec()
+
+	if err != nil {
+		log.Printf("Error in models/board.go error: %+v", err)
+		return err
+	}
+
+	return nil
+
 }

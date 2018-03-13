@@ -1,12 +1,12 @@
-hash: d6ca59accc943b975db223165c33952c3f6c40a86f13e28f3b6944daba86e8ac
-updated: 2018-02-22T22:45:55.146352004+02:00
+hash: 0d6689024c2a82e7ec22d27c9bae0b9b5c6d8bf2abe5bf4eb5e748cb24a84407
+updated: 2018-03-13T23:02:49.087351969+02:00
 imports:
 - name: github.com/auth0/go-jwt-middleware
   version: 5493cabe49f7bfa6e2ec444a09d334d90cd4e2bd
 - name: github.com/corpix/uarand
   version: 2b8494104d86337cdd41d0a49cbed8e4583c0ab4
 - name: github.com/dgrijalva/jwt-go
-  version: dbeaa9332f19a944acb5736b4456cfcc02140e29
+  version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/gocql/gocql
   version: a2c732f85a90e3b03df8088d7719488c8dc4d7d1
   subpackages:
@@ -17,6 +17,7 @@ imports:
   version: 13f360950a79f5864a972c786a10a50e44b69541
   subpackages:
   - gomock
+  - mockgen
 - name: github.com/golang/snappy
   version: 553a641470496b2327abcac10b36396bd98e45c9
 - name: github.com/gorilla/context
@@ -31,8 +32,10 @@ imports:
   version: 0ac35893ea3f1e4ee717ba838972b70a0943f7d7
 - name: github.com/rs/cors
   version: feef513b9575b32f84bafa580aad89b011259019
+- name: github.com/Shopify/sarama
+  version: 598379494566842a64f60ccc237fef992b28d051
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: d670f9405373e636a5a2765eea47fac0c9bc91a4
+  version: 7f97868eec74b32b0982dd158a51a446d1da7eb5
 testImports: []

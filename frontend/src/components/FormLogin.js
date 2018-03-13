@@ -7,6 +7,7 @@ import axios from 'axios'
 import { API_URL } from '../constants/global'
 import * as formActions from '../actions/FormActions'
 import * as topBarActions from '../actions/ProjectsActions';
+import * as defaultPageActions from '../actions/DefaultPageActions';
 import FormInput from './FormInput'
 import SnackBar from './SnackBar'
 import ModalNotification from './ModalNotification'
@@ -19,7 +20,7 @@ import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
 import auth from '../services/auth'
 
-const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
+const FormLogin = ({ classes, form, action, defaultPageActions, ownProps, ...decorator }) => {
 
   const sendUserData = (e) => {
     e.preventDefault()
@@ -33,6 +34,7 @@ const FormLogin = ({ classes, form, action, ownProps, ...decorator }) => {
     .then((response) => {
       if (response.data.Status) {
           auth.logIn(response.data.Token)
+          defaultPageActions.setCurrentUser(response.data.User)
           browserHistory.push('/projects')
       }
     })
@@ -168,7 +170,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     action: bindActionCreators(formActions, dispatch),
-    topBarAction: bindActionCreators(topBarActions, dispatch)
+    topBarAction: bindActionCreators(topBarActions, dispatch),
+    defaultPageActions: bindActionCreators(defaultPageActions, dispatch)
   }
 }
 

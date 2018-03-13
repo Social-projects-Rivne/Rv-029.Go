@@ -1,37 +1,53 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
 import Button from 'material-ui/Button';
+import TextField from 'material-ui/TextField'
+import Dialog, {
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from 'material-ui/Dialog';
 import Typography from 'material-ui/Typography';
 import { Link, browserHistory } from 'react-router'
 
-function ProjectCard(props) {
-  const { classes, board } = props;
 
-  return (
-    <div>
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography variant="headline" component="h2">{board.name}</Typography>
-          <Typography className={classes.title}>{board.description}</Typography>
-        </CardContent>
-        <CardActions>
-          <Link
-            to={`board/${board.id}`}
-            className={classes.link}>
-            <Button
-              size="small"
-              color={'secondary'}>
-              View
-            </Button>
-          </Link>
-        </CardActions>
-      </Card>
-    </div>
-  )
+class ProjectCard extends Component {
+
+
+  render() {
+      const { classes, board } = this.props;
+    return (
+        <div>
+            <Card className={classes.card}>
+                <CardContent>
+                    <Typography variant="headline" component="h2">{board.name}</Typography>
+                    <Typography className={classes.title}>{board.description}</Typography>
+                </CardContent>
+                <CardActions>
+                    <Link
+                        to={`board/${board.id}`}
+                        className={classes.link}>
+                        <Button
+                            size="small"
+                            color={'secondary'}
+                            >
+                            View
+                        </Button>
+                    </Link>
+                </CardActions>
+            </Card>
+
+
+        </div>
+    )
+  }
 }
+
+
 
 
 const styles = theme => ({

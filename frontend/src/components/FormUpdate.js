@@ -17,7 +17,7 @@ import Typography from 'material-ui/Typography'
 import { withStyles } from 'material-ui/styles'
 
 const FormUpdate = ({ classes, form, action, ...decorator}) => {
-
+  
   const sendUserData = (e) => {
     e.preventDefault()
 
@@ -26,11 +26,9 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
     axios.post(API_URL + 'profile/update', {
       name: form.name,
       surname: form.surname,
-      password: decorator.MD5Encode(form.password)
     })
     .then((res) => {
-      action.setNotificationMessage("Please check your email")
-      browserHistory.push('/authorization/login')
+      browserHistory.push('/profile')
     })
     .catch((err) => {
 
@@ -47,16 +45,13 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
   const checkValidation = () => {
     let nameValidation = decorator.validateName(form.name)
     let surnameValidation = decorator.validateName(form.surname)
-    let passwordValidation = decorator.validatePassword(form.password)
 
     action.isValidName(!!nameValidation)
     action.isValidSurname(!!surnameValidation)
-    action.isValidPassword(!!passwordValidation)
 
 
     return !!nameValidation &&
-           !!surnameValidation &&
-           !!passwordValidation
+           !!surnameValidation
   }
 
   const handleNameInput = (e) => {
@@ -67,11 +62,8 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
     action.handleSurname(e.target.value)
   }
 
-  const handlePasswordInput = (e) => {
-    action.handlePassword(e.target.value)
-  }
-
   return (
+    <div className={classes.container}>
     <Paper
       className={classes.root}
       elevation={8}
@@ -80,7 +72,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
       <Typography
         type='headline'
         component='h3'>
-        Registration
+        Update your info
       </Typography>
 
       <FormInput
@@ -97,13 +89,6 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         onUserInput={handleSurnameInput}
       />
 
-      <FormInput
-        type='password'
-        name='Password'
-        isValid={form.isValidPassword}
-        onUserInput={handlePasswordInput}
-      />
-
       <Grid
         container
         alignItems={'center'}
@@ -117,13 +102,6 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
           className={classes.button}>
           Submit
         </Button>
-        <Link to={'/authorization/login'}
-          className={classes.link}>
-          <Button
-            color={'secondary'}>
-            Log In
-          </Button>
-        </Link>
       </Grid>
 
       <SnackBar
@@ -131,18 +109,27 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         setErrorMessage={action.setErrorMessage}/>
 
     </Paper>
+    </div>
   )
 }
 
 const styles = {
   root: {
     padding: '4em 3em',
+    display: 'inline-block'
   },
   buttons: {
     marginTop: '1.5em',
   },
   link: {
     textDecoration: 'none'
+  },
+  container: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    minHeight: '100vh',
+    alignItems: 'center'
   }
 }
 
