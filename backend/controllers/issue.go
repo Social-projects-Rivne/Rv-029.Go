@@ -42,25 +42,11 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = gocql.TimeUUID()
 	issue.Name = issueRequestData.Name
 	issue.Status = issueRequestData.Status
-	issue.UserID = issueRequestData.UserID
 	issue.Description = issueRequestData.Description
 	issue.Estimate = issueRequestData.Estimate
 	issue.SprintID = issueRequestData.SprintID
-
-	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000" {
-		user := models.User{}
-		user.UUID = issue.UserID
-		if err := models.UserDB.FindByID(&user); err != nil {
-			log.Printf("Error in controllers/issue error: %+v", err)
-			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
-			response.Failed(w)
-			return
-		}
-		issue.UserFirstName = user.FirstName
-		issue.UserLastName = user.LastName
-	}
-
 	issue.BoardID = boardID
+
 	board := &models.Board{}
 	board.ID = issue.BoardID
 	if err := models.BoardDB.FindByID(board); err != nil {

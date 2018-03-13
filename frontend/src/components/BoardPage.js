@@ -132,7 +132,6 @@ class BoardPage extends Component{
     axios.post(API_URL + `project/board/${this.props.ownProps.params.id}/issue/create`, {
       name: this.props.boards.nameInput,
       description: this.props.boards.descInput,
-      user_id:'9646324a-0aa2-11e8-ba34-b06ebf83499f', // debug
       estimate: +this.props.boards.estimation,
       status: 'Todo'
     })
