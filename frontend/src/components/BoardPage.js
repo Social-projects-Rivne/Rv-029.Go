@@ -20,10 +20,7 @@ import AddIcon from 'material-ui-icons/Add'
 import TextField from 'material-ui/TextField';
 import Avatar from 'material-ui/Avatar';
 import PersonIcon from 'material-ui-icons/Person';
-import ImageIcon from 'material-ui-icons/Image';
-import Divider from 'material-ui/Divider';
-import WorkIcon from 'material-ui-icons/Work';
-import BeachAccessIcon from 'material-ui-icons/BeachAccess';
+import DeleteIcon from 'material-ui-icons/Delete';
 import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List';
 import Dialog, {
   DialogActions,
@@ -33,13 +30,13 @@ import Dialog, {
 } from 'material-ui/Dialog';
 
 class BoardPage extends Component{
+
   state = {
     createIssueOpen: false,
     createSprintOpen: false,
     addUserOpen: false,
     selectedEmail : null
   }
-
 
   handleClickOpenAddUser = () => {
       this.setState({ addUserOpen: true })
@@ -61,10 +58,6 @@ class BoardPage extends Component{
       createSprintOpen: false,
       addUserOpen: false
     });
-  };
-
-  handleListItemClick = value => {
-      this.addUserToBoard(value)
   };
   
   componentDidMount() {
@@ -157,6 +150,21 @@ class BoardPage extends Component{
             });
     }
 
+    deleteUserFromBoard = (userId) => () => {
+        axios.delete(API_URL + `project/board/${this.props.ownProps.params.id}/user/${userId}`)
+            .then(() => {
+                // TODO append to redux
+                this.getCurrentBoard()
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
   createIssue = () => {
     axios.post(API_URL + `project/board/${this.props.ownProps.params.id}/issue/create`, {
       name: this.props.boards.nameInput,
@@ -203,6 +211,7 @@ class BoardPage extends Component{
 
   render() {
 
+      // TODO refactor
       let usersArr = []
       let freeUsers = []
 
@@ -262,7 +271,9 @@ class BoardPage extends Component{
                               (usersArr.map((item, i) => (
                                   <ListItem key={i}>
                                       <ListItemText primary={item.email}  />
-                                      {/*<button className={classes.right}>1</button>*/}
+                                      <Button fab raised={true} onClick={this.deleteUserFromBoard(item.ID)} className={classes.button}>
+                                          <DeleteIcon />
+                                      </Button>
                                   </ListItem>
                               )))
                           : ("null")
@@ -432,7 +443,7 @@ class BoardPage extends Component{
             <DialogContent>
                 <List>
                     {(freeUsers) ? (freeUsers.map((item, i) => (
-                        <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                        <ListItem button onClick={() => this.addUserToBoard(item)} key={i}>
                             <ListItemAvatar>
                                 <Avatar className={classes.avatar}>
                                     <PersonIcon />

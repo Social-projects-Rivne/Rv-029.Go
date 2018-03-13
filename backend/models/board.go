@@ -17,7 +17,10 @@ type Board struct {
 	UpdatedAt   time.Time  `cql:"updated_at"`
 }
 
-const UPDATE_USER = "UPDATE boards SET users = users +  ? WHERE id = ?"
+const (
+	UPDATE_USER = "UPDATE boards SET users = users +  ? WHERE id = ?"
+	DELETE_USER_FROM_BOARD = "DELETE users[?] FROM boards WHERE id= ?"
+)
 
 //go:generate mockgen -destination=../mocks/mock_board.go -package=mocks github.com/Social-projects-Rivne/Rv-029.Go/backend/models BoardCRUD
 
@@ -27,6 +30,7 @@ type BoardCRUD interface {
 	Delete(*Board) error
 	FindByID(*Board) error
 	AddUserToBoard(userId gocql.UUID, email string, boardId gocql.UUID)  error
+	DeleteUserFromBoard(userId gocql.UUID, boardId gocql.UUID) error
 	List(gocql.UUID) ([]map[string]interface{}, error)
 }
 
@@ -113,7 +117,20 @@ func (s *BoardStorage) AddUserToBoard(userId gocql.UUID,email string, boardId go
 	err := Session.Query(UPDATE_USER, userMap, boardId).Exec()
 
 	if err != nil {
-		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
+		log.Printf("Error in models/board.go error: %+v", err)
+		return err
+	}
+
+	return nil
+
+}
+
+func (s *BoardStorage) DeleteUserFromBoard(userId gocql.UUID, boardId gocql.UUID) error  {
+
+	err := Session.Query(DELETE_USER_FROM_BOARD, userId, boardId).Exec()
+
+	if err != nil {
+		log.Printf("Error in models/board.go error: %+v", err)
 		return err
 	}
 

@@ -99,6 +99,9 @@ func applyBoardRoutes(r *mux.Router) {
 
 	r.HandleFunc("/project/{project_id}/board/list/", controllers.BoardsList).Methods("GET")
 	r.HandleFunc("/project/{project_id}/board/list", controllers.BoardsList).Methods("GET")
+
+	r.HandleFunc("/project/board/{board_id}/user/{user_id}/", controllers.DeleteUserFromBoard).Methods("DELETE")
+	r.HandleFunc("/project/board/{board_id}/user/{user_id}", controllers.DeleteUserFromBoard).Methods("DELETE")
 }
 
 func applyIssueRoutes(r *mux.Router) {
