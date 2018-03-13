@@ -21,9 +21,7 @@ const (
 	//ROLE_USER .
 	ROLE_USER = "User"
 
-
 	CHECK_USER_PASSWORD      = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, role, status FROM users WHERE email = ? LIMIT 1 allow filtering"
-
 	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
 	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
 	GET_PROJECT_USERS_LIST   = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, role, status from users WHERE projects CONTAINS KEY ?"
@@ -40,6 +38,7 @@ type User struct {
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID]string
+	Photo     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -56,6 +55,7 @@ type UserCRUD interface {
 	DeleteProject(projectId gocql.UUID, userId gocql.UUID) error
 	GetProjectUsersList(projectId gocql.UUID)  ([]User, error)
 	CheckUserPassword(User) (User, error)
+	UpdateFirstAndLastName(*User) error
 }
 
 type UserStorage struct {
@@ -72,9 +72,9 @@ func InitUserDB(crud UserCRUD) {
 func (u *UserStorage) Insert(user *User) error {
 
 	if err := u.DB.Query(`INSERT INTO users (id,email,first_name,last_name,password,
-		salt,role,status,projects,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?);	`,
+		salt,role,status,projects,photo,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);	`,
 		user.UUID, user.Email, user.FirstName, user.LastName, user.Password,
-		user.Salt, user.Role, user.Status,user.Projects, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
+		user.Salt, user.Role, user.Status, user.Projects, user.Photo, user.CreatedAt, user.UpdatedAt).Exec(); err != nil {
 
 		log.Printf("Error occured while inserting user %v", err)
 		return err
@@ -87,6 +87,18 @@ func (u *UserStorage) Update(user *User) error {
 
 	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
 		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
+
+		log.Printf("Error occured while updating user %v", err)
+		return err
+	}
+	return nil
+}
+
+//UpdateUserFull
+func (u *UserStorage) UpdateFirstAndLastName(user *User) error {
+
+	if err := u.DB.Query(`Update users SET first_name = ?, last_name = ?, updated_at = ? WHERE id= ? ;`,
+		user.FirstName, user.LastName, user.UpdatedAt, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
 		return err
@@ -112,7 +124,7 @@ func (u *UserStorage) Delete(user *User) error {
 	if err := u.DB.Query(`DELETE FROM users WHERE id= ? ;`,
 		user.UUID).Exec(); err != nil {
 
-			log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
+		log.Printf("Error occured in models/user.go, method: Delete, error: %v", err)
 		return err
 	}
 	return nil
@@ -154,10 +166,10 @@ func (user User) GetClaims() map[string]interface{} {
 }
 
 // PROJECTS METHODS
-func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId gocql.UUID) error  {
+func (u *UserStorage) AddRoleToProject(projectId gocql.UUID, role string, userId gocql.UUID) error  {
 	roleMap := make(map[gocql.UUID]string)
 	roleMap[projectId] = role
-	err := Session.Query(UPDATE_USER_PROJECT_ROLE,roleMap,userId).Exec()
+	err := Session.Query(UPDATE_USER_PROJECT_ROLE, roleMap, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in method AddRoleToProject models/user.go: %s\n", err.Error())
@@ -168,9 +180,9 @@ func (u *UserStorage) AddRoleToProject(projectId gocql.UUID,role string, userId 
 
 }
 
-func (u *UserStorage) DeleteProject(projectId gocql.UUID , userId gocql.UUID) error  {
+func (u *UserStorage) DeleteProject(projectId gocql.UUID, userId gocql.UUID) error {
 
-	err := Session.Query(DELETE_USER_PROJECT_ROLE,projectId,userId).Exec()
+	err := Session.Query(DELETE_USER_PROJECT_ROLE, projectId, userId).Exec()
 
 	if err != nil {
 		log.Printf("Error in method DeleteProject models/user.go: %s\n", err.Error())
@@ -219,7 +231,6 @@ func (u *UserStorage) GetProjectUsersList(projectId gocql.UUID) ([]User, error) 
 }
 
 // END PROJECTS METHODS
-
 func (u *UserStorage) CheckUserPassword(user User) (User, error) {
 
 	if err := u.DB.Query(CHECK_USER_PASSWORD, user.Email).
@@ -234,9 +245,6 @@ func (u *UserStorage) CheckUserPassword(user User) (User, error) {
 
 	return user, nil
 }
-
-
-
 
 func (u *UserStorage) CheckUserEmail(user User) (User, error) {
 

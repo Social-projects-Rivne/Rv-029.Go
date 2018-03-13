@@ -30,6 +30,9 @@ const styles = {
     root: {
         width: '100%'
     },
+    a: {
+        textDecoration: 'none',
+    },
     flex: {
         flex: 1,
     },
@@ -126,6 +129,11 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         {projectBoardsList}
                         <Divider />
                         <List component="nav">
+                            <Link className={classes.a} to={'/profile/'}>
+                                <ListItem button>
+                                    <ListItemText primary="Profile" />
+                                </ListItem>
+                            </Link>
                             <ListItem button>
                                 <ListItemText primary="Logout" onClick={auth.logOut} />
                             </ListItem>

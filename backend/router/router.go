@@ -30,6 +30,11 @@ func init() {
 	projectRouter.Use(middlewares.AuthenticatedMiddleware)
 	//projectRouter.Use(middlewares.ProjectAccessMiddleware)
 	projectRouter.Use(middlewares.CheckUserPermission)
+
+	profileRouter := Router.PathPrefix("/profile").Subrouter()
+	applyProfileRoutes(profileRouter)
+	profileRouter.Use(middlewares.AuthenticatedMiddleware)
+
 }
 
 func applyAuthRoutes(r *mux.Router) {
@@ -48,6 +53,14 @@ func applyUserRoutes(r *mux.Router) {
 	r.HandleFunc("/{role_name}/add/permission", controllers.AddUserPermission).Name(`user.permissions.add`)
 	r.HandleFunc("/{role_name}/remove/permission", controllers.RemoveUserPermissions).Name(`user.permissions.remove`)
 	r.HandleFunc("/{role_name}/set/permissions", controllers.SetUserPermissions).Name(`user.permissions.update`)
+}
+
+func applyProfileRoutes(r *mux.Router) {
+	r.HandleFunc("/", controllers.GetUserInfo).Methods("GET")
+	r.HandleFunc("", controllers.GetUserInfo).Methods("GET")
+
+	r.HandleFunc("/update/", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/update", controllers.UpdateUserInfo).Methods("POST")
 }
 
 func applyProjectsRoutes(r *mux.Router) {

@@ -1,5 +1,5 @@
-hash: c592ae20ad0f0a9bb434ec83b3b757a3096b68bac0c508dcdd2c0935d4a61028
-updated: 2018-03-09T22:15:16.123043512+02:00
+hash: 0d6689024c2a82e7ec22d27c9bae0b9b5c6d8bf2abe5bf4eb5e748cb24a84407
+updated: 2018-03-13T23:02:49.087351969+02:00
 imports:
 - name: github.com/auth0/go-jwt-middleware
   version: 5493cabe49f7bfa6e2ec444a09d334d90cd4e2bd
@@ -17,6 +17,7 @@ imports:
   version: 13f360950a79f5864a972c786a10a50e44b69541
   subpackages:
   - gomock
+  - mockgen
 - name: github.com/golang/snappy
   version: 553a641470496b2327abcac10b36396bd98e45c9
 - name: github.com/gorilla/context
