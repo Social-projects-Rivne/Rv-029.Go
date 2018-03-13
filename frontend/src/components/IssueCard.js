@@ -89,11 +89,11 @@ class IssueCard extends Component  {
     const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
-    this.setState({ isIssueOpen: false })
 
     axios.delete(API_URL + `project/board/issue/delete/${ UUID }`, {})
     .then((res) => {
       setNotificationMessage(res.data.Message)
+      this.setState({ isIssueOpen: false })
       onUpdate()
     })
     .catch((err) => {

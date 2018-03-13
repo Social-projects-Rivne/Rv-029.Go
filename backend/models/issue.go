@@ -30,7 +30,7 @@ const (
 
 	UPDATE_ISSUE = "Update issues SET name = ?, status = ?, description = ?,estimate = ?, user_id = ?,user_first_name = ?,user_last_name = ?, board_name = ?, project_name = ?, parent = ?, updated_at = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;"
 
-	DELETE_ISSUE = "DELETE FROM issues WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ? ;"
+	DELETE_ISSUE = "DELETE FROM issues WHERE id = ?;"
 
 	FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
 
@@ -110,11 +110,12 @@ func (s *IssueStorage) Update(issue *Issue) error {
 	return nil
 }
 
-//Delete removes issue by id
+// FIXME
+// bug possible
+// see previous commit to figure out changes
 func (s *IssueStorage) Delete(issue *Issue) error {
 
-	if err := s.DB.Query(DELETE_ISSUE,
-		issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
+	if err := s.DB.Query(DELETE_ISSUE, issue.UUID).Exec(); err != nil {
 		log.Printf("Error occured inside models/issue.go, method: Delete, error: %+v", err)
 		return err
 	}
