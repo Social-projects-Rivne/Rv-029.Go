@@ -7,6 +7,7 @@ import {
 
 const initialState = {
   isDrawerOpen: false,
+  isUserToProjectOpen: false,
   pageTitle: null,
   errorMessage: null,
   notificationMessage: null,

@@ -60,11 +60,10 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
 
     //TODO:
     const handleClickOpenAddUser = () => {
-        this.setState({ addUserOpen: true })
+        this.setState({ isUserToProjectOpen: true })
     };
-
     const handleClose = () => {
-        this.setState({ addUserOpen: false });
+        this.setState({ isUserToProjectOpen: false });
     };
 
     let projectBoardsList = null
@@ -157,7 +156,7 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
 
             {/* ADD USER TO PROJECT DIALOG */}
             <Dialog
-                open={true}
+                open={defaultPage.isUserToProjectOpen}
                 onClose={handleClose}
                 aria-labelledby="form-dialog-title" >
                 <DialogTitle id="form-dialog-title">Add user</DialogTitle>
