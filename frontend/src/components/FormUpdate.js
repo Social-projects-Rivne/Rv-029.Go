@@ -28,8 +28,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
       surname: form.surname,
     })
     .then((res) => {
-      action.setNotificationMessage("Please log in again")
-      browserHistory.push('/authorization/login')
+      browserHistory.push('/profile')
     })
     .catch((err) => {
 
@@ -64,6 +63,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
   }
 
   return (
+    <div className={classes.container}>
     <Paper
       className={classes.root}
       elevation={8}
@@ -109,18 +109,27 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         setErrorMessage={action.setErrorMessage}/>
 
     </Paper>
+    </div>
   )
 }
 
 const styles = {
   root: {
     padding: '4em 3em',
+    display: 'inline-block'
   },
   buttons: {
     marginTop: '1.5em',
   },
   link: {
     textDecoration: 'none'
+  },
+  container: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    minHeight: '100vh',
+    alignItems: 'center'
   }
 }
 

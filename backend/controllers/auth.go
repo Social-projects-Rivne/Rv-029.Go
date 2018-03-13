@@ -101,6 +101,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
 		Status:    0,
+		Photo:     "../static/nigga.png",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -278,6 +279,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		user.Projects[k] = c[i].Name
 		i++
 	}
+	user.Photo = "static/nigga.png"
 
 	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
 	response.Success(w)
@@ -303,7 +305,6 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-	
 
 	response := helpers.Response{Message: "Done", StatusCode: http.StatusOK}
 	response.Success(w)

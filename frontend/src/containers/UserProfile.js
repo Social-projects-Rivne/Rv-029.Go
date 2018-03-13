@@ -73,6 +73,12 @@ class ViewUserProfile extends Component {
                 <ul className={classes.list}>
                   <li>
                     <Grid item>
+                        <img className={classes.img}src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
+                    </Grid>
+                  </li>
+                    <br/>
+                  <li>
+                    <Grid item>
                         <Typography variant="headline" gutterBottom component="h2">
                           {(user.userInfo) ? (user.userInfo.FirstName) : ('')}    {(user.userInfo) ? (user.userInfo.LastName) : ('')}  
                         </Typography>
@@ -164,6 +170,8 @@ const styles = theme => ({
     width:"100%",
     minHeight: "100vh",
     paddingTop:"2em",
+    paddingBottom: '2em',
+    alignItems: 'center',
   },
   pos: {
     marginBottom: 12,
@@ -171,6 +179,9 @@ const styles = theme => ({
   },
   list: {
     listStyleType: "none",  
+  },
+  img: {
+    height: '20vh', 
   },
 });
 
