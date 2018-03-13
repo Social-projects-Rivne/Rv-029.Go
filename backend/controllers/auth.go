@@ -25,6 +25,7 @@ type loginResponse struct {
 	Status  bool
 	Message string
 	Token   string
+	User    models.User
 }
 
 type registerResponse struct {
@@ -73,6 +74,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "You was successfully authenticated.",
 		Token:   token,
+		User:    user,
 	})
 	if err != nil{
 		log.Printf("Error in controllers/auth error: %+v",err)

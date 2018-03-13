@@ -22,7 +22,7 @@ const (
 	ROLE_USER = "User"
 
 
-	CHECK_USER_PASSWORD      = "SELECT password, salt, id FROM users WHERE email = ? LIMIT 1 allow filtering"
+	CHECK_USER_PASSWORD      = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, role, status FROM users WHERE email = ? LIMIT 1 allow filtering"
 
 	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
 	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
@@ -223,7 +223,8 @@ func (u *UserStorage) GetProjectUsersList(projectId gocql.UUID) ([]User, error) 
 func (u *UserStorage) CheckUserPassword(user User) (User, error) {
 
 	if err := u.DB.Query(CHECK_USER_PASSWORD, user.Email).
-		Consistency(gocql.One).Scan(&user.Password, &user.Salt, &user.UUID); err != nil {
+		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
+		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
 
 		log.Printf("Error in models/user.go error: %+v", err)
 		user.UUID, err = gocql.ParseUUID(" ")

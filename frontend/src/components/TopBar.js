@@ -55,15 +55,14 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
 
     const toggleDrawer = () => {
         defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
-    }
+    };
 
-
-    //TODO:
+    //
     const handleClickOpenAddUser = () => {
-        this.setState({ isUserToProjectOpen: true })
+        defaultPageActions.toggleAddUserToProject(true)
     };
     const handleClose = () => {
-        this.setState({ isUserToProjectOpen: false });
+        defaultPageActions.toggleAddUserToProject(false);
     };
 
     let projectBoardsList = null
@@ -85,7 +84,7 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         <ListItemIcon>
                             <Icon color="primary">add</Icon>
                         </ListItemIcon>
-                        <ListItemText primary="Add Board" />
+                        <ListItemText primary="Add User To Project" />
                     </ListItem>
                 </Link>
             </List>
@@ -162,16 +161,18 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                 <DialogTitle id="form-dialog-title">Add user</DialogTitle>
                 <DialogContent>
                     <List>
-                        {projects.currentProjectUsers.map((item, i) => (
-                            <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
-                                <ListItemAvatar>
-                                    <Avatar className={classes.avatar}>
-                                        <PersonIcon />
-                                    </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText primary={item.Email}  />
-                            </ListItem>
-                        ))}
+                        {(projects.currentProjectUsers.length > 0) ? (
+                            projects.currentProjectUsers.map((item, i) => (
+                                <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                                    <ListItemAvatar>
+                                        <Avatar className={classes.avatar}>
+                                            <PersonIcon />
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={item.Email}  />
+                                </ListItem>
+                            ))
+                        ) : ("No Users")}
                     </List>
                 </DialogContent>
                 <DialogActions>
