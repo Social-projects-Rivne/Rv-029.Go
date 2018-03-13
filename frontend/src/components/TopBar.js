@@ -18,6 +18,13 @@ import * as defaultAction from '../actions/DefaultPageActions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import auth from '../services/auth'
+import Dialog, {
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from 'material-ui/Dialog';
+
 
 const styles = {
     root: {
@@ -39,6 +46,7 @@ const styles = {
     }
 };
 
+//TODO: rewrite to component
 const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, ...decorator }) => {
 
     if (!sessionStorage.getItem('token')) {
@@ -48,6 +56,16 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
     const toggleDrawer = () => {
         defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
     }
+
+
+    //TODO:
+    const handleClickOpenAddUser = () => {
+        this.setState({ addUserOpen: true })
+    };
+
+    const handleClose = () => {
+        this.setState({ addUserOpen: false });
+    };
 
     let projectBoardsList = null
     if (projects.currentProject !== null) {
@@ -62,16 +80,16 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         <ListItemText primary="Add Board" />
                     </ListItem>
                 </Link>
+                <Link onClick={handleClickOpenAddUser}
+                    className={classes.link}>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <Icon color="primary">add</Icon>
+                        </ListItemIcon>
+                        <ListItemText primary="Add Board" />
+                    </ListItem>
+                </Link>
             </List>
-
-            // <Link className={classes.link} to={'project/'+ projects.currentProject.UUID +'/board/create'}>Add Board</Link>
-        // projectBoardsList = <List component="nav">
-        //     {projects.currentProjectBoards.map((value, index) => (
-        //         <ListItem button key={value.id} className={classes.link}>
-        //             <ListItemText primary={value.name} />
-        //         </ListItem>
-        //     ))}
-        // </List>
     }
 
     return (
@@ -136,7 +154,36 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                 title='Notification'
                 content={defaultPage.notificationMessage}
                 setNotificationMessage={defaultPageActions.setNotificationMessage}/>
+
+            {/* ADD USER TO PROJECT DIALOG */}
+            <Dialog
+                open={true}
+                onClose={handleClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Add user</DialogTitle>
+                <DialogContent>
+                    <List>
+                        {projects.currentProjectUsers.map((item, i) => (
+                            <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                                <ListItemAvatar>
+                                    <Avatar className={classes.avatar}>
+                                        <PersonIcon />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={item.Email}  />
+                            </ListItem>
+                        ))}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
+
+
     );
 }
 
