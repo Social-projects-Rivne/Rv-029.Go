@@ -47,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	user.Email = loginRequestData.Email
 	user, err = models.UserDB.CheckUserPassword(user)
 
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -61,8 +61,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// generate jwt token from user claims
 	token, err := jwt.GenerateToken(&user)
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -74,8 +74,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully authenticated.",
 		Token:   token,
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -101,6 +101,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
 		Status:    0,
+		Photo:     "../static/nigga.png",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -143,7 +144,7 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Status = 1
 	fmt.Println(user)
-	if err = models.UserDB.Update(&user); err != nil{
+	if err = models.UserDB.Update(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -181,7 +182,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Email = forgotRequestData.Email
 	// TODO err handler
-	if err = models.UserDB.FindByEmail(&user); err != nil{
+	if err = models.UserDB.FindByEmail(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -220,7 +221,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	user.Email = resetRequestData.Email
 	user, err = models.UserDB.CheckUserPassword(user)
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
@@ -263,3 +264,50 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//GetUserInfo gives frontend information about user
+func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(models.User)
+	var b gocql.UUID
+	a := make([]gocql.UUID, 0)
+	for k := range user.Projects {
+		b, _ = gocql.ParseUUID(fmt.Sprintf("%s", k))
+		a = append(a, b)
+	}
+	c, _ := models.ProjectDB.GetProjectsNamesList(a)
+	var i = 0
+	for k := range user.Projects {
+		user.Projects[k] = c[i].Name
+		i++
+	}
+	user.Photo = "static/nigga.png"
+
+	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
+	response.Success(w)
+	return
+
+}
+
+//UpdateUserInfo gives frontend information about user
+func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(models.User)
+	var updateRequestData validator.UpdateUserRequestData
+	err := decodeAndValidate(r, &updateRequestData)
+	if err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
+		return
+	}
+	user.FirstName = updateRequestData.FirstName
+	user.LastName = updateRequestData.LastName
+	user.UpdatedAt = time.Now()
+	if err = models.UserDB.UpdateFirstAndLastName(&user); err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
+		return
+	}
+
+	response := helpers.Response{Message: "Done", StatusCode: http.StatusOK}
+	response.Success(w)
+	return
+
+}
