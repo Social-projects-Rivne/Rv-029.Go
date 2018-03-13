@@ -85,7 +85,7 @@ func (p *ProjectStorage) Delete(project *Project) error {
 
 }
 
-//FindByID func finds project by id
+
 func (p *ProjectStorage) FindByID(project *Project) error {
 
 	err := Session.Query(FIND_PROJECT, project.UUID).Consistency(gocql.One).Scan(&project.UUID, &project.Name, &project.CreatedAt, &project.UpdatedAt)
@@ -101,8 +101,10 @@ func (p *ProjectStorage) FindByID(project *Project) error {
 func (p *ProjectStorage) GetProjectList(project *Project) ([]Project, error) {
 	var projects []Project
 	var row map[string]interface{}
+	var pageState []byte
+	iterator := Session.Query(GET_PROJECTS).Consistency(gocql.One).PageState(pageState).PageSize(5).Iter()
 
-	iterator := Session.Query(GET_PROJECTS).Consistency(gocql.One).Iter()
+	pageState = iterator.PageState()
 
 	if iterator.NumRows() > 0 {
 		for {

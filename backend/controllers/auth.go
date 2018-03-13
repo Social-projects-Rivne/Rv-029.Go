@@ -3,11 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
-	"log"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
@@ -37,41 +38,24 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &loginRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 
 	user := models.User{}
 	user.Email = loginRequestData.Email
-	if err := models.UserDB.FindByEmail(&user);err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	user, err = models.UserDB.CheckUserPassword(user)
+
+	if err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return
 	}
 
 	if user.Password != password.EncodePassword(loginRequestData.Password, user.Salt) {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: "There is no such user with email and password combination.",
-		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return
-		}
-
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go There is no such user with email and password combination. error: %+v", err), StatusCode: http.StatusUnauthorized}
+		response.Failed(w)
 		return
 	}
 
@@ -84,7 +68,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-
+	//TODO change on helper, than will be not Token: token but Data: token, and change it in frontend
 	jsonResponse, err := json.Marshal(loginResponse{
 		Status:  true,
 		Message: "You was successfully authenticated.",
@@ -100,21 +84,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	var registerRequestData validator.RegisterRequestData
-
 	err := decodeAndValidate(r, &registerRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err)}
+		response.Failed(w)
 		return
 	}
 
@@ -132,8 +105,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now(),
 	}
 
-	if err := models.UserDB.Insert(&user);err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err := models.UserDB.Insert(&user); err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
 		return
 	}
 
@@ -145,8 +119,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Message: "You was successfully registered",
 		User:    user,
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -161,25 +135,19 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &confirmRegistrationRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return
-		}
-
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 	fmt.Println(confirmRegistrationRequestData)
 	user := models.User{}
 	user.Status = 1
-	models.UserDB.Update(&user)
+	fmt.Println(user)
+	if err = models.UserDB.Update(&user); err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
 
 	jsonResponse, err := json.Marshal(struct {
 		Status  bool
@@ -188,8 +156,8 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "Your account was successfully activated.",
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -205,25 +173,19 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	err := decodeAndValidate(r, &forgotRequestData)
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 
 	user := models.User{}
 	user.Email = forgotRequestData.Email
 	// TODO err handler
-	err = models.UserDB.FindByEmail(&user)
+	if err = models.UserDB.FindByEmail(&user); err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
 
 	message := fmt.Sprintf("Hello %s,\nIt is your link to restore password <a href=\"http://localhost/authorization/new-password/%s\">LINK</a>\n", user.FirstName, user.Password)
 	mail.Mailer.Send(user.Email, user.FirstName, "Successfully Registered", message)
@@ -232,8 +194,8 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "Your link sent",
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -251,23 +213,18 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	err := decodeAndValidate(r, &resetRequestData)
 
 	if err != nil {
-		jsonResponse, err := json.Marshal(errorResponse{
-			Status:  false,
-			Message: err.Error(),
-		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonResponse)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response.Failed(w)
 		return
 	}
 	user := models.User{}
 	user.Email = resetRequestData.Email
-	err = models.UserDB.FindByEmail(&user)
+	user, err = models.UserDB.CheckUserPassword(user)
+	if err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
 
 	// FIXME doesn't work properly
 	if user.Password != resetRequestData.Token {
@@ -275,8 +232,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 			Status:  false,
 			Message: "Invalid reset token",
 		})
-		if err != nil{
-			log.Printf("Error in controllers/auth error: %+v",err)
+		if err != nil {
+			log.Printf("Error in controllers/auth error: %+v", err)
 			return
 		}
 
@@ -294,8 +251,8 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		Status:  true,
 		Message: "Your password restored",
 	})
-	if err != nil{
-		log.Printf("Error in controllers/auth error: %+v",err)
+	if err != nil {
+		log.Printf("Error in controllers/auth error: %+v", err)
 		return
 	}
 
@@ -305,3 +262,4 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
+

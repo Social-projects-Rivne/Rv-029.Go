@@ -44,7 +44,6 @@ func (SprintTableSeeder) Run() {
 				UpdatedAt:   time.Now(),
 			}
 
-
 			if err := models.SprintDB.Insert(&sprint); err != nil {
 				log.Printf("Error occured in seeder/seeders/board_table_seeder.go method: Run,where: board.sprint error: %+v", err)
 				return

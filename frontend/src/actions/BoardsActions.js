@@ -4,6 +4,7 @@ import {
   HANDLE_NAME_INPUT,
   HANDLE_DESC_INPUT,
   HANDLE_ESTIMATION,
+  HANDLE_BOARD_LOADED,
   RESET
 } from '../constants/boards'
 
@@ -40,6 +41,13 @@ export const setEstimation = (estimation) => {
     type: HANDLE_ESTIMATION,
     payload: estimation
   }
+}
+
+export const setCurrentBoard = (board) => {
+    return {
+        type: HANDLE_BOARD_LOADED,
+        payload: board
+    }
 }
 
 export const resetInput = () => {

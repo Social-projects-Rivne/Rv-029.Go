@@ -65,6 +65,9 @@ func applyProjectsRoutes(r *mux.Router) {
 
 	r.HandleFunc("/list/", controllers.ProjectsList).Methods("GET").Name(`project.list`)
 	r.HandleFunc("/list", controllers.ProjectsList).Methods("GET").Name(`project.list`)
+
+	r.HandleFunc("/{project_id}/users/", controllers.ProjectUsersList).Methods("GET")
+	r.HandleFunc("/{project_id}/users", controllers.ProjectUsersList).Methods("GET")
 }
 
 func applyBoardRoutes(r *mux.Router) {
@@ -82,6 +85,9 @@ func applyBoardRoutes(r *mux.Router) {
 
 	r.HandleFunc("/{project_id}/board/list/", controllers.BoardsList).Methods("GET").Name(`board.list`)
 	r.HandleFunc("/{project_id}/board/list", controllers.BoardsList).Methods("GET").Name(`board.list`)
+
+	r.HandleFunc("/project/board/assign-user/{board_id}/", controllers.AssignUserToBoard).Methods("POST")
+	r.HandleFunc("/project/board/assign-user/{board_id}", controllers.AssignUserToBoard).Methods("POST")
 }
 
 func applyIssueRoutes(r *mux.Router) {
