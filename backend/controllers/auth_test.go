@@ -285,6 +285,38 @@ requestData := &struct {
 
 }
 
+// func TestGetUserInfoSuccess(t *testing.T) {
+
+// 	requestData := &struct {
+// 		Email    string
+// 		Password string
+// 		Token    string
+// 	}{
+// 		Email:    "nigga@gmail.com",
+// 		Password: "8934784566",
+// 		Token:    "8934784566",
+// 	}
+// 	body, _ := json.Marshal(requestData)
+// 	r := *mux.NewRouter()
+// 	res := httptest.NewRecorder()
+// 	req, err := http.NewRequest("GET", "/profile/", strings.NewReader(string(body)))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+	
+// 	handler := http.HandlerFunc(GetUserInfo)
+// 	r.Handle("/profile/", handler).Methods("GET")
+// 	r.ServeHTTP(res, req)
+
+// 	if status := res.Code; status != http.StatusOK {
+// 		t.Errorf("handler returned wrong status code: got %v want %v",
+// 			status, http.StatusOK)
+// 	}
+
+// }
+
+
 func TestLoginDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()

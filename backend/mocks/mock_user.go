@@ -130,3 +130,15 @@ func (m *MockUserCRUD) Update(arg0 *models.User) error {
 func (mr *MockUserCRUDMockRecorder) Update(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserCRUD)(nil).Update), arg0)
 }
+
+// UpdateFirstAndLastName mocks base method
+func (m *MockUserCRUD) UpdateFirstAndLastName(arg0 *models.User) error {
+	ret := m.ctrl.Call(m, "UpdateFirstAndLastName", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateFirstAndLastName indicates an expected call of UpdateFirstAndLastName
+func (mr *MockUserCRUDMockRecorder) UpdateFirstAndLastName(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFirstAndLastName", reflect.TypeOf((*MockUserCRUD)(nil).UpdateFirstAndLastName), arg0)
+}

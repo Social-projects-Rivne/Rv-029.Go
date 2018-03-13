@@ -6,6 +6,7 @@ package mocks
 
 import (
 	models "github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	gocql "github.com/gocql/gocql"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -21,7 +22,7 @@ type MockProjectCRUDMockRecorder struct {
 	mock *MockProjectCRUD
 }
 
-// NewMockdecodeAndValidateProjectCRUD creates a new mock instance
+// NewMockProjectCRUD creates a new mock instance
 func NewMockProjectCRUD(ctrl *gomock.Controller) *MockProjectCRUD {
 	mock := &MockProjectCRUD{ctrl: ctrl}
 	mock.recorder = &MockProjectCRUDMockRecorder{mock}
@@ -68,6 +69,19 @@ func (m *MockProjectCRUD) GetProjectList(arg0 *models.Project) ([]models.Project
 // GetProjectList indicates an expected call of GetProjectList
 func (mr *MockProjectCRUDMockRecorder) GetProjectList(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectList", reflect.TypeOf((*MockProjectCRUD)(nil).GetProjectList), arg0)
+}
+
+// GetProjectsNamesList mocks base method
+func (m *MockProjectCRUD) GetProjectsNamesList(arg0 []gocql.UUID) ([]models.ProjectName, error) {
+	ret := m.ctrl.Call(m, "GetProjectsNamesList", arg0)
+	ret0, _ := ret[0].([]models.ProjectName)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProjectsNamesList indicates an expected call of GetProjectsNamesList
+func (mr *MockProjectCRUDMockRecorder) GetProjectsNamesList(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectsNamesList", reflect.TypeOf((*MockProjectCRUD)(nil).GetProjectsNamesList), arg0)
 }
 
 // Insert mocks base method

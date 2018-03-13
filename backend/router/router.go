@@ -37,6 +37,10 @@ func init() {
 	issueRouter := Router.PathPrefix("/project/board").Subrouter()
 	applyIssueRoutes(issueRouter)
 
+	userRouter := Router.PathPrefix("/profile").Subrouter()
+	applyUserRoutes(userRouter)
+	userRouter.Use(middlewares.AuthenticatedMiddleware)
+
 }
 
 func applyAuthRoutes(r *mux.Router) {
@@ -54,6 +58,14 @@ func applyAuthRoutes(r *mux.Router) {
 func applyAuthorizedUserRoutes(r *mux.Router) {
 	r.HandleFunc("/", controllers.Dashboard)
 	r.HandleFunc("", controllers.Dashboard)
+}
+
+func applyUserRoutes(r *mux.Router) {
+	r.HandleFunc("/", controllers.GetUserInfo).Methods("GET")
+	r.HandleFunc("", controllers.GetUserInfo).Methods("GET")
+
+	r.HandleFunc("/update/", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/update", controllers.UpdateUserInfo).Methods("POST")
 }
 
 func applyProjectsRoutes(r *mux.Router) {

@@ -1,30 +1,30 @@
 package controllers
 
 import (
-	"testing"
-	"github.com/golang/mock/gomock"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
-	"net/http/httptest"
-	"net/http"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"github.com/gorilla/mux"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
-	"encoding/json"
 	"bytes"
-	"errors"
 	"context"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
+	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
 )
 
 // show project tests
 
-func TestShowProjectSuccess(t *testing.T)  {
+func TestShowProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
 	models.InitProjectDB(mockProjectCRUD)
 	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
-
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
@@ -37,7 +37,6 @@ func TestShowProjectSuccess(t *testing.T)  {
 	r.Handle("/project/show/{project_id}/", handler).Methods("GET")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
@@ -49,9 +48,8 @@ func TestShowProjectSuccess(t *testing.T)  {
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		t.Errorf("handler returned unexpected body: got %v want JSON",res.Body.String())
+		t.Errorf("handler returned unexpected body: got %v want JSON", res.Body.String())
 	}
-
 
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -79,8 +77,7 @@ func TestShowProjectBadVariable(t *testing.T) {
 
 }
 
-
-func TestShowProjectDBError(t *testing.T)  {
+func TestShowProjectDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -106,13 +103,11 @@ func TestShowProjectDBError(t *testing.T)  {
 			status, http.StatusInternalServerError)
 	}
 
-
 }
 
 // update project tests
 
-func TestUpdateProjectBadVariable(t *testing.T)  {
-
+func TestUpdateProjectBadVariable(t *testing.T) {
 
 	body := bytes.NewBufferString(`{"name" : "update"}`)
 
@@ -127,7 +122,6 @@ func TestUpdateProjectBadVariable(t *testing.T)  {
 	r.Handle("/project/update/{project_id}/", handler).Methods("PUT")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
@@ -135,8 +129,7 @@ func TestUpdateProjectBadVariable(t *testing.T)  {
 
 }
 
-func TestUpdateProjectValidate(t *testing.T)  {
-
+func TestUpdateProjectValidate(t *testing.T) {
 
 	body := bytes.NewBufferString(`{"name" : ""}`)
 
@@ -151,7 +144,6 @@ func TestUpdateProjectValidate(t *testing.T)  {
 	r.Handle("/project/update/{project_id}/", handler).Methods("PUT")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
@@ -159,7 +151,7 @@ func TestUpdateProjectValidate(t *testing.T)  {
 
 }
 
-func TestUpdateProjectDBError(t *testing.T)  {
+func TestUpdateProjectDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -182,7 +174,6 @@ func TestUpdateProjectDBError(t *testing.T)  {
 	r.Handle("/project/update/{project_id}/", handler).Methods("PUT")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusInternalServerError)
@@ -190,8 +181,7 @@ func TestUpdateProjectDBError(t *testing.T)  {
 
 }
 
-
-func TestUpdateProjectSuccess(t *testing.T)  {
+func TestUpdateProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -212,7 +202,6 @@ func TestUpdateProjectSuccess(t *testing.T)  {
 	r.Handle("/project/update/{project_id}/", handler).Methods("PUT")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
@@ -222,15 +211,14 @@ func TestUpdateProjectSuccess(t *testing.T)  {
 
 // project list test
 
-func TestProjectsListSuccess(t *testing.T)  {
+func TestProjectsListSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
 	models.InitProjectDB(mockProjectCRUD)
 	//TODO return parameters
-	mockProjectCRUD.EXPECT().GetProjectList(gomock.Any()).Return(nil ,nil).Times(1)
-
+	mockProjectCRUD.EXPECT().GetProjectList(gomock.Any()).Return(nil, nil).Times(1)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
@@ -242,7 +230,6 @@ func TestProjectsListSuccess(t *testing.T)  {
 	handler := http.HandlerFunc(ProjectsList)
 	r.Handle("/project/list/", handler).Methods("GET")
 	r.ServeHTTP(res, req)
-
 
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -251,8 +238,7 @@ func TestProjectsListSuccess(t *testing.T)  {
 
 }
 
-
-func TestProjectsListDBError(t *testing.T)  {
+func TestProjectsListDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -260,8 +246,7 @@ func TestProjectsListDBError(t *testing.T)  {
 	models.InitProjectDB(mockProjectCRUD)
 
 	customError := errors.New("DB Error")
-	mockProjectCRUD.EXPECT().GetProjectList(gomock.Any()).Return(nil ,customError).Times(1)
-
+	mockProjectCRUD.EXPECT().GetProjectList(gomock.Any()).Return(nil, customError).Times(1)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
@@ -274,7 +259,6 @@ func TestProjectsListDBError(t *testing.T)  {
 	r.Handle("/project/list/", handler).Methods("GET")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusInternalServerError)
@@ -282,13 +266,9 @@ func TestProjectsListDBError(t *testing.T)  {
 
 }
 
-
-
-
 // Create Project test
 
-
-func TestCreateProjectSuccess(t *testing.T)  {
+func TestCreateProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -299,7 +279,7 @@ func TestCreateProjectSuccess(t *testing.T)  {
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
 	// TODO CHeck type each parameter in AddRoleToProject
-	mockUserCRUD.EXPECT().AddRoleToProject(gomock.Any(), gomock.Any() , gomock.Any()).Return(nil).Times(1)
+	mockUserCRUD.EXPECT().AddRoleToProject(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).Times(1)
 
 	boby := bytes.NewBufferString(`{"name" : "insert project"}`)
 
@@ -310,7 +290,7 @@ func TestCreateProjectSuccess(t *testing.T)  {
 		t.Fatal(err)
 	}
 
- 	user , err  := helpers.InitFakeUser()
+	user, err := helpers.InitFakeUser()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -323,7 +303,6 @@ func TestCreateProjectSuccess(t *testing.T)  {
 	r.Handle("/project/create/", handler).Methods("POST")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
@@ -331,7 +310,7 @@ func TestCreateProjectSuccess(t *testing.T)  {
 
 }
 
-func TestCreateProjectDBInsertError(t *testing.T)  {
+func TestCreateProjectDBInsertError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -349,7 +328,7 @@ func TestCreateProjectDBInsertError(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	user , err  := helpers.InitFakeUser()
+	user, err := helpers.InitFakeUser()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -362,7 +341,6 @@ func TestCreateProjectDBInsertError(t *testing.T)  {
 	r.Handle("/project/create/", handler).Methods("POST")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusInternalServerError)
@@ -370,7 +348,7 @@ func TestCreateProjectDBInsertError(t *testing.T)  {
 
 }
 
-func TestCreateProjectDBError(t *testing.T)  {
+func TestCreateProjectDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -382,7 +360,7 @@ func TestCreateProjectDBError(t *testing.T)  {
 	models.InitUserDB(mockUserCRUD)
 	customError := errors.New("DB Error")
 	// TODO CHeck type each parameter in AddRoleToProject
-	mockUserCRUD.EXPECT().AddRoleToProject(gomock.Any(), gomock.Any() , gomock.Any()).Return(customError).Times(1)
+	mockUserCRUD.EXPECT().AddRoleToProject(gomock.Any(), gomock.Any(), gomock.Any()).Return(customError).Times(1)
 
 	boby := bytes.NewBufferString(`{"name" : "insert project"}`)
 
@@ -393,7 +371,7 @@ func TestCreateProjectDBError(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	user , err  := helpers.InitFakeUser()
+	user, err := helpers.InitFakeUser()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -406,7 +384,6 @@ func TestCreateProjectDBError(t *testing.T)  {
 	r.Handle("/project/create/", handler).Methods("POST")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusInternalServerError)
@@ -416,8 +393,7 @@ func TestCreateProjectDBError(t *testing.T)  {
 
 // Delete Project test
 
-
-func TestDeleteProjectSuccess(t *testing.T)  {
+func TestDeleteProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -427,8 +403,7 @@ func TestDeleteProjectSuccess(t *testing.T)  {
 
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
-	mockUserCRUD.EXPECT().DeleteProject(gomock.Any() , gomock.Any()).Return(nil).Times(1)
-
+	mockUserCRUD.EXPECT().DeleteProject(gomock.Any(), gomock.Any()).Return(nil).Times(1)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
@@ -437,7 +412,7 @@ func TestDeleteProjectSuccess(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	user , err  := helpers.InitFakeUser()
+	user, err := helpers.InitFakeUser()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -449,7 +424,6 @@ func TestDeleteProjectSuccess(t *testing.T)  {
 	handler := http.HandlerFunc(DeleteProject)
 	r.Handle("/project/delete/{project_id}/", handler).Methods("Delete")
 	r.ServeHTTP(res, req)
-
 
 	if status := res.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -458,20 +432,18 @@ func TestDeleteProjectSuccess(t *testing.T)  {
 
 }
 
-func TestDeleteProjectDBDeleteError(t *testing.T)  {
+func TestDeleteProjectDBDeleteError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
-	mockUserCRUD.EXPECT().DeleteProject(gomock.Any() , gomock.Any()).Return(nil).Times(1)
+	mockUserCRUD.EXPECT().DeleteProject(gomock.Any(), gomock.Any()).Return(nil).Times(1)
 
 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
 	models.InitProjectDB(mockProjectCRUD)
 	customError := errors.New("DB Error")
 	mockProjectCRUD.EXPECT().Delete(gomock.Any()).Return(customError).Times(1)
-
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
@@ -480,7 +452,7 @@ func TestDeleteProjectDBDeleteError(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	user , err  := helpers.InitFakeUser()
+	user, err := helpers.InitFakeUser()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -493,7 +465,6 @@ func TestDeleteProjectDBDeleteError(t *testing.T)  {
 	r.Handle("/project/delete/{project_id}/", handler).Methods("Delete")
 	r.ServeHTTP(res, req)
 
-
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusInternalServerError)
@@ -501,16 +472,14 @@ func TestDeleteProjectDBDeleteError(t *testing.T)  {
 
 }
 
-func TestDeleteProjectDBError(t *testing.T)  {
+func TestDeleteProjectDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
 	customError := errors.New("DB Error")
-	mockUserCRUD.EXPECT().DeleteProject(gomock.Any() , gomock.Any()).Return(customError).Times(1)
-
-
+	mockUserCRUD.EXPECT().DeleteProject(gomock.Any(), gomock.Any()).Return(customError).Times(1)
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
@@ -519,7 +488,7 @@ func TestDeleteProjectDBError(t *testing.T)  {
 		t.Fatal(err)
 	}
 
-	user , err  := helpers.InitFakeUser()
+	user, err := helpers.InitFakeUser()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -531,7 +500,6 @@ func TestDeleteProjectDBError(t *testing.T)  {
 	handler := http.HandlerFunc(DeleteProject)
 	r.Handle("/project/delete/{project_id}/", handler).Methods("DELETE")
 	r.ServeHTTP(res, req)
-
 
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
