@@ -129,6 +129,7 @@ func applyIssueRoutes(r *mux.Router) {
 	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET")
 	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET")
 
+	r.HandleFunc("/issue/set_parent", controllers.SetParentIssue).Methods("PUT")
 }
 
 func applySprintRoutes(r *mux.Router) {

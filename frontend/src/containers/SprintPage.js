@@ -23,7 +23,6 @@ const STATUS_DONE = "Done";
 
 const styles = theme => ({
     root: {
-        // flexGrow: 1,
         minHeight: '100vh',
         backgroundColor: '#2B2D42',
     },

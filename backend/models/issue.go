@@ -34,13 +34,12 @@ const (
 
 	FIND_ISSUE_BY_ID = "SELECT id, name, status, description,estimate, user_id,user_first_name, user_last_name,sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM issues WHERE id = ? LIMIT 1"
 
-	GET_BOARD_ISSUE_LIST          = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM board_issues WHERE board_id = ?"
+	GET_BOARD_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM board_issues WHERE board_id = ?"
 
 	GET_BOARD_BACKLOG_ISSUES_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM board_issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000"
 
 	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at from sprint_issues WHERE sprint_id = ? ;"
 )
-
 
 //Issue model
 type Issue struct {
@@ -57,7 +56,7 @@ type Issue struct {
 	BoardName     string
 	ProjectID     gocql.UUID
 	ProjectName   string
-	Parent	      gocql.UUID
+	Parent        gocql.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
@@ -70,6 +69,7 @@ type IssueCRUD interface {
 	GetBoardIssueList(*Issue) ([]Issue, error)
 	GetSprintIssueList(*Issue) ([]Issue, error)
 	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
+	SetParentIssue([]gocql.UUID, gocql.UUID) error
 }
 
 type IssueStorage struct {
@@ -81,6 +81,7 @@ var IssueDB IssueCRUD
 func InitIssueDB(crud IssueCRUD) {
 	IssueDB = crud
 }
+
 //Insert func inserts user object in database
 func (s *IssueStorage) Insert(issue *Issue) error {
 
@@ -103,7 +104,7 @@ func (s *IssueStorage) Update(issue *Issue) error {
 
 		issue.Name, issue.Status, issue.Description, issue.Estimate, issue.UserID, issue.UserFirstName, issue.UserLastName,
 		issue.BoardName, issue.ProjectName, issue.Parent, issue.UpdatedAt, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec(); err != nil {
-		log.Printf("Error in models/issue.go error: %+v",err)
+		log.Printf("Error in models/issue.go error: %+v", err)
 		return err
 	}
 
@@ -269,4 +270,24 @@ func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 	}
 
 	return issues, nil
+}
+
+func (s *IssueStorage) SetParentIssue(children []gocql.UUID, parent gocql.UUID) error {
+
+	for _, value := range children {
+		issue := &Issue{}
+		issue.UUID = value
+
+		IssueDB.FindByID(issue)
+
+		err := s.DB.Query("UPDATE issues SET parent = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;",
+			parent, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec()
+
+		if err != nil {
+			log.Printf("Error in models/issue.go error: %+v", err)
+			return err
+		}
+	}
+
+	return nil
 }

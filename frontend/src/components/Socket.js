@@ -15,54 +15,54 @@ class Socket extends Component {
     response: []
   }
 
-  subscribe = () => {
-    const socket = openSocket.connect("http://localhost:8080", {
-      extraHeaders: {
-        Connection: "upgrade"
-      }
-    })
-
-    socket.on('open', () => {
-        ws.send("ping");
-        console.log("firs message sent")
-    })
-
-    socket.on('message', () => {
-        console.log(evt.data)
-        if(evt.data === "pong") {
-          setTimeout(function(){ws.send("ping");}, 2000);
-        }
-    })
-
-    socket.on('close', () => {
-        console.log("connection close")
-    })
-  }
-
   // subscribe = () => {
-  //   const socket = new WebSocket("ws://localhost:8080/socketserver");
-  //
-  //   this.setState({
-  //     socket: socket
+  //   const socket = openSocket.connect("http://localhost:8080", {
+  //     extraHeaders: {
+  //       Connection: "upgrade"
+  //     }
   //   })
   //
-  //   socket.onopen = () => {
-  //     console.log("Connection is open")
-  //   }
+  //   socket.on('open', () => {
+  //       ws.send("ping");
+  //       console.log("firs message sent")
+  //   })
   //
-  //   socket.onmessage = (evt) => {
-  //     let currentMessages = this.state.response
-  //     currentMessages.unshift(evt.data)
+  //   socket.on('message', () => {
+  //       console.log(evt.data)
+  //       if(evt.data === "pong") {
+  //         setTimeout(function(){ws.send("ping");}, 2000);
+  //       }
+  //   })
   //
-  //     this.setState({
-  //       response: currentMessages
-  //     })
-  //   }
-  //
-  //   socket.onclose = () => {
-  //     console.log("connection close")
-  //   }
+  //   socket.on('close', () => {
+  //       console.log("connection close")
+  //   })
   // }
+
+  subscribe = () => {
+    const socket = new WebSocket("ws://localhost:8080/socketserver");
+
+    this.setState({
+      socket: socket
+    })
+
+    socket.onopen = () => {
+      console.log("Connection is open")
+    }
+
+    socket.onmessage = (evt) => {
+      let currentMessages = this.state.response
+      currentMessages.unshift(evt.data)
+
+      this.setState({
+        response: currentMessages
+      })
+    }
+
+    socket.onclose = () => {
+      console.log("connection close")
+    }
+  }
 
   sendMessage = () => {
     const { socket } = this.state

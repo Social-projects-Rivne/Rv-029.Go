@@ -16,36 +16,83 @@ import { withStyles } from 'material-ui/styles'
 import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'
 import AddIcon from 'material-ui-icons/Add'
-import TextField from 'material-ui/TextField';
+import TextField from 'material-ui/TextField'
+import { FormGroup, FormControlLabel } from 'material-ui/Form'
+import Checkbox from 'material-ui/Checkbox'
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from 'material-ui/Dialog';
+} from 'material-ui/Dialog'
 
 class BoardPage extends Component{
   state = {
     createIssueOpen: false,
     createSprintOpen: false,
+    setSubTaskOpen: false,
+    checkedSubTasks: [],
+    parent: null,
   }
 
   handleClickOpenCreateIssue = () => {
     this.props.boardsActions.resetInput()
     this.setState({ createIssueOpen: true })
-  };
+  }
 
   handleClickOpenCreateSprint = () => {
     this.props.boardsActions.resetInput()
     this.setState({ createSprintOpen: true })
   }
 
+  handleSetSubTaskClick = parent => () => {
+    this.setState({
+      setSubTaskOpen: true,
+      parent
+    })
+  }
+
+  handleCheckBoxChange = id => e => {
+    let { checkedSubTasks } = this.state
+
+    if (e.target.checked) {
+      checkedSubTasks.push(id)
+      this.setState({ checkedSubTasks })
+    } else {
+      checkedSubTasks.splice(checkedSubTasks.indexOf(id), 1)
+      this.setState({ checkedSubTasks })
+    }
+  }
+
+
+  setSubTasks = () => {
+    axios.put(API_URL + `project/board/issue/set_parent`, {
+      issues: this.state.checkedSubTasks,
+      parent: this.state.parent
+    })
+      .then((res) => {
+        this.getIssuesList()
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      })
+
+    this.handleClose()
+  }
+
   handleClose = () => {
     this.setState({
       createIssueOpen: false,
       createSprintOpen: false,
-    });
-  };
+      setSubTaskOpen: false,
+      checkedSubTasks: [],
+      parent: null
+    })
+  }
   
   componentDidMount() {
     this.props.sprintsActions.setCurrentSprint(null)
@@ -64,7 +111,7 @@ class BoardPage extends Component{
         } else {
           messages("Server error occured")
         }
-      });
+      })
   }
 
   getIssuesList = () => {
@@ -78,7 +125,7 @@ class BoardPage extends Component{
         } else {
           messages("Server error occured")
         }
-      });
+      })
   }
 
   createIssue = () => {
@@ -162,7 +209,7 @@ class BoardPage extends Component{
               key={i}
               data={item}
               onUpdate={this.getIssuesList}
-            />
+              setSubTaskClick={this.handleSetSubTaskClick} />
           ))}
 
         </Grid>
@@ -201,7 +248,7 @@ class BoardPage extends Component{
 
         </Grid>
 
-        {/* #################### MODAL ISSUE #################### */}
+        {/* ### Modal issue ### */}
         <Dialog
           open={this.state.createIssueOpen}
           onClose={this.handleClose}
@@ -244,7 +291,7 @@ class BoardPage extends Component{
           </DialogActions>
         </Dialog>
 
-        {/* #################### MODAL CREATE SPRINT #################### */}
+        {/* ### Modal create sprint ### */}
         <Dialog
           open={this.state.createSprintOpen}
           onClose={this.handleClose}
@@ -280,7 +327,57 @@ class BoardPage extends Component{
           </DialogActions>
         </Dialog>
 
+        { /* TODO remove */ }
+        {/* ### Modal set sub tasks ### */}
+        <Dialog
+          open={this.state.setSubTaskOpen}
+          onClose={this.handleClose}
+          aria-labelledby="form-dialog-title" >
+          <DialogTitle id="form-dialog-title">Set sub tasks</DialogTitle>
+          <DialogContent>
+            <FormGroup>
 
+              {
+                this.props.issues.currentIssues.map((item, i) => {
+                if (item.Parent === "00000000-0000-0000-0000-000000000000") {
+                  return (
+
+                    <FormControlLabel
+                      key={i}
+                      label={item.Name}
+                      control={
+                      <Checkbox
+                        onChange={this.handleCheckBoxChange(item.UUID)} />
+                      }/>
+
+                    )
+                  } else {
+
+                  return (
+                    <FormControlLabel
+                      key={i}
+                      label={item.Name}
+                      control={
+                        <Checkbox
+                          defaultChecked={true}
+                          onChange={this.handleCheckBoxChange(item.UUID)} />
+                      }/>
+                    )
+                  }
+                })
+              }
+
+            </FormGroup>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.setSubTasks} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
 
       </Grid>
     )

@@ -34,7 +34,6 @@ func (IssueTableSeeder) Run() {
 				BoardName:   board.Name,
 				ProjectID:   board.ProjectID,
 				ProjectName: board.ProjectName,
-				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
@@ -60,7 +59,6 @@ func (IssueTableSeeder) Run() {
 				ProjectID:   sprint.ProjectId,
 				ProjectName: sprint.ProjectName,
 				SprintID:    sprint.ID,
-				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
@@ -83,7 +81,6 @@ func (IssueTableSeeder) Run() {
 				ProjectID:   sprint.ProjectId,
 				ProjectName: sprint.ProjectName,
 				SprintID:    sprint.ID,
-				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
@@ -106,7 +103,6 @@ func (IssueTableSeeder) Run() {
 				ProjectID:   sprint.ProjectId,
 				ProjectName: sprint.ProjectName,
 				SprintID:    sprint.ID,
-				Parent:      gocql.TimeUUID(),
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
 			}
