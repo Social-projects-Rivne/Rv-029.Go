@@ -26,6 +26,9 @@ import Dialog, {
     DialogContentText,
     DialogTitle,
 } from 'material-ui/Dialog';
+import {API_URL} from "../constants/global";
+import messages from "../services/messages";
+import axios from "axios/index";
 
 
 const styles = {
@@ -58,6 +61,34 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
         browserHistory.push("/authorization/login")
     }
 
+    if (defaultPage.permissions.length == 0) {
+        axios.get(API_URL + `permissions/list`)
+            .then((response) => {
+                defaultPageActions.setPermissionsList(response.data.Data)
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
+    if (defaultPage.roles.length == 0) {
+        axios.get(API_URL + `roles/list`)
+            .then((response) => {
+                defaultPageActions.setRolesList(response.data.Data)
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
     const toggleDrawer = () => {
         defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
     };
@@ -66,9 +97,37 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
     const handleClickOpenAddUser = () => {
         defaultPageActions.toggleAddUserToProject(true)
     };
-    const handleClose = () => {
+    const handleUserToProjectClose = () => {
         defaultPageActions.toggleAddUserToProject(false);
     };
+
+    const handleUserToProjectWithPermissionsClose = () => {
+        defaultPageActions.togglePermissionsDialog(false);
+    };
+
+    const handleListItemClick = (item) => {
+        defaultPageActions.togglePermissionsDialog(true, item);
+    };
+
+    const handleAddUserToProject = (role) => {
+        handleUserToProjectClose()
+        handleUserToProjectWithPermissionsClose()
+
+        axios.post(API_URL + `project/` + projects.currentProject.UUID + `/add/user`, {
+            user: defaultPage.userToAdd.UUID,
+            role: role,
+        })
+            .then((response) => {
+                messages(response.data.Message)
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
 
     let projectBoardsList = null
     if (projects.currentProject !== null) {
@@ -166,14 +225,14 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
             {/* ADD USER TO PROJECT DIALOG */}
             <Dialog
                 open={defaultPage.isUserToProjectOpen}
-                onClose={handleClose}
+                onClose={handleUserToProjectClose}
                 aria-labelledby="form-dialog-title" >
                 <DialogTitle id="form-dialog-title">Add user</DialogTitle>
                 <DialogContent>
                     <List>
-                        {(projects.currentProjectUsers.length > 0) ? (
-                            projects.currentProjectUsers.map((item, i) => (
-                                <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                        {(projects.users.length > 0) ? (
+                            projects.users.map((item, i) => (
+                                <ListItem button onClick={() => handleListItemClick(item)} key={i}>
                                     <ListItemAvatar>
                                         <Avatar className={classes.avatar}>
                                             <PersonIcon />
@@ -186,7 +245,30 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                     </List>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleUserToProjectClose} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* ADD USER TO PROJECT WITH PERMISSIONS DIALOG */}
+            <Dialog
+                open={defaultPage.isUserToProjectPermissionsOpen}
+                onClose={handleUserToProjectWithPermissionsClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Add user</DialogTitle>
+                <DialogContent>
+                    <List>
+                        {(defaultPage.roles.length > 0) ? (
+                            defaultPage.roles.map((item, i) => (
+                                <ListItem button onClick={() => handleAddUserToProject(item)} key={i}>
+                                    { item }
+                                </ListItem>
+                            ))
+                        ) : ("No Roles")}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleUserToProjectWithPermissionsClose} color="primary">
                         Cancel
                     </Button>
                 </DialogActions>

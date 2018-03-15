@@ -25,6 +25,7 @@ const (
 	UPDATE_USER_PROJECT_ROLE = "UPDATE users SET projects = projects +  ? WHERE id = ?"
 	DELETE_USER_PROJECT_ROLE = "DELETE projects[?] FROM users WHERE id= ?"
 	GET_PROJECT_USERS_LIST   = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, role, status from users WHERE projects CONTAINS KEY ?"
+	GET_USERS_LIST   = "SELECT id, email, first_name, last_name, projects, updated_at, created_at, password, salt, photo, role, status FROM users"
 )
 
 //User type
@@ -56,6 +57,7 @@ type UserCRUD interface {
 	GetProjectUsersList(projectId gocql.UUID)  ([]User, error)
 	CheckUserPassword(User) (User, error)
 	UpdateFirstAndLastName(*User) error
+	List() ([]User, error)
 }
 
 type UserStorage struct {
@@ -260,3 +262,38 @@ func (u *UserStorage) CheckUserEmail(user User) (User, error) {
 	return user, nil
 }
 
+func (u *UserStorage) List() ([]User, error) {
+
+	var users []User
+	var row map[string]interface{}
+
+	iterator := Session.Query(GET_USERS_LIST).Consistency(gocql.One).Iter()
+
+	if iterator.NumRows() > 0 {
+		for {
+			// New map each iteration
+			row = make(map[string]interface{})
+			if !iterator.MapScan(row) {
+				break
+			}
+
+			users = append(users, User{
+				UUID:      row["id"].(gocql.UUID),
+				Email:     row["email"].(string),
+				FirstName: row["first_name"].(string),
+				LastName:  row["last_name"].(string),
+				Role:  	   row["role"].(string),
+				Photo:     row["photo"].(string),
+				Projects:  row["projects"].(map[gocql.UUID]string),
+				CreatedAt: row["created_at"].(time.Time),
+				UpdatedAt: row["updated_at"].(time.Time),
+			})
+		}
+	}
+
+	if err := iterator.Close(); err != nil {
+		log.Printf("Error in models/user.go error: %+v",err)
+	}
+
+	return users, nil
+}

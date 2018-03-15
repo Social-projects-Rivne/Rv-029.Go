@@ -19,6 +19,16 @@ func init() {
 	userRouter.Use(middlewares.AuthenticatedMiddleware)
 	userRouter.Use(middlewares.OwenrMiddleware)
 
+	permissionsRouter := Router.PathPrefix("/permissions").Subrouter()
+	applyPermissionsRoutes(permissionsRouter)
+	permissionsRouter.Use(middlewares.AuthenticatedMiddleware)
+	permissionsRouter.Use(middlewares.OwenrMiddleware)
+
+	rolesRouter := Router.PathPrefix("/roles").Subrouter()
+	applyRolesRoutes(rolesRouter)
+	rolesRouter.Use(middlewares.AuthenticatedMiddleware)
+	rolesRouter.Use(middlewares.OwenrMiddleware)
+
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	applyBoardRoutes(projectRouter)
@@ -81,6 +91,12 @@ func applyProjectsRoutes(r *mux.Router) {
 
 	r.HandleFunc("/{project_id}/users/", controllers.ProjectUsersList).Methods("GET")
 	r.HandleFunc("/{project_id}/users", controllers.ProjectUsersList).Methods("GET")
+
+	r.HandleFunc("/users/", controllers.UsersToAddProjectList).Methods("GET")
+	r.HandleFunc("/users", controllers.UsersToAddProjectList).Methods("GET")
+
+	r.HandleFunc("/{project_id}/add/user/", controllers.ProjectAddUser).Methods("POST")
+	r.HandleFunc("/{project_id}/add/user", controllers.ProjectAddUser).Methods("POST")
 }
 
 func applyBoardRoutes(r *mux.Router) {
@@ -133,4 +149,12 @@ func applySprintRoutes(r *mux.Router) {
 	r.HandleFunc("/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE").Name(`sprint.delete`)
 	r.HandleFunc("/{board_id}/sprint/list", controllers.SprintsList).Methods("GET").Name(`sprint.list`)
 	r.HandleFunc("/sprint/{sprint_id}/add/issue/{issue_id}", controllers.AddIssueToSprint).Methods("PUT").Name(`sprint.issue.add`)
+}
+
+func applyPermissionsRoutes(r *mux.Router) {
+	r.HandleFunc("/list", controllers.PermissionsList).Methods("GET").Name(`permissions.list`)
+}
+
+func applyRolesRoutes(r *mux.Router) {
+	r.HandleFunc("/list", controllers.RolesList).Methods("GET").Name(`permissions.list`)
 }
