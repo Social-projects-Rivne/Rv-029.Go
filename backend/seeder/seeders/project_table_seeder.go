@@ -9,14 +9,11 @@ import (
 	"time"
 )
 
-//ProjectTableSeeder model
-type ProjectTableSeeder struct {
-}
-
 var projects []models.Project
 var userProjects map[gocql.UUID]string
 
-//Run .
+type ProjectTableSeeder struct {}
+
 func (ProjectTableSeeder) Run() {
 
 	projects = []models.Project{}

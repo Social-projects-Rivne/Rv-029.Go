@@ -10,6 +10,6 @@ type Seeder interface {
 }
 
 func Call(class Seeder) {
-	fmt.Println(reflect.TypeOf(class).Name())
 	class.Run()
+	fmt.Println(reflect.TypeOf(class).Name())
 }

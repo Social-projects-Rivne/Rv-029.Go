@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/kafka"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 )
 
@@ -10,6 +11,10 @@ var Router *mux.Router
 
 func init() {
 	Router = mux.NewRouter()
+
+	// TMP
+	testrouter := Router
+	applySocketRouter(testrouter)
 
 	authRouter := Router.PathPrefix("/auth").Subrouter()
 	applyAuthRoutes(authRouter)
@@ -45,6 +50,11 @@ func init() {
 	applyProfileRoutes(profileRouter)
 	profileRouter.Use(middlewares.AuthenticatedMiddleware)
 
+}
+
+func applySocketRouter(r *mux.Router) {
+	r.HandleFunc("/socketserver", kafka.SocketHandler)
+	r.HandleFunc("/socket.io/", kafka.SocketHandler)
 }
 
 func applyAuthRoutes(r *mux.Router) {
@@ -140,6 +150,8 @@ func applyIssueRoutes(r *mux.Router) {
 
 	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET").Name(`issue.show`)
 	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET").Name(`issue.show`)
+
+	r.HandleFunc("/issue/set_parent", controllers.SetParentIssue).Methods("PUT")
 }
 
 func applySprintRoutes(r *mux.Router) {

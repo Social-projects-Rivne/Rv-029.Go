@@ -18,10 +18,11 @@ import Grid from 'material-ui/Grid'
 import IconButton from 'material-ui/IconButton'
 import EditIcon from 'material-ui-icons/ModeEdit';
 import { InputLabel } from 'material-ui/Input'
-import { MenuItem } from 'material-ui/Menu'
+import Menu, { MenuItem } from 'material-ui/Menu';
 import Select from 'material-ui/Select'
 import TextField from 'material-ui/TextField'
 import Typography from 'material-ui/Typography'
+import SettingsIcon from 'material-ui-icons/Settings';
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -38,6 +39,7 @@ class IssueCard extends Component  {
   state = {
     updateIssueOpen: false,
     isIssueOpen: false,
+    anchorEl: null
   }
 
   static propTypes = {
@@ -55,7 +57,10 @@ class IssueCard extends Component  {
   }
 
   handleClose = () => {
-    this.setState({ updateIssueOpen: false })
+    this.setState({
+      updateIssueOpen: false,
+      anchorEl: null
+    })
   }
 
   updateIssue = () => {
@@ -89,11 +94,11 @@ class IssueCard extends Component  {
     const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
-    this.setState({ isIssueOpen: false })
 
     axios.delete(API_URL + `project/board/issue/delete/${ UUID }`, {})
     .then((res) => {
       setNotificationMessage(res.data.Message)
+      this.setState({ isIssueOpen: false })
       onUpdate()
     })
     .catch((err) => {
@@ -140,10 +145,14 @@ class IssueCard extends Component  {
     this.setState({ isIssueOpen: !this.state.isIssueOpen })
   }
 
+  handleSettingsClick = e => {
+    this.setState({ anchorEl: e.target })
+  }
+
   render() {
-    const { classes } = this.props
-    const { Name, Description, Status, Estimate, SprintID } = this.props.data
-    const { issueName, issueDesc, issueEstimate, issueStatus  } = this.props.issues
+    const { classes, setSubTaskClick } = this.props
+    const { Name, Description, Status, Estimate, SprintID, UUID } = this.props.data
+    const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
     const {
       setNameUpdateIssueInput,
@@ -179,6 +188,27 @@ class IssueCard extends Component  {
             container
             justify={'flex-end'}>
             <Grid item>
+
+              {(SprintID === "00000000-0000-0000-0000-000000000000") ? (
+                <div className={classes.settings}>
+                  <IconButton
+                    aria-haspopup="true"
+                    aria-owns={this.state.anchorEl ? 'simple-menu' : null} >
+
+                    <SettingsIcon onClick={this.handleSettingsClick} />
+                  </IconButton>
+
+                  <Menu
+                    id="simple-menu"
+                    open={Boolean(this.state.anchorEl)}
+                    anchorEl={this.state.anchorEl}
+                    onClose={this.handleClose} >
+
+                    <MenuItem onClick={setSubTaskClick(UUID)}>sub tasks</MenuItem>
+                  </Menu>
+                </div>
+              ) : ( "" )}
+
               {/*You can not update issue if it's already in finished sprint*/}
               {(this.props.sprints.currentSprint == null || (this.props.sprints.currentSprint != null && this.props.sprints.currentSprint.Status != "Done")) ? (
                   <IconButton onClick={this.handleOpenUpdateIssueClick}>
@@ -280,6 +310,9 @@ class IssueCard extends Component  {
 const styles = {
   formControl: {
     width: '100%'
+  },
+  settings: {
+    display: 'inline-block'
   }
 }
 

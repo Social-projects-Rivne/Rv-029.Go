@@ -30,6 +30,8 @@ import FormUpdate from "./components/FormUpdate"
 
 // import VeiwUserProfile from "./containers/ChangeUserInformation"
 
+import Socket from './components/Socket'
+
 // TODO move these out of here
 // e.g. routeEvents.js
 const reset = () => {
@@ -91,6 +93,8 @@ export const routes = (
         <Route path="profile/update" component={FormUpdate}/>
         {/* <Route path="profile/update" component={ChangeUserInformation}/> */}
       </Route>
+
+      <Route path="socket" component={Socket}/>
 
       <Route path="home-page" component={HomePage}/>
     </Route>
