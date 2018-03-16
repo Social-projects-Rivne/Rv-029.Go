@@ -71,19 +71,20 @@ class ViewUserProfile extends Component {
             <Paper className={classes.paper}>
               <Grid container wrap="nowrap">
                 <ul className={classes.list}>
-                  <li>
-                    <Grid item>
-                        <img className={classes.img}src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
-                    </Grid>
-                  </li>
-                    <br/>
-                  <li>
-                    <Grid item>
-                        <Typography variant="headline" gutterBottom component="h2">
-                          {(user.userInfo) ? (user.userInfo.FirstName) : ('')}    {(user.userInfo) ? (user.userInfo.LastName) : ('')}  
-                        </Typography>
-                    </Grid>
-                  </li>
+                  <div>
+                    <li>
+                      <Grid item>
+                          <img className={classes.img}src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
+                      </Grid>
+                    </li>
+                    <li>
+                      <Grid item>
+                          <Typography variant="headline" gutterBottom component="h2">
+                            {(user.userInfo) ? (user.userInfo.FirstName) : ('')}    {(user.userInfo) ? (user.userInfo.LastName) : ('')}  
+                          </Typography>
+                      </Grid>
+                    </li>
+                  </div>                  
                     <br/>
                   <li>
                     <Grid item>
@@ -112,7 +113,7 @@ class ViewUserProfile extends Component {
                           (user.userInfo) ? (
                             projectsArr.map((item, i) => (
                               <Link className={classes.a} to={'/project/'+item.ID}>     
-                                <ListItem button key={i}>
+                                <ListItem button  key={i}>
                                   <ListItemText primary={item.name} />
                                 </ListItem>
                               </Link>
@@ -156,12 +157,12 @@ const styles = theme => ({
     backgroundColor: theme.palette.background.paper,
   },
   wrapper: {
-    maxWidth: 400,
+    maxWidth: 600,
   },
   paper: {
     padding: theme.spacing.unit * 2,
     height: "100%",
-    width: "300px",
+    width: "600px",
   },
   a: {
     textDecoration: 'none',
@@ -171,11 +172,15 @@ const styles = theme => ({
     minHeight: "100vh",
     paddingTop:"2em",
     paddingBottom: '2em',
-    alignItems: 'center',
   },
   pos: {
     marginBottom: 12,
     color: theme.palette.text.secondary,
+  },
+  photo: {
+    paddingTop:"2em",
+    paddingBottom: '2em',
+    float: 'left',
   },
   list: {
     listStyleType: "none",  

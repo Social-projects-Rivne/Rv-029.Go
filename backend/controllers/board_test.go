@@ -3,13 +3,14 @@ package controllers
 import (
 	"bytes"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 // ######## DELETE BOARD ########

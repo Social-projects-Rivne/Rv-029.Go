@@ -281,7 +281,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		user.Projects[k] = c[i].Name
 		i++
 	}
-	user.Photo = "static/nigga.png"
+	user.Photo = "static/nigga.jpeg"
 
 	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
 	response.Success(w)
