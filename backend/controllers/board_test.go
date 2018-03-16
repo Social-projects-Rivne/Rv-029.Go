@@ -114,7 +114,7 @@ func TestCreateBoardSuccess(t *testing.T) {
 	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
 
 	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
-	models.InitBoardDB(mockBoardCRUD)
+	// models.InitBoardDB(mockBoardCRUD)
 	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
 
 	body := bytes.NewBufferString(`{"name": "boardName", "desc": "boardDescription"}`)

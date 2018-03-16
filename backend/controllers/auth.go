@@ -268,6 +268,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 //GetUserInfo gives frontend information about user
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
+
 	user := r.Context().Value("user").(models.User)
 	var b gocql.UUID
 	a := make([]gocql.UUID, 0)
@@ -275,11 +276,18 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		b, _ = gocql.ParseUUID(fmt.Sprintf("%s", k))
 		a = append(a, b)
 	}
-	c, _ := models.ProjectDB.GetProjectsNamesList(a)
+	c, err := models.ProjectDB.GetProjectsNamesList(a)
+	if err != nil{
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
 	var i = 0
-	for k := range user.Projects {
-		user.Projects[k] = c[i].Name
-		i++
+	if len(c) > 0{
+		for k := range user.Projects {
+			user.Projects[k] = c[i].Name
+			i++
+		}
 	}
 	user.Photo = "static/nigga.jpeg"
 
@@ -303,7 +311,7 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	user.LastName = updateRequestData.LastName
 	user.UpdatedAt = time.Now()
 	if err = models.UserDB.UpdateFirstAndLastName(&user); err != nil {
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}

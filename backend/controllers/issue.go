@@ -199,8 +199,8 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = issueID
 
 	if err := models.IssueDB.Delete(issue); err != nil {
-		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.FindByID, error: %s", err.Error())
-		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: UpdateIssue, where: issue.FindByID, error: %s", err.Error())}
+		log.Printf("Error occured in controllers/issue.go error %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go error: %s", err.Error())}
 		response.Failed(w)
 		return
 	}
