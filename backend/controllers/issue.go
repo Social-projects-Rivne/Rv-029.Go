@@ -225,7 +225,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	issue := models.Issue{}
 	issue.BoardID = id
-
+	
 	boardIssueList, err := models.IssueDB.GetBoardBacklogIssuesList(&issue)
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)

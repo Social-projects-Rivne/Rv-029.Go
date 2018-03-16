@@ -555,7 +555,7 @@ func TestBoardIssueslistDBError(t *testing.T) {
 	customError := errors.New("DB Error")
 	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
 	models.InitIssueDB(mockIssueCRUD)	
-	mockIssueCRUD.EXPECT().GetBoardIssueList(gomock.Any()).Return(nil,customError).Times(1)	
+	mockIssueCRUD.EXPECT().GetBoardBacklogIssuesList(gomock.Any()).Return(nil,customError).Times(1)	
 
 	r := *mux.NewRouter()
 	res := httptest.NewRecorder()
