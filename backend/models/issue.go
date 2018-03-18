@@ -69,7 +69,7 @@ type IssueCRUD interface {
 	GetBoardIssueList(*Issue) ([]Issue, error)
 	GetSprintIssueList(*Issue) ([]Issue, error)
 	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
-	SetParentIssue([]gocql.UUID, gocql.UUID) error
+	SetParentIssue(gocql.UUID, gocql.UUID) error
 }
 
 type IssueStorage struct {
@@ -272,21 +272,19 @@ func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 	return issues, nil
 }
 
-func (s *IssueStorage) SetParentIssue(children []gocql.UUID, parent gocql.UUID) error {
+func (s *IssueStorage) SetParentIssue(child gocql.UUID, parent gocql.UUID) error {
 
-	for _, value := range children {
-		issue := &Issue{}
-		issue.UUID = value
+	issue := &Issue{}
+	issue.UUID = child
 
-		IssueDB.FindByID(issue)
+	IssueDB.FindByID(issue)
 
-		err := s.DB.Query("UPDATE issues SET parent = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;",
-			parent, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec()
+	err := s.DB.Query("UPDATE issues SET parent = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;",
+		parent, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec()
 
-		if err != nil {
-			log.Printf("Error in models/issue.go error: %+v", err)
-			return err
-		}
+	if err != nil {
+		log.Printf("Caugh error (models/issue.SetParentIssue): %+v", err)
+		return err
 	}
 
 	return nil

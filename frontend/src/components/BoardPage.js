@@ -17,8 +17,6 @@ import { withStyles } from 'material-ui/styles'
 import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'
 import AddIcon from 'material-ui-icons/Add'
-import { FormGroup, FormControlLabel } from 'material-ui/Form'
-import Checkbox from 'material-ui/Checkbox'
 import TextField from 'material-ui/TextField';
 import Avatar from 'material-ui/Avatar';
 import PersonIcon from 'material-ui-icons/Person';
@@ -36,11 +34,8 @@ class BoardPage extends Component{
   state = {
     createIssueOpen: false,
     createSprintOpen: false,
-    setSubTaskOpen: false,
-    checkedSubTasks: [],
-    parent: null,
     addUserOpen: false,
-    selectedEmail : null
+    selectedEmail : null,
   }
 
   handleClickOpenAddUser = () => {
@@ -57,52 +52,10 @@ class BoardPage extends Component{
     this.setState({ createSprintOpen: true })
   }
 
-  handleSetSubTaskClick = parent => () => {
-    this.setState({
-      setSubTaskOpen: true,
-      parent
-    })
-  }
-
-  handleCheckBoxChange = id => e => {
-    let { checkedSubTasks } = this.state
-
-    if (e.target.checked) {
-      checkedSubTasks.push(id)
-      this.setState({ checkedSubTasks })
-    } else {
-      checkedSubTasks.splice(checkedSubTasks.indexOf(id), 1)
-      this.setState({ checkedSubTasks })
-    }
-  }
-
-
-  setSubTasks = () => {
-    axios.put(API_URL + `project/board/issue/set_parent`, {
-      issues: this.state.checkedSubTasks,
-      parent: this.state.parent
-    })
-      .then((res) => {
-        this.getIssuesList()
-      })
-      .catch((error) => {
-        if (error.response && error.response.data.Message) {
-          messages(error.response.data.Message)
-        } else {
-          messages("Server error occured")
-        }
-      })
-
-    this.handleClose()
-  }
-
   handleClose = () => {
     this.setState({
       createIssueOpen: false,
       createSprintOpen: false,
-      setSubTaskOpen: false,
-      checkedSubTasks: [],
-      parent: null,
       addUserOpen: false
     });
   };
@@ -112,7 +65,6 @@ class BoardPage extends Component{
     this.getSprintsList()
     this.getIssuesList()
     this.getCurrentBoard()
-
   }
 
   getSprintsList = () => {
@@ -136,9 +88,12 @@ class BoardPage extends Component{
   }
 
   getIssuesList = () => {
+    const { issuesActions } = this.props
+
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
-        this.props.issuesActions.setIssues(response.data.Data)
+        this.props.issuesActions.setIssues(response.data.Data) // todo RM
+        issuesActions.setIssuesHierarchy(this.transform(response.data.Data))
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -147,6 +102,42 @@ class BoardPage extends Component{
           messages("Server error occured")
         }
       })
+  }
+
+  // refactor
+  transform = (issues) => {
+    const emptyID = "00000000-0000-0000-0000-000000000000"
+    let lvl1 = []
+
+    issues.forEach((item) => {
+      if (item.Parent === emptyID) {
+        lvl1.push(item)
+      }
+    })
+
+    lvl1.forEach((item) => { // WARNING changing redux state without store.dispatch
+      item.Children = this.findChildren(issues, item.UUID)
+    })
+
+    return lvl1
+  }
+
+  findChildren = (arr, parent) => {
+    let out = []
+
+    for (let i in arr) {
+      if (arr[i].Parent === parent) {
+        let children = this.findChildren(arr, arr[i].UUID)
+
+        children.length ?
+          arr[i].Children = children :
+          arr[i].Children = []
+
+        out.push(arr[i])
+      }
+    }
+
+    return out
   }
 
   getCurrentBoard = () => {
@@ -255,7 +246,32 @@ class BoardPage extends Component{
     })
   }
 
+  // getNesting = (hierarchy, issue, nesting = '') => {
+  //
+  //   for (let i = 0; i < hierarchy.length; i++) {
+  //
+  //     if (hierarchy[i].UUID === issue.UUID) {
+  //       return nesting += ` > ${issue.Name} <`
+  //     } else if (!hierarchy[i].Children.length) {
+  //       return null
+  //     } else {
+  //       nesting += ` > ${hierarchy[i].Name}`
+  //       nesting += this.getNesting(hierarchy[i].Children, issue, nesting)
+  //     }
+  //   }
+  //
+  //   return nesting
+  //
+  // }
+
   render() {
+
+    if (this.props.issues.hierarchy) {
+      console.log(this.getNesting(this.props.issues.hierarchy, this.props.issues.currentIssues[1]))
+    }
+
+    const { classes } = this.props
+    const { issues } = this.props
 
       // TODO refactor
       let usersArr = []
@@ -278,7 +294,6 @@ class BoardPage extends Component{
           })
       }
 
-    const { classes } = this.props
     return (
       <Grid
         container
@@ -357,13 +372,23 @@ class BoardPage extends Component{
 
           </Grid>
 
-          {this.props.issues.currentIssues.map((item, i) => (
-            <IssueCard
-              key={i}
-              data={item}
-              onUpdate={this.getIssuesList}
-              setSubTaskClick={this.handleSetSubTaskClick} />
-          ))}
+          {/* (issues.hierarchy) ? (
+
+
+          ) : (null) */}
+
+
+          { (this.props.issues.currentIssues) ? (
+
+            this.props.issues.currentIssues.map((item, i) => (
+              <IssueCard
+                key={i}
+                data={item}
+                onUpdate={this.getIssuesList} />
+              ))
+
+            ) : (null)
+           }
 
         </Grid>
 
@@ -480,57 +505,6 @@ class BoardPage extends Component{
           </DialogActions>
         </Dialog>
 
-        { /* TODO remove */ }
-        {/* ### Modal set sub tasks ### */}
-        <Dialog
-          open={this.state.setSubTaskOpen}
-          onClose={this.handleClose}
-          aria-labelledby="form-dialog-title" >
-          <DialogTitle id="form-dialog-title">Set sub tasks</DialogTitle>
-          <DialogContent>
-            <FormGroup>
-
-              {
-                this.props.issues.currentIssues.map((item, i) => {
-                if (item.Parent === "00000000-0000-0000-0000-000000000000") {
-                  return (
-
-                    <FormControlLabel
-                      key={i}
-                      label={item.Name}
-                      control={
-                      <Checkbox
-                        onChange={this.handleCheckBoxChange(item.UUID)} />
-                      }/>
-
-                    )
-                  } else {
-
-                  return (
-                    <FormControlLabel
-                      key={i}
-                      label={item.Name}
-                      control={
-                        <Checkbox
-                          defaultChecked={true}
-                          onChange={this.handleCheckBoxChange(item.UUID)} />
-                      }/>
-                    )
-                  }
-                })
-              }
-
-            </FormGroup>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.setSubTasks} color="primary">
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
         {/*/!* #################### MODAL USER #################### *!/*/}
         <Dialog
             open={this.state.addUserOpen}
