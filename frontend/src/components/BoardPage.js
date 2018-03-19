@@ -9,6 +9,7 @@ import * as boardsActions from "../actions/BoardsActions"
 import * as sprintsActions from "../actions/SprintsActions"
 import * as issuesActions from "../actions/IssuesActions"
 import * as projectsActions from "../actions/ProjectsActions"
+import * as usersActions from '../actions/UsersActions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import messages from "../services/messages"
@@ -23,6 +24,8 @@ import Avatar from 'material-ui/Avatar';
 import PersonIcon from 'material-ui-icons/Person';
 import DeleteIcon from 'material-ui-icons/Delete';
 import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List';
+import Chip from 'material-ui/Chip';
+import FaceIcon from 'material-ui-icons/Face';
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -94,7 +97,7 @@ class BoardPage extends Component{
 
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
-        this.props.issuesActions.setIssues(transformIssues(response.data.Data))
+        issuesActions.setIssues(transformIssues(response.data.Data))
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -109,6 +112,7 @@ class BoardPage extends Component{
       axios.get(API_URL + `project/board/select/${this.props.ownProps.params.id}`)
           .then((response) => {
               this.props.boardsActions.setCurrentBoard(response.data.Data)
+
               this.getProjectUsers()
           })
           .catch((error) => {
@@ -120,10 +124,46 @@ class BoardPage extends Component{
           });
   }
 
+  findAvailableUsers = () => {
+
+    let { currentProjectUsers } = this.props.projects,
+        { Users } = this.props.boards.currentBoard,
+        assignedUsers = []
+
+    for (let key in Users) {
+      assignedUsers.push(key)
+    }
+
+    return currentProjectUsers.filter((item) => {
+      return !assignedUsers.includes(item.UUID)
+    })
+  }
+
+  findAssignedUsers = () => {
+
+    const { Users } = this.props.boards.currentBoard || {},
+          { currentProjectUsers } = this.props.projects
+
+    let assignedUsers = []
+
+    if (Users) {
+      currentProjectUsers.forEach((item) => {
+        if (Users[item.UUID]) {
+          assignedUsers.push(item)
+        }
+      })
+    }
+
+    return assignedUsers
+  }
+
   getProjectUsers = () => {
       axios.get(API_URL + `project/${this.props.boards.currentBoard.ProjectID}/users`)
           .then((response) => {
               this.props.projectsActions.setProjectUsers(response.data.Data)
+
+            this.props.usersActions.setAvailableUsers(this.findAvailableUsers())
+            this.props.usersActions.setAssignedUsers(this.findAssignedUsers())
           })
           .catch((error) => {
               if (error.response && error.response.data.Message) {
@@ -214,28 +254,6 @@ class BoardPage extends Component{
   render() {
 
     const { classes } = this.props
-    const { issues } = this.props
-
-      // TODO refactor
-      let usersArr = []
-      let freeUsers = []
-
-      if (this.props.boards.currentBoard && this.props.projects.currentProjectUsers) {
-
-          freeUsers = this.props.projects.currentProjectUsers
-          let users = this.props.boards.currentBoard.Users
-          for (let key in users) {
-              usersArr.push({ID: key, email: users[key]})
-          }
-
-          freeUsers.forEach((freeUser, i) => {
-              usersArr.forEach((assignedUser) => {
-                  if (freeUser.UUID === assignedUser.ID && freeUser.Role === "Owner") {
-                      freeUsers.splice(i, 1)
-                  }
-              })
-          })
-      }
 
     return (
       <Grid
@@ -268,23 +286,24 @@ class BoardPage extends Component{
 
               </Grid>
 
-              <div className={classes.list}>
-                  <List>
-                      {
-                          (usersArr) ?
-                              (usersArr.map((item, i) => (
-                                  <ListItem key={i}>
-                                      <ListItemText primary={item.email}  />
-                                      <Button fab raised={true} onClick={this.deleteUserFromBoard(item.ID)} className={classes.button}>
-                                          <DeleteIcon />
-                                      </Button>
-                                  </ListItem>
-                              )))
-                          : ("null")
-                      }
+          {(this.props.users.assignedUsers) ? (
+            this.props.users.assignedUsers.map((item, i) => (
 
-                  </List>
-              </div>
+              <Chip
+                // todo: link to user page
+                onClick={this.handleClose}
+                key={i}
+                label={ `${item.FirstName} ${item.LastName}`}
+                onDelete={this.deleteUserFromBoard(item.UUID)}
+                className={classes.chip}
+                avatar={
+                  <Avatar>
+                    <FaceIcon />
+                  </Avatar>
+                } />
+
+            ))
+          ) : (null)}
 
           </Grid>
 
@@ -314,12 +333,6 @@ class BoardPage extends Component{
             </Grid>
 
           </Grid>
-
-          {/* (issues.hierarchy) ? (
-
-
-          ) : (null) */}
-
 
           { (this.props.issues.currentIssues) ? (
 
@@ -456,14 +469,15 @@ class BoardPage extends Component{
             <DialogTitle id="form-dialog-title">Add user</DialogTitle>
             <DialogContent>
                 <List>
-                    {(freeUsers) ? (freeUsers.map((item, i) => (
+                    {(this.props.users.availableUsers) ?
+                      (this.props.users.availableUsers.map((item, i) => (
                         <ListItem button onClick={() => this.addUserToBoard(item)} key={i}>
                             <ListItemAvatar>
                                 <Avatar className={classes.avatar}>
                                     <PersonIcon />
                                 </Avatar>
                             </ListItemAvatar>
-                            <ListItemText primary={item.Email}  />
+                            <ListItemText primary={ `${item.FirstName} ${item.LastName}` }  />
                         </ListItem>
                     ))) : (null)}
                 </List>
@@ -500,14 +514,11 @@ const styles = {
   button: {
     marginRight: '1em'
   },
-  list: {
-      backgroundColor: '#fff'
-  },
-
-  // avatar: {
-  //     backgroundColor: "1E88E5",
-  //     color: "#1e88e5",
-  // }
+  chip: {
+    background: '#fff',
+    marginBottom: '.5em',
+    marginRight: '.5em',
+  }
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -517,6 +528,7 @@ const mapStateToProps = (state, ownProps) => {
     boards: state.boards,
     issues: state.issues,
     projects: state.projects,
+    users: state.users,
     ownProps
   }
 }
@@ -527,7 +539,8 @@ const mapDispatchToProps = (dispatch) => {
     sprintsActions: bindActionCreators(sprintsActions, dispatch),
     issuesActions: bindActionCreators(issuesActions, dispatch),
     boardsActions: bindActionCreators(boardsActions, dispatch),
-    projectsActions: bindActionCreators(projectsActions, dispatch)
+    projectsActions: bindActionCreators(projectsActions, dispatch),
+    usersActions: bindActionCreators(usersActions, dispatch)
   }
 }
 
