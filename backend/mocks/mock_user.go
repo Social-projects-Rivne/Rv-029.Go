@@ -46,6 +46,19 @@ func (mr *MockUserCRUDMockRecorder) AddRoleToProject(arg0, arg1, arg2 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddRoleToProject", reflect.TypeOf((*MockUserCRUD)(nil).AddRoleToProject), arg0, arg1, arg2)
 }
 
+// CheckUserPassword mocks base method
+func (m *MockUserCRUD) CheckUserPassword(arg0 models.User) (models.User, error) {
+	ret := m.ctrl.Call(m, "CheckUserPassword", arg0)
+	ret0, _ := ret[0].(models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckUserPassword indicates an expected call of CheckUserPassword
+func (mr *MockUserCRUDMockRecorder) CheckUserPassword(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserPassword", reflect.TypeOf((*MockUserCRUD)(nil).CheckUserPassword), arg0)
+}
+
 // Delete mocks base method
 func (m *MockUserCRUD) Delete(arg0 *models.User) error {
 	ret := m.ctrl.Call(m, "Delete", arg0)
@@ -94,6 +107,19 @@ func (mr *MockUserCRUDMockRecorder) FindByID(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockUserCRUD)(nil).FindByID), arg0)
 }
 
+// GetProjectUsersList mocks base method
+func (m *MockUserCRUD) GetProjectUsersList(arg0 gocql.UUID) ([]models.User, error) {
+	ret := m.ctrl.Call(m, "GetProjectUsersList", arg0)
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProjectUsersList indicates an expected call of GetProjectUsersList
+func (mr *MockUserCRUDMockRecorder) GetProjectUsersList(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectUsersList", reflect.TypeOf((*MockUserCRUD)(nil).GetProjectUsersList), arg0)
+}
+
 // Insert mocks base method
 func (m *MockUserCRUD) Insert(arg0 *models.User) error {
 	ret := m.ctrl.Call(m, "Insert", arg0)
@@ -116,4 +142,16 @@ func (m *MockUserCRUD) Update(arg0 *models.User) error {
 // Update indicates an expected call of Update
 func (mr *MockUserCRUDMockRecorder) Update(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserCRUD)(nil).Update), arg0)
+}
+
+// UpdateFirstAndLastName mocks base method
+func (m *MockUserCRUD) UpdateFirstAndLastName(arg0 *models.User) error {
+	ret := m.ctrl.Call(m, "UpdateFirstAndLastName", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateFirstAndLastName indicates an expected call of UpdateFirstAndLastName
+func (mr *MockUserCRUDMockRecorder) UpdateFirstAndLastName(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFirstAndLastName", reflect.TypeOf((*MockUserCRUD)(nil).UpdateFirstAndLastName), arg0)
 }

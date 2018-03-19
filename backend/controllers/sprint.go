@@ -10,6 +10,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
+	//"fmt"
 )
 
 const DBError = "Error while accessing to database"

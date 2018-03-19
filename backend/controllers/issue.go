@@ -3,14 +3,16 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
-	"time"
 )
 
 //StoreIssue creates issue in database
@@ -40,25 +42,11 @@ func StoreIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = gocql.TimeUUID()
 	issue.Name = issueRequestData.Name
 	issue.Status = issueRequestData.Status
-	issue.UserID = issueRequestData.UserID
 	issue.Description = issueRequestData.Description
 	issue.Estimate = issueRequestData.Estimate
 	issue.SprintID = issueRequestData.SprintID
-
-	if issue.UserID.String() != "00000000-0000-0000-0000-000000000000"{
-		user := models.User{}
-		user.UUID = issue.UserID
-		if err := models.UserDB.FindByID(&user); err != nil {
-			log.Printf("Error in controllers/issue error: %+v", err)
-			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
-			response.Failed(w)
-			return
-		}
-		issue.UserFirstName = user.FirstName
-		issue.UserLastName = user.LastName
-	}
-
 	issue.BoardID = boardID
+
 	board := &models.Board{}
 	board.ID = issue.BoardID
 	if err := models.BoardDB.FindByID(board); err != nil {
@@ -308,4 +296,49 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
+}
+
+func SetParentIssue(w http.ResponseWriter, r *http.Request) {
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.SetParentIssue): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	type req struct {
+		Issues []string `json:"issues"`
+		Parent string   `json:"parent"`
+	}
+
+	var reqData req
+
+	err = json.Unmarshal(body, &reqData)
+
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.SetParentIssue): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	parent, _ := gocql.ParseUUID(reqData.Parent)
+	children := make([]gocql.UUID, 0)
+
+	for _, value := range reqData.Issues {
+		parsedUUID, _ := gocql.ParseUUID(value)
+		children = append(children, parsedUUID)
+	}
+
+	models.IssueDB.SetParentIssue(children, parent)
 }

@@ -103,3 +103,6 @@ $ fresh
 | Board Issues list | project/board/:board_id/issue/list | - | GET | YES |
 | Sprint Issues list | project/board/sprint/:sprint_id/issue/list | - | GET | YES |
 | Show Issue | project/board/issue/show/:issue_id | - | GET | YES |
+| User Add Permission | user/:user_id/add/permission | JSON{ permission: some-permission-name } | POST | YES |
+| User Remove Permission | user/:user_id/remove/permission | JSON{ permission: some-permission-name } | POST | YES |
+| Set User Permissions | user/:user_id/issue/set/permissions | JSON{ permissions: ["some-permission-name1", "some-permission-name2", "some-permission-name3"] } | POST | YES |

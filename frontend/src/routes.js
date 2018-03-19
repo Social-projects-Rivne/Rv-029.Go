@@ -18,13 +18,19 @@ import BoardPage from './components/BoardPage'
 
 import HomePage from './containers/HomePage'
 import DefaultPage from './containers/DefaultPage'
-import ProjectsPage from "./containers/ProjectsPage";
-import CreateProjectsPage from "./containers/CreateProjectsPage";
-import SprintPage from "./containers/SprintPage";
+import ProjectsPage from "./containers/ProjectsPage"
+import CreateProjectsPage from "./containers/CreateProjectsPage"
+import SprintPage from "./containers/SprintPage"
 
 import auth from './services/auth'
 import ViewProjectPage from './components/ViewProjectPage'
-import CreateBoardPage from "./containers/CreateBoardPage";
+import CreateBoardPage from "./containers/CreateBoardPage"
+import VeiwUserProfile from "./containers/UserProfile"
+import FormUpdate from "./components/FormUpdate"
+
+// import VeiwUserProfile from "./containers/ChangeUserInformation"
+
+import Socket from './components/Socket'
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -83,7 +89,12 @@ export const routes = (
         <Route path="project/:id/board/create" component={CreateBoardPage}/>
         <Route path="board/:id" component={BoardPage}/>
         <Route path="sprint/:id" component={SprintPage}/>
+        <Route path="profile" component={VeiwUserProfile}/>
+        <Route path="profile/update" component={FormUpdate}/>
+        {/* <Route path="profile/update" component={ChangeUserInformation}/> */}
       </Route>
+
+      <Route path="socket" component={Socket}/>
 
       <Route path="home-page" component={HomePage}/>
     </Route>
