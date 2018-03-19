@@ -29,6 +29,7 @@ import Dialog, {
   DialogTitle,
 } from 'material-ui/Dialog'
 
+
 class BoardPage extends Component{
 
   state = {
@@ -93,7 +94,7 @@ class BoardPage extends Component{
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
         this.props.issuesActions.setIssues(response.data.Data) // todo RM
-        issuesActions.setIssuesHierarchy(this.transform(response.data.Data))
+        issuesActions.setIssuesHierarchy(this.buildTree(response.data.Data))
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -104,30 +105,48 @@ class BoardPage extends Component{
       })
   }
 
-  // refactor
-  transform = (issues) => {
+  buildTree = (issues) => {
     const emptyID = "00000000-0000-0000-0000-000000000000"
-    let lvl1 = []
+    let result = []
 
     issues.forEach((item) => {
       if (item.Parent === emptyID) {
-        lvl1.push(item)
+        result.push(item)
       }
     })
 
-    lvl1.forEach((item) => { // WARNING changing redux state without store.dispatch
-      item.Children = this.findChildren(issues, item.UUID)
+    result.forEach((item) => {
+      item.Children = this.setChildren(issues, item.UUID)
     })
 
-    return lvl1
+    this.setNesting(result)
+
+    return result
   }
 
-  findChildren = (arr, parent) => {
+
+  setNesting = (arr, prefix = null) => {
+    if (arr.length > 0) {
+      for (let i = 0; i < arr.length; i++) {
+        if (!prefix) {
+          arr[i].Nesting = arr[i].Name
+        } else {
+          arr[i].Nesting = prefix + ' > ' + arr[i].Name
+        }
+
+        if (arr[i].Children.length > 0) {
+          this.setNesting(arr[i].Children, arr[i].Nesting)
+        }
+      }
+    }
+  }
+
+  setChildren = (arr, parent) => {
     let out = []
 
     for (let i in arr) {
       if (arr[i].Parent === parent) {
-        let children = this.findChildren(arr, arr[i].UUID)
+        let children = this.setChildren(arr, arr[i].UUID)
 
         children.length ?
           arr[i].Children = children :
@@ -246,29 +265,7 @@ class BoardPage extends Component{
     })
   }
 
-  // getNesting = (hierarchy, issue, nesting = '') => {
-  //
-  //   for (let i = 0; i < hierarchy.length; i++) {
-  //
-  //     if (hierarchy[i].UUID === issue.UUID) {
-  //       return nesting += ` > ${issue.Name} <`
-  //     } else if (!hierarchy[i].Children.length) {
-  //       return null
-  //     } else {
-  //       nesting += ` > ${hierarchy[i].Name}`
-  //       nesting += this.getNesting(hierarchy[i].Children, issue, nesting)
-  //     }
-  //   }
-  //
-  //   return nesting
-  //
-  // }
-
   render() {
-
-    if (this.props.issues.hierarchy) {
-      console.log(this.getNesting(this.props.issues.hierarchy, this.props.issues.currentIssues[1]))
-    }
 
     const { classes } = this.props
     const { issues } = this.props
