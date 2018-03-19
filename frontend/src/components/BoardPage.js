@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import SprintCard from "./SprintCard"
 import {API_URL} from "../constants/global"
 import IssueCard from "./IssueCard"
+import InjectTransformIssues from '../decorators/transformIssues'
 import PropTypes from 'prop-types'
 import * as defaultPageActions from "../actions/DefaultPageActions"
 import * as boardsActions from "../actions/BoardsActions"
@@ -89,12 +90,11 @@ class BoardPage extends Component{
   }
 
   getIssuesList = () => {
-    const { issuesActions } = this.props
+    const { issuesActions, transformIssues } = this.props
 
     axios.get(API_URL + `project/board/${this.props.ownProps.params.id}/issue/list`)
       .then((response) => {
-        this.props.issuesActions.setIssues(response.data.Data) // todo RM
-        issuesActions.setIssuesHierarchy(this.buildTree(response.data.Data))
+        this.props.issuesActions.setIssues(transformIssues(response.data.Data))
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -103,60 +103,6 @@ class BoardPage extends Component{
           messages("Server error occured")
         }
       })
-  }
-
-  buildTree = (issues) => {
-    const emptyID = "00000000-0000-0000-0000-000000000000"
-    let result = []
-
-    issues.forEach((item) => {
-      if (item.Parent === emptyID) {
-        result.push(item)
-      }
-    })
-
-    result.forEach((item) => {
-      item.Children = this.setChildren(issues, item.UUID)
-    })
-
-    this.setNesting(result)
-
-    return result
-  }
-
-
-  setNesting = (arr, prefix = null) => {
-    if (arr.length > 0) {
-      for (let i = 0; i < arr.length; i++) {
-        if (!prefix) {
-          arr[i].Nesting = arr[i].Name
-        } else {
-          arr[i].Nesting = prefix + ' > ' + arr[i].Name
-        }
-
-        if (arr[i].Children.length > 0) {
-          this.setNesting(arr[i].Children, arr[i].Nesting)
-        }
-      }
-    }
-  }
-
-  setChildren = (arr, parent) => {
-    let out = []
-
-    for (let i in arr) {
-      if (arr[i].Parent === parent) {
-        let children = this.setChildren(arr, arr[i].UUID)
-
-        children.length ?
-          arr[i].Children = children :
-          arr[i].Children = []
-
-        out.push(arr[i])
-      }
-    }
-
-    return out
   }
 
   getCurrentBoard = () => {
@@ -585,6 +531,6 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-export default withStyles(styles)(
-    connect(mapStateToProps, mapDispatchToProps)(BoardPage)
+export default InjectTransformIssues(
+  withStyles(styles)( connect(mapStateToProps, mapDispatchToProps)(BoardPage) )
 )
