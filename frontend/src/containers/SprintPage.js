@@ -12,6 +12,7 @@ import {bindActionCreators} from 'redux';
 import {API_URL} from "../constants/global";
 import messages from "../services/messages";
 import axios from "axios";
+import InjectTransformIssues from '../decorators/transformIssues'
 
 const pageTitle = "Active Sprint";
 
@@ -97,7 +98,7 @@ class SprintPage extends Component {
                 if (response.data.Data == null) {
                     this.props.sprintsActions.setSprintIssues([])
                 } else {
-                    this.props.sprintsActions.setSprintIssues(response.data.Data)
+                    this.props.sprintsActions.setSprintIssues(this.props.transformIssues(response.data.Data))
                 }
             })
             .catch((error) => {
@@ -114,6 +115,7 @@ class SprintPage extends Component {
     }
 
     render () {
+
         const {classes, projects, } = this.props
         const issues = this.groupByStatus()
 
@@ -182,6 +184,8 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-export default withStyles(styles)(
+export default InjectTransformIssues(
+  withStyles(styles)(
     connect(mapStateToProps, mapDispatchToProps)(SprintPage)
+  )
 )

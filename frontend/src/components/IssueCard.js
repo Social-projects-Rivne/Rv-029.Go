@@ -23,6 +23,7 @@ import Select from 'material-ui/Select'
 import TextField from 'material-ui/TextField'
 import Typography from 'material-ui/Typography'
 import SettingsIcon from 'material-ui-icons/Settings';
+import Tooltip from 'material-ui/Tooltip';
 import { FormGroup, FormControlLabel } from 'material-ui/Form'
 import Checkbox from 'material-ui/Checkbox'
 import Dialog, {
@@ -219,7 +220,7 @@ class IssueCard extends Component  {
 
   render() {
     const { classes } = this.props
-    const { Name, Description, Status, Estimate, SprintID, UUID } = this.props.data
+    const { Name, Description, Status, Estimate, SprintID, UUID, Nesting } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
     const {
@@ -232,21 +233,24 @@ class IssueCard extends Component  {
     return (
       <ExpansionPanel expanded={this.state.isIssueOpen}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} onClick={this.toggleOpened}>
-          <Grid
-            container
-            alignItems={'center'}>
-            <Grid style={{ marginRight: '1em' }}>
-              <Chip label={Status} />
+          <Tooltip title={Nesting === '' ? '' : `Parents: ${Nesting}`}>
+            <Grid
+              container
+              alignItems={'center'}>
+              <Grid style={{ marginRight: '1em' }}>
+                <Chip label={Status} />
+              </Grid>
+              <Grid>
+                <Typography>{Name}</Typography>
+              </Grid>
             </Grid>
-            <Grid>
-              <Typography>{Name}</Typography>
-            </Grid>
-          </Grid>
+          </Tooltip>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container >
             <Grid item xs={12}>
-              <Typography type={'title'}>{ `Estimate: ${Estimate}` }</Typography>
+              <Typography type={'body2'}>{Nesting === '' ? null : `Nesting: ${Nesting} ${Name}`}</Typography>
+              <Typography type={'body2'}>{ `Estimate: ${Estimate}` }</Typography>
               <Typography> {Description} </Typography>
             </Grid>
           </Grid>
@@ -379,9 +383,12 @@ class IssueCard extends Component  {
           <DialogContent>
             <FormGroup>
 
-              { // TODO: move to IssueCard to get parent id
+              {
                 this.props.issues.currentIssues.map((item, i) => {
-                  if (item.Parent === "00000000-0000-0000-0000-000000000000") {
+
+                  if (item.UUID === UUID) return null
+
+                  else if (item.Parent === "00000000-0000-0000-0000-000000000000") {
                     return (
 
                       <FormControlLabel
