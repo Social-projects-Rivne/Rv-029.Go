@@ -67,7 +67,10 @@ class ViewProjectPage extends Component {
     return (
       <Grid className={classes.root}>
         <Grid item xs={12}>
-          <Grid container className={classes.list} justify="center">
+          <Grid
+            container
+            className={classes.list}
+            justify="flex-start">
             {boards.currentBoards.map((item, i) => (
               <Grid key={i} item>
                 <BoardCard board={item}/>
@@ -96,6 +99,7 @@ const styles = theme => ({
     paddingTop: 20,
     paddingLeft: 80,
     paddingRight: 80,
+    maxWidth: '100%'
   }
 });
 
