@@ -112,7 +112,7 @@ func (p *ProjectStorage) GetProjectList(project *Project) ([]Project, error) {
 	var row map[string]interface{}
 	var pageState []byte
 
-	iterator := p.DB.Query(GET_PROJECTS).Consistency(gocql.One).PageState(pageState).PageSize(5).Iter()
+	iterator := p.DB.Query(GET_PROJECTS).Consistency(gocql.One).PageState(pageState).PageSize(25).Iter()
 	pageState = iterator.PageState()
 
 	if iterator.NumRows() > 0 {
