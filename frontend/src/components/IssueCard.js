@@ -233,7 +233,7 @@ class IssueCard extends Component  {
     return (
       <ExpansionPanel expanded={this.state.isIssueOpen}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} onClick={this.toggleOpened}>
-          <Tooltip title={Nesting}>
+          <Tooltip title={Nesting === '' ? '' : `Parents: ${Nesting}`}>
             <Grid
               container
               alignItems={'center'}>
@@ -249,7 +249,8 @@ class IssueCard extends Component  {
         <ExpansionPanelDetails>
           <Grid container >
             <Grid item xs={12}>
-              <Typography type={'title'}>{ `Estimate: ${Estimate}` }</Typography>
+              <Typography type={'body2'}>{Nesting === '' ? null : `Nesting: ${Nesting} ${Name}`}</Typography>
+              <Typography type={'body2'}>{ `Estimate: ${Estimate}` }</Typography>
               <Typography> {Description} </Typography>
             </Grid>
           </Grid>
