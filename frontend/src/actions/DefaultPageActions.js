@@ -6,6 +6,7 @@ import {
     HANDLE_ADD_USER_TO_PROJECT_TOGGLE,
     HANDLE_PERMISSIONS_LOADED,
     HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE,
+    HANDLE_IMPORT_USERS_TOGGLE,
     HANDLE_ROLES_LOADED,
     HANDLE_SET_USER,
 } from '../constants/defaultPage'
@@ -63,5 +64,11 @@ export const togglePermissionsDialog = (state, user = null) => {
         type: HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE,
         payload: state,
         user: state ? user : null
+    }
+}
+export const toggleImportUsersDialog = (state) => {
+    return {
+        type: HANDLE_IMPORT_USERS_TOGGLE,
+        payload: state,
     }
 }

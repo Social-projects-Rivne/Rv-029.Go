@@ -29,6 +29,7 @@ import Dialog, {
 import {API_URL} from "../constants/global";
 import messages from "../services/messages";
 import axios from "axios/index";
+import FormInput from "./FormInput";
 
 
 const styles = {
@@ -51,6 +52,16 @@ const styles = {
     },
     link: {
         textDecoration: 'none'
+    },
+    exampleImageInput: {
+        cursor: 'pointer',
+        position: 'absolute',
+        top: '0',
+        bottom: '0',
+        right: '0',
+        left: '0',
+        width: '100%',
+        opacity: '0'
     }
 };
 
@@ -109,25 +120,22 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
         defaultPageActions.togglePermissionsDialog(true, item);
     };
 
+    const handleImportUsers = () => {
+        //TODO: send file
+    };
+
+    const handleImportUsersOpen = () => {
+        defaultPageActions.toggleImportUsersDialog(true);
+    };
+
+    const handleImportUsersClose = () => {
+        defaultPageActions.toggleImportUsersDialog(false);
+    };
+
     const handleAddUserToProject = (role) => {
         handleUserToProjectClose()
         handleUserToProjectWithPermissionsClose()
-
-        axios.post(API_URL + `project/` + projects.currentProject.UUID + `/add/user`, {
-            user: defaultPage.userToAdd.UUID,
-            role: role,
-        })
-            .then((response) => {
-                messages(response.data.Message)
-            })
-            .catch((error) => {
-                if (error.response && error.response.data.Message) {
-                    messages(error.response.data.Message)
-                } else {
-                    messages("Server error occured")
-                }
-            });
-    }
+    };
 
     let projectBoardsList = null
     if (projects.currentProject !== null) {
@@ -183,6 +191,14 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                                         <Icon color="primary">add</Icon>
                                     </ListItemIcon>
                                     <ListItemText primary="Add Project" />
+                                </ListItem>
+                            </Link>
+                            <Link onClick={handleImportUsersOpen} className={classes.link}>
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <Icon color="primary">add</Icon>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Import Users From CSV" />
                                 </ListItem>
                             </Link>
                         </List>
@@ -270,6 +286,31 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                 <DialogActions>
                     <Button onClick={handleUserToProjectWithPermissionsClose} color="primary">
                         Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* IMPORT USERS */}
+            <Dialog
+                open={defaultPage.isImportUsersOpened}
+                onClose={handleImportUsersClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Select *.csv file in appropriate format</DialogTitle>
+                <DialogContent>
+                    <div>
+                        <input
+                            type="file" name="file" id="file"
+                            className="input-file"
+                            onChange={() => {}}
+                            accept="text/csv"
+                        />
+                    </div>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleImportUsersClose} color="default">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleImportUsers} color="primary">
+                        Import
                     </Button>
                 </DialogActions>
             </Dialog>
