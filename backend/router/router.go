@@ -1,9 +1,9 @@
 package router
 
 import (
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/scrum_poker"
 	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/kafka"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
 )
 
@@ -43,8 +43,8 @@ func init() {
 }
 
 func applySocketRouter(r *mux.Router) {
-	r.HandleFunc("/socketserver", kafka.SocketHandler)
-	r.HandleFunc("/socket.io/", kafka.SocketHandler)
+	r.HandleFunc("/socketserver", scrum_poker.SocketHandler)
+	//r.HandleFunc("/socket.io/", kafka.SocketHandler)
 }
 
 func applyAuthRoutes(r *mux.Router) {
