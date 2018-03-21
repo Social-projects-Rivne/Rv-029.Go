@@ -276,16 +276,16 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		b, _ = gocql.ParseUUID(fmt.Sprintf("%s", k))
 		a = append(a, b)
 	}
-	c, err := models.ProjectDB.GetProjectsNamesList(a)
+	projects, err := models.ProjectDB.GetProjectsNamesList(a)
 	if err != nil{
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
 	var i = 0
-	if len(c) > 0{
+	if len(projects) > 0{
 		for k := range user.Projects {
-			user.Projects[k] = c[i].Name
+			user.Projects[k] = projects[i].Name
 			i++
 		}
 	}
