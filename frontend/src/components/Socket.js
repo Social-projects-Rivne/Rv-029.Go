@@ -39,6 +39,10 @@ class Socket extends Component {
   //   })
   // }
 
+  componentDidMount() {
+    this.subscribe()
+  }
+
   subscribe = () => {
     const socket = new WebSocket("ws://localhost:8080/socketserver");
 
@@ -67,8 +71,12 @@ class Socket extends Component {
   sendMessage = () => {
     const { socket } = this.state
 
+    let json = {action: 'CREATE_ESTIMATION_ROOM', sprintID: '12345', user: '123456'}
+
+    let jsonStr = JSON.stringify(json)
+
     if (socket) {
-      socket.send(this.state.message);
+      socket.send(jsonStr);
 
       this.setState({
         message: ''
@@ -100,6 +108,13 @@ class Socket extends Component {
         </CardContent>
 
         <CardActions>
+          <Button
+            raised
+            color="secondary"
+            onClick={this.subscribe}>
+            Start Estimation
+          </Button>
+
           <Button
             raised
             color="secondary"
