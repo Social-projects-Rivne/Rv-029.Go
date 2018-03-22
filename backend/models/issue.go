@@ -38,7 +38,7 @@ const (
 
 	GET_BOARD_BACKLOG_ISSUES_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at FROM board_issues WHERE board_id = ? AND sprint_id = 00000000-0000-0000-0000-000000000000"
 
-	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at from sprint_issues WHERE sprint_id = ? ;"
+	GET_SPRINT_ISSUE_LIST = "SELECT id, name, status, description, estimate, user_id,user_first_name,user_last_name, sprint_id, board_id, board_name, project_id, project_name, parent, created_at, updated_at, logs from sprint_issues WHERE sprint_id = ? ;"
 )
 
 //Issue model
@@ -59,7 +59,7 @@ type Issue struct {
 	Parent        gocql.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	Logs          map[gocql.UUID]string
+	Logs          string
 }
 
 type IssueCRUD interface {
@@ -113,9 +113,6 @@ func (s *IssueStorage) Update(issue *Issue) error {
 	return nil
 }
 
-// FIXME
-// bug possible
-// see previous commit to figure out changes
 func (s *IssueStorage) Delete(issue *Issue) error {
 
 	if err := s.DB.Query(DELETE_ISSUE, issue.UUID).Exec(); err != nil {
@@ -260,6 +257,7 @@ func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 				ProjectID:     row["project_id"].(gocql.UUID),
 				ProjectName:   row["project_name"].(string),
 				Parent:        row["parent"].(gocql.UUID),
+				Logs: 		   row["logs"].(string),
 				CreatedAt:     row["created_at"].(time.Time),
 				UpdatedAt:     row["updated_at"].(time.Time),
 			})

@@ -40,6 +40,14 @@ import Avatar from 'material-ui/Avatar';
 import FaceIcon from 'material-ui-icons/Face';
 import messages from "../services/messages";
 
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import ImageIcon from 'material-ui-icons/Image';
+import WorkIcon from 'material-ui-icons/Work';
+import BeachAccessIcon from 'material-ui-icons/BeachAccess';
+import Divider from 'material-ui/Divider';
+
+
+
 class IssueCard extends Component  {
   state = {
     updateIssueOpen: false,
@@ -77,7 +85,6 @@ class IssueCard extends Component  {
       log: this.state.logInput
     })
       .then((res) => {
-        setNotificationMessage(res.data.Message)
         this.props.onUpdate()
         this.handleClose()
       })
@@ -349,42 +356,39 @@ class IssueCard extends Component  {
             </Grid>
 
             <Grid container spacing={8}>
-            <Grid item xs={12}>
-              <TextField
-                id="logInput"
-                label="Log progress"
-                helperText="Any job you made working on this task"
-                onChange={this.handleLogInput}
-                fullWidth
-                margin="normal" />
+              <Grid item xs={12}>
+                <TextField
+                  id="logInput"
+                  label="Log progress"
+                  helperText="Any job you made working on this task"
+                  onChange={this.handleLogInput}
+                  value={this.state.logInput}
+                  fullWidth
+                  margin="normal" />
 
-              <Button
-                onClick={this.addLog}
-                fullWidth
-                color={'primary'}>
-                send
-              </Button>
+                <Button
+                  onClick={this.addLog}
+                  fullWidth
+                  color={'primary'}>
+                  send
+                </Button>
+              </Grid>
+
+              {(this.props.sprints.issues) ? (
+
+                <List>
+                  <ListItem>
+                    <Avatar>
+                      <FaceIcon />
+                    </Avatar>
+                    <ListItemText primary="Photos" secondary="Jan 9, 2014" />
+                  </ListItem>
+                </List>
+
+              ) : (null)}
+
+
             </Grid>
-
-              {/*{Logs ? (*/}
-
-                {/*<Grid item xs={12}>*/}
-                  {/*<Chip*/}
-                    {/*label="Log"*/}
-                    {/*onClick={()=>{}}*/}
-                    {/*className={classes.log}*/}
-                    {/*avatar={*/}
-                      {/*<Avatar>*/}
-                        {/*<FaceIcon />*/}
-                      {/*</Avatar>*/}
-                    {/*}*/}
-                  {/*/>*/}
-                {/*</Grid>*/}
-                {/**/}
-              {/*) : (null)}*/}
-
-
-          </Grid>
           </Grid>
 
         {/*</ExpansionPanelDetails>*/}

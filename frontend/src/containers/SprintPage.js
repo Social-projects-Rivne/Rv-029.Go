@@ -110,6 +110,10 @@ class SprintPage extends Component {
             });
     };
 
+    transformIssueLogs = (issues) => {
+
+    }
+
     static propTypes = {
         classes: PropTypes.object.isRequired,
     }

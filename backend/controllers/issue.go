@@ -366,6 +366,7 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 	})
 
 	err = json.Unmarshal(body, &req)
+
 	if err != nil {
 		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
 
@@ -377,8 +378,8 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newLog := make(map[gocql.UUID]string)
-	newLog[req.UserID] = req.Log
+	//newLog := make(map[gocql.UUID]string)
+	//newLog[req.UserID] = req.Log
 
 	issue := &models.Issue{}
 	issue.UUID = req.IssueID
@@ -388,7 +389,7 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	issue.Logs = newLog
+	issue.Logs = string(body)
 
 	err = models.IssueDB.AddLog(issue)
 	if err != nil {
