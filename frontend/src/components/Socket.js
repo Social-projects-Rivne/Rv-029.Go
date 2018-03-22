@@ -65,7 +65,7 @@ class Socket extends Component {
       if (socket) {
         let msg = JSON.stringify({
           action: 'CREATE_ESTIMATION_ROOM',
-          sprintID: '83275e7b-26d4-11e8-9e3b-88d7f6700d35', // only for debugging
+          sprintID: 'bc3f1b7f-26ae-11e8-82ef-00224d6aa2cc', // only for debugging
         })
 
         socket.send(msg)
@@ -78,8 +78,8 @@ class Socket extends Component {
     if (socket) {
       let msg = JSON.stringify({
         action: 'REGISTER_CLIENT',
-        sprintID: '83275e7b-26d4-11e8-9e3b-88d7f6700d35', // only for debugging
-        user: '123456'
+        sprintID: 'bc3f1b7f-26ae-11e8-82ef-00224d6aa2cc', // only for debugging
+        userID: 'bc3929a1-26ae-11e8-82d1-00224d6aa2cc'
       })
 
       socket.send(msg)
@@ -93,8 +93,8 @@ class Socket extends Component {
 
       let msg = JSON.stringify({
         action: 'ESTIMATION',
-        sprintID: '83275e7b-26d4-11e8-9e3b-88d7f6700d35', // only for debugging
-        user: '123456',
+        sprintID: 'bc3f1b7f-26ae-11e8-82ef-00224d6aa2cc', // only for debugging
+        userID: 'bc3929a1-26ae-11e8-82d1-00224d6aa2cc',
         message: this.state.message
       })
 

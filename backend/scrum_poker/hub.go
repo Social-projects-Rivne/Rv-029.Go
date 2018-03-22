@@ -3,23 +3,24 @@ package scrum_poker
 import (
 	"github.com/Shopify/sarama"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"log"
+	"github.com/gocql/gocql"
 )
 
 type Hub struct {
 	Producer sarama.SyncProducer
 	Consumer sarama.PartitionConsumer
-	Clients map[*Client]bool
+	Clients map[gocql.UUID]*Client
 	Register chan *Client
 	Unregister chan *Client
 	Sprint models.Sprint
+	Broadcast chan []byte
 }
 
 func newHub(producer sarama.SyncProducer, consumer sarama.PartitionConsumer, sprint models.Sprint) Hub {
 	return Hub{
 		Producer: producer,
 		Consumer: consumer,
-		Clients:    make(map[*Client]bool),
+		Clients:    make(map[gocql.UUID]*Client),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Sprint: sprint,
@@ -31,26 +32,22 @@ func (h *Hub) run() {
 		select {
 
 		case client := <-h.Register:
-			h.Clients[client] = true
+			h.Clients[client.user.UUID] = client
 
 		case client := <-h.Unregister:
-			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
+
+			if _, ok := h.Clients[client.user.UUID]; ok {
+				delete(h.Clients, client.user.UUID)
 				close(client.send)
 			}
 
-		case err := <-h.Consumer.Errors():
-			log.Fatal(err)
-
-		case m := <-h.Consumer.Messages():
-			message := []byte(m.Value)
-
-			for client := range h.Clients {
+		case msg := <-h.Broadcast:
+			for _, client := range h.Clients {
 				select {
-				case client.send <- message:
+				case client.send <- msg:
 				default:
 					close(client.send)
-					delete(h.Clients, client)
+					delete(h.Clients, client.user.UUID)
 				}
 			}
 		}

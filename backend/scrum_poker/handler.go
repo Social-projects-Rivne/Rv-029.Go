@@ -17,7 +17,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var ActiveEstimations = make([]Hub, 0)
+var ActiveHubs = make(map[gocql.UUID]*Hub, 0)
 
 func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -28,14 +28,14 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			req := make(map[string]interface{}, 0)
 			_, msg, _ := conn.ReadMessage()
 			json.Unmarshal(msg, &req)
-
+			fmt.Println("HANDLER:", req)
 			switch req["action"] {
 			case "CREATE_ESTIMATION_ROOM":
 				CreateRoom(req)
 			case "REGISTER_CLIENT":
 				RegisterClient(req, conn)
 			case "ESTIMATION":
-				fmt.Println(1)
+				SetEstimation(req)
 			}
 		}
 	}()
@@ -50,13 +50,11 @@ func CreateRoom(req map[string]interface{}) {
 	}
 	_ = models.SprintDB.FindByID(&sprint)
 
-	// One producer & one consumer per room
-	producer := InitProducer()
-	consumer := InitConsumer("test-topic-1", 0)
+	hub := newHub(Producer, Consumer, sprint)
 
-	hub := newHub(producer, consumer, sprint)
-
-	ActiveEstimations = append(ActiveEstimations, hub)
+	if _, ok := ActiveHubs[sprintUUID]; ok {
+		ActiveHubs[sprintUUID] = &hub
+	}
 
 	go hub.run()
 

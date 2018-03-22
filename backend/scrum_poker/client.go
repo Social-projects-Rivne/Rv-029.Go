@@ -1,20 +1,20 @@
 package scrum_poker
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
-	"log"
 	"strconv"
 	"time"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 )
 
 type Client struct {
 	hub *Hub
 	conn *websocket.Conn
 	send chan []byte
+	user *models.User
 }
 
 func RegisterClient(res map[string]interface{}, conn *websocket.Conn) {
@@ -25,51 +25,37 @@ func RegisterClient(res map[string]interface{}, conn *websocket.Conn) {
 
 	sprintUUID, _ := gocql.ParseUUID(res["sprintID"].(string))
 
-	for _, hub := range ActiveEstimations {
-		if hub.Sprint.ID == sprintUUID {
-			client.hub = &hub
-			client.hub.Register <- &client
-		}
+	userUUID, _ := gocql.ParseUUID(res["userID"].(string))
+	user := &models.User{
+		UUID: userUUID,
+	}
+	models.UserDB.FindByID(user)
+	client.user = user
+
+	if _, ok := ActiveHubs[sprintUUID]; ok {
+		client.hub = ActiveHubs[sprintUUID]
+		client.hub.Register <- &client
 	}
 
-	go client.ReadWorker()
 	go client.WriteWorker()
 }
 
-func (c *Client) ReadWorker() {
-	defer func() {
-		c.hub.Unregister <- c
-		c.conn.Close()
-	}()
+func SetEstimation(req map[string]interface{}){
+	message := req["message"].(string)
 
-	for {
-		_, msg, err := c.conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
-			break
-		}
-
-		req := make(map[string]interface{}, 0)
-		json.Unmarshal(msg, &req)
-
-		message := req["message"].(string)
-
-		strTime := strconv.Itoa(int(time.Now().Unix()))
-		producerMessage := &sarama.ProducerMessage{
-			Partition: 0,
-			Topic: "test-topic-1", // move to argument
-			Key:   sarama.StringEncoder(strTime),
-			Value: sarama.StringEncoder(message),
-		}
-
-		_, _, err = c.hub.Producer.SendMessage(producerMessage)
-
-		if err != nil {
-			fmt.Println(err)
-		}
+	strTime := strconv.Itoa(int(time.Now().Unix()))
+	producerMessage := &sarama.ProducerMessage{
+		//Partition: 0,
+		Topic: "test-topic-1", // move to argument
+		Key:   sarama.StringEncoder(strTime),
+		Value: sarama.StringEncoder(message),
 	}
+
+	_, _, err := Producer.SendMessage(producerMessage)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(producerMessage)
 }
 
 func (c *Client) WriteWorker() {
@@ -84,6 +70,7 @@ func (c *Client) WriteWorker() {
 	for {
 		select {
 		case message, ok := <-c.send:
+			fmt.Println(string(message))
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -94,7 +81,7 @@ func (c *Client) WriteWorker() {
 			if err != nil {
 				return
 			}
-
+			fmt.Println(string(message))
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.

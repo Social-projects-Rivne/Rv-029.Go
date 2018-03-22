@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/kafka"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/router"
@@ -20,6 +19,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/rs/cors"
 	"gopkg.in/yaml.v2"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/scrum_poker"
 )
 
 type App struct {
@@ -60,6 +60,8 @@ func init() {
 	APP.InitApp("./backend/config/app.yml")
 }
 
+
+
 func main() {
 	models.InitBoardDB(&models.BoardStorage{APP.DB})
 	models.InitProjectDB(&models.ProjectStorage{APP.DB})
@@ -68,10 +70,11 @@ func main() {
 	models.InitSprintDB(&models.SprintStorage{APP.DB})
 	models.InitRoleDB(&models.RoleStorage{APP.DB})
 
-	kafka.InitProducer()
+	scrum_poker.InitProducer()
+	scrum_poker.InitConsumer("test-topic-1", 0)
 
 	defer func() {
-		if err := kafka.Producer.Close(); err != nil {
+		if err := scrum_poker.Producer.Close(); err != nil {
 			panic(err)
 		}
 	}()

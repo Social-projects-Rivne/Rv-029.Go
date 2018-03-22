@@ -1,8 +1,12 @@
 package scrum_poker
 
-import "github.com/Shopify/sarama"
+import (
+	"github.com/Shopify/sarama"
+)
 
-func InitProducer() sarama.SyncProducer {
+var Producer sarama.SyncProducer
+
+func InitProducer() {
 	config := sarama.NewConfig()
 	config.Producer.Retry.Max = 10
 	config.Producer.Return.Successes = true
@@ -13,5 +17,5 @@ func InitProducer() sarama.SyncProducer {
 		panic(err)
 	}
 
-	return producer
+	Producer = producer
 }
