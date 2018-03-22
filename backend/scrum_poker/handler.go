@@ -2,8 +2,6 @@ package scrum_poker
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -25,37 +23,19 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		for {
-			req := make(map[string]interface{}, 0)
 			_, msg, _ := conn.ReadMessage()
+
+			req := make(map[string]interface{}, 0)
 			json.Unmarshal(msg, &req)
-			fmt.Println("HANDLER:", req)
+
 			switch req["action"] {
 			case "CREATE_ESTIMATION_ROOM":
-				CreateRoom(req)
+				RegisterHub(req)
 			case "REGISTER_CLIENT":
 				RegisterClient(req, conn)
 			case "ESTIMATION":
-				SetEstimation(req)
+				SendEstimation(string(msg))
 			}
 		}
 	}()
-
-}
-
-func CreateRoom(req map[string]interface{}) {
-
-	sprintUUID, _ := gocql.ParseUUID(req["sprintID"].(string))
-	sprint := models.Sprint{
-		ID: sprintUUID,
-	}
-	_ = models.SprintDB.FindByID(&sprint)
-
-	hub := newHub(Producer, Consumer, sprint)
-
-	if _, ok := ActiveHubs[sprintUUID]; ok {
-		ActiveHubs[sprintUUID] = &hub
-	}
-
-	go hub.run()
-
 }

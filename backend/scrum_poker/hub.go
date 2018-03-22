@@ -1,30 +1,40 @@
 package scrum_poker
 
 import (
-	"github.com/Shopify/sarama"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 )
 
 type Hub struct {
-	Producer sarama.SyncProducer
-	Consumer sarama.PartitionConsumer
 	Clients map[gocql.UUID]*Client
 	Register chan *Client
 	Unregister chan *Client
-	Sprint models.Sprint
 	Broadcast chan []byte
+	Sprint models.Sprint
 }
 
-func newHub(producer sarama.SyncProducer, consumer sarama.PartitionConsumer, sprint models.Sprint) Hub {
+func newHub(sprint models.Sprint) Hub {
 	return Hub{
-		Producer: producer,
-		Consumer: consumer,
 		Clients:    make(map[gocql.UUID]*Client),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
+		Broadcast: make(chan []byte),
 		Sprint: sprint,
 	}
+}
+
+func RegisterHub(req map[string]interface{}) {
+	sprintUUID, _ := gocql.ParseUUID(req["sprintID"].(string))
+	sprint := models.Sprint{
+		ID: sprintUUID,
+	}
+	_ = models.SprintDB.FindByID(&sprint)
+
+	hub := newHub(sprint)
+
+	ActiveHubs[sprintUUID] = &hub
+
+	go hub.run()
 }
 
 func (h *Hub) run() {

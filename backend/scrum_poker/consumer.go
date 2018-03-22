@@ -1,16 +1,17 @@
 package scrum_poker
 
 import (
-	"github.com/Shopify/sarama"
 	"log"
-	"encoding/json"
+
+	"github.com/Shopify/sarama"
 	"github.com/gocql/gocql"
-	"fmt"
+
+	"encoding/json"
 )
 
 var Consumer sarama.PartitionConsumer
 
-func InitConsumer(topic string, partition int32) {
+func InitConsumer(topic string) {
 
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
@@ -21,40 +22,41 @@ func InitConsumer(topic string, partition int32) {
 		panic(err)
 	}
 
-	consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetOldest)
+	consumer, err := master.ConsumePartition(topic, 0, sarama.OffsetOldest)
 	if err != nil {
 		panic(err)
 	}
 
+	Consumer = consumer
+
 	go func() {
-		select {
+		for {
+			select {
 
-		case err := <-consumer.Errors():
-			log.Fatal(err)
+			case err := <-consumer.Errors():
+				log.Fatal(err)
 
-		case m := <-consumer.Messages():
-			message := []byte(m.Value)
+			case m := <-consumer.Messages():
+				message := []byte(m.Value)
 
-			fmt.Println(string(message))
-			jsonMessage := make(map[string]interface{}, 0)
-			err := json.Unmarshal(message, jsonMessage)
-			if err != nil {
-				//TODO: error
-			}
+				jsonMessage := make(map[string]string, 0)
+				err := json.Unmarshal(message, &jsonMessage)
 
-			if sprintID, ok := jsonMessage["sprintID"]; ok {
-				sprintUUI, err := gocql.ParseUUID(sprintID.(string))
 				if err != nil {
 					//TODO: error
 				}
 
-				if hub, ok := ActiveHubs[sprintUUI]; ok {
-					hub.Broadcast <- message
+				if sprintID, ok := jsonMessage["sprintID"]; ok {
+					sprintUUI, err := gocql.ParseUUID(sprintID)
+					if err != nil {
+						//TODO: error
+					}
+
+					if hub, ok := ActiveHubs[sprintUUI]; ok {
+						hub.Broadcast <- message
+					}
 				}
 			}
 		}
 	}()
-
-	Consumer = consumer
 }
-

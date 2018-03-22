@@ -17,19 +17,25 @@ type Client struct {
 	user *models.User
 }
 
-func RegisterClient(res map[string]interface{}, conn *websocket.Conn) {
+func RegisterClient(req map[string]interface{}, conn *websocket.Conn) {
 
 	client := Client{}
 	client.conn = conn
 	client.send = make(chan []byte, 256)
 
-	sprintUUID, _ := gocql.ParseUUID(res["sprintID"].(string))
+	sprintUUID, _ := gocql.ParseUUID(req["sprintID"].(string))
 
-	userUUID, _ := gocql.ParseUUID(res["userID"].(string))
+	userUUID, _ := gocql.ParseUUID(req["userID"].(string))
 	user := &models.User{
 		UUID: userUUID,
 	}
-	models.UserDB.FindByID(user)
+
+	err := models.UserDB.FindByID(user)
+
+	if err != nil {
+		// TODO: error
+	}
+
 	client.user = user
 
 	if _, ok := ActiveHubs[sprintUUID]; ok {
@@ -40,22 +46,19 @@ func RegisterClient(res map[string]interface{}, conn *websocket.Conn) {
 	go client.WriteWorker()
 }
 
-func SetEstimation(req map[string]interface{}){
-	message := req["message"].(string)
-
+func SendEstimation(req string){
 	strTime := strconv.Itoa(int(time.Now().Unix()))
 	producerMessage := &sarama.ProducerMessage{
-		//Partition: 0,
-		Topic: "test-topic-1", // move to argument
+		Topic: "test-topic-1",
 		Key:   sarama.StringEncoder(strTime),
-		Value: sarama.StringEncoder(message),
+		Value: sarama.StringEncoder(req),
 	}
 
 	_, _, err := Producer.SendMessage(producerMessage)
+
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(producerMessage)
 }
 
 func (c *Client) WriteWorker() {
@@ -70,7 +73,6 @@ func (c *Client) WriteWorker() {
 	for {
 		select {
 		case message, ok := <-c.send:
-			fmt.Println(string(message))
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -81,10 +83,9 @@ func (c *Client) WriteWorker() {
 			if err != nil {
 				return
 			}
-			fmt.Println(string(message))
+
 			w.Write(message)
 
-			// Add queued chat messages to the current websocket message.
 			n := len(c.send)
 			for i := 0; i < n; i++ {
 				w.Write([]byte{'\n'})
@@ -93,7 +94,6 @@ func (c *Client) WriteWorker() {
 
 			err = w.Close()
 			if err != nil { return }
-
 		}
 	}
 }
