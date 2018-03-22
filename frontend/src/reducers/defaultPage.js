@@ -7,6 +7,7 @@ import {
   HANDLE_PERMISSIONS_LOADED,
   HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE,
   HANDLE_ROLES_LOADED,
+  HANDLE_SET_IMPORT_FILE,
   HANDLE_SET_USER,
   HANDLE_IMPORT_USERS_TOGGLE
 } from '../constants/defaultPage'
@@ -17,6 +18,7 @@ const initialState = {
   isUserToProjectOpen: false,
   isUserToProjectPermissionsOpen: false,
   userToAdd: null,
+  file: null,
   permissions: [],
   roles: [],
   pageTitle: null,
@@ -47,6 +49,8 @@ export default function (state = initialState, action) {
       return { ...state, roles: action.payload }
     case HANDLE_IMPORT_USERS_TOGGLE:
       return { ...state, isImportUsersOpened: action.payload }
+    case HANDLE_SET_IMPORT_FILE:
+      return { ...state, file: action.payload }
     default:
       return state
   }

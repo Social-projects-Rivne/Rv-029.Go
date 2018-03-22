@@ -101,12 +101,12 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
     }
 
     const toggleDrawer = () => {
-        defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
+        defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen);
     };
 
     //
     const handleClickOpenAddUser = () => {
-        defaultPageActions.toggleAddUserToProject(true)
+        defaultPageActions.toggleAddUserToProject(true);
     };
     const handleUserToProjectClose = () => {
         defaultPageActions.toggleAddUserToProject(false);
@@ -120,8 +120,23 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
         defaultPageActions.togglePermissionsDialog(true, item);
     };
 
+    const handleFileSelected = (e) => {
+        defaultPageActions.setUsersFileToImport(e.target.files[0]);
+    };
+
     const handleImportUsers = () => {
-        //TODO: send file
+        const formData = new FormData();
+
+        formData.append('import', defaultPage.file);
+
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
+            }
+        };
+
+        return axios.post(API_URL + "user/import", formData, config)
     };
 
     const handleImportUsersOpen = () => {
@@ -300,7 +315,7 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         <input
                             type="file" name="file" id="file"
                             className="input-file"
-                            onChange={() => {}}
+                            onChange={handleFileSelected}
                             accept="text/csv"
                         />
                     </div>

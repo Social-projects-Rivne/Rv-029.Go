@@ -338,10 +338,6 @@ func Import(w http.ResponseWriter, r *http.Request)  {
 
 	// read file content line by line
 	for i := 0 ; ; i++  {
-		if i == 0 { // skip headers
-			continue
-		}
-
 		line, err := reader.Read()
 		// check if not the end of file
 		if err == io.EOF {
@@ -352,20 +348,22 @@ func Import(w http.ResponseWriter, r *http.Request)  {
 			response.Failed(w)
 			return
 		}
+		if i == 0 { // skip headers
+			continue
+		}
 
 		user := models.User{
 			Email: line[0],
 		}
 		// check if user with such email already exists
 		err = models.UserDB.FindByEmail(&user)
-		if err != nil { // user exists
+		if err != nil { // user not exists
 			user.UUID = gocql.TimeUUID()
 			user.FirstName = line[1]
 			user.LastName = line[2]
 			user.Salt = password.GenerateSalt(8)
 			user.Password = password.EncodePassword(password.EncodeMD5(line[3]), user.Salt)
-			user.Role = line[4]
-			user.Photo = `download file from url`
+			user.Role = line[3]
 			user.Status = 1
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = time.Now()
@@ -377,6 +375,7 @@ func Import(w http.ResponseWriter, r *http.Request)  {
 				response.Failed(w)
 				return
 			}
+
 			respLogs = append(respLogs, fmt.Sprintf("User with email %s successfully imported", line[0]))
 		} else {
 			respLogs = append(respLogs, fmt.Sprintf("User with email %s already exists", line[0]))
