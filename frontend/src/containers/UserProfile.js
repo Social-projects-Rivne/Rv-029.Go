@@ -12,7 +12,7 @@ import {bindActionCreators} from 'redux'
 import {API_URL} from "../constants/global"
 import messages from "../services/messages"
 import axios from "axios"
-import * as userActions from "../actions/UserActions"
+import * as userActions from "../actions/UsersActions"
 import Paper from 'material-ui/Paper'
 import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'

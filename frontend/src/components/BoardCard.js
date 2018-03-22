@@ -52,7 +52,9 @@ class ProjectCard extends Component {
 
 const styles = theme => ({
   card: {
+    width: '100%',
     minWidth: 275,
+    maxWidth: 700
   },
   bullet: {
     display: 'inline-block',

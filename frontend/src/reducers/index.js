@@ -4,7 +4,7 @@ import projects from './projects'
 import boards from './boards'
 import sprints from './sprints'
 import issues from './issues'
-import user from './user'
+import users from './users'
 import defaultPage from './defaultPage'
 import { routerReducer } from 'react-router-redux'
 
@@ -16,6 +16,6 @@ export default combineReducers({
   boards,
   sprints,
   issues,
-  user
+  users
 })
 

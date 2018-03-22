@@ -52,7 +52,7 @@ class SprintCard extends Component {
     this.props.sprintsActions.setEditedSprint(this.props.data)
   }
 
-  handleClose = () => {
+  handleClose = () => { `${Nes}`
     this.setState({ updateSprintOpen: false })
   }
 
