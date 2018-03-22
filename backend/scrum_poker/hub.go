@@ -3,6 +3,7 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
+	"github.com/gorilla/websocket"
 )
 
 type Hub struct {
@@ -11,6 +12,12 @@ type Hub struct {
 	Unregister chan *Client
 	Broadcast chan []byte
 	Sprint models.Sprint
+	Summary map[gocql.UUID]map[gocql.UUID]int // map[issueID]map[userID]estimate
+}
+
+func (h *Hub) Calculate() {
+	//todo: calculate result of estimation
+	//todo: if len(Clients) == len(issue estimations) -> send message with result to broadcast
 }
 
 func newHub(sprint models.Sprint) Hub {
@@ -23,18 +30,43 @@ func newHub(sprint models.Sprint) Hub {
 	}
 }
 
-func RegisterHub(req map[string]interface{}) {
-	sprintUUID, _ := gocql.ParseUUID(req["sprintID"].(string))
+func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
+	sprintUUID, err := gocql.ParseUUID(req["sprintID"].(string))
+	if err != nil {
+		conn.WriteJSON(SocketResponse{
+			Status: false,
+			Action: `CREATE_ESTIMATION_ROOM`,
+			Message: `invalid sprint id`,
+		});
+		return
+	}
+	
 	sprint := models.Sprint{
 		ID: sprintUUID,
 	}
-	_ = models.SprintDB.FindByID(&sprint)
-
+	
+	err = models.SprintDB.FindByID(&sprint)
+	if err != nil {
+		conn.WriteJSON(SocketResponse{
+			Status: false,
+			Action: `CREATE_ESTIMATION_ROOM`,
+			Message: `sprint not found`,
+		});
+		return
+	}
+	
 	hub := newHub(sprint)
 
 	ActiveHubs[sprintUUID] = &hub
 
 	go hub.run()
+
+	conn.WriteJSON(SocketResponse{
+		Status: true,
+		Action: `CREATE_ESTIMATION_ROOM`,
+		Message: `room was successfully created`,
+	});
+	return
 }
 
 func (h *Hub) run() {

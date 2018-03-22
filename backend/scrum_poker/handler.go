@@ -15,6 +15,13 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+type SocketResponse struct {
+	Status bool `json:"status"`
+	Action string `json:"action,omitempty"`
+	Message string `json:"message"`
+	Data interface{} `json:"data,omitempty"`
+}
+
 var ActiveHubs = make(map[gocql.UUID]*Hub, 0)
 
 func SocketHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,11 +37,11 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 			switch req["action"] {
 			case "CREATE_ESTIMATION_ROOM":
-				RegisterHub(req)
+				RegisterHub(req, conn)
 			case "REGISTER_CLIENT":
 				RegisterClient(req, conn)
 			case "ESTIMATION":
-				SendEstimation(string(msg))
+				SendEstimation(req, conn)
 			}
 		}
 	}()
