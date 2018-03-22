@@ -59,6 +59,7 @@ type Issue struct {
 	Parent        gocql.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
+	Logs          map[gocql.UUID]string
 }
 
 type IssueCRUD interface {
@@ -70,6 +71,7 @@ type IssueCRUD interface {
 	GetSprintIssueList(*Issue) ([]Issue, error)
 	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
 	SetParentIssue(gocql.UUID, gocql.UUID) error
+	AddLog(*Issue) error
 }
 
 type IssueStorage struct {
@@ -277,13 +279,26 @@ func (s *IssueStorage) SetParentIssue(child gocql.UUID, parent gocql.UUID) error
 	issue := &Issue{}
 	issue.UUID = child
 
-	IssueDB.FindByID(issue)
+	IssueDB.FindByID(issue) // todo ERROR handler
 
 	err := s.DB.Query("UPDATE issues SET parent = ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;",
 		parent, issue.UUID, issue.BoardID, issue.SprintID, issue.ProjectID).Exec()
 
 	if err != nil {
 		log.Printf("Caugh error (models/issue.SetParentIssue): %+v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *IssueStorage) AddLog(i *Issue) error {
+
+	err := s.DB.Query("UPDATE issues SET logs = logs + ? WHERE id = ? AND board_id = ? AND sprint_id = ? AND project_id = ?;",
+		i.Logs, i.UUID, i.BoardID, i.SprintID, i.ProjectID).Exec()
+
+	if err != nil {
+		log.Printf("Caugh error (models/issue.AddLog): %+v", err)
 		return err
 	}
 

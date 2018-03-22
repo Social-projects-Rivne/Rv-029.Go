@@ -311,14 +311,9 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-	//
-	//type ReqPayload struct {
-	//	Child gocql.UUID
-	//	Parent gocql.UUID
-	//}
 
-	req := make([]struct{
-		Child gocql.UUID
+	req := make([]struct {
+		Child  gocql.UUID
 		Parent gocql.UUID
 	}, 0)
 
@@ -346,5 +341,62 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
+	}
+}
+
+func AddIssueLog(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: move to decodeAndValidate
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	req := new(struct {
+		IssueID gocql.UUID `json:"issueID"`
+		UserID  gocql.UUID `json:"userID"`
+		Log     string     `json:"log"`
+	})
+
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	newLog := make(map[gocql.UUID]string)
+	newLog[req.UserID] = req.Log
+
+	issue := &models.Issue{}
+	issue.UUID = req.IssueID
+
+	err = models.IssueDB.FindByID(issue) // todo ERROR handler
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	issue.Logs = newLog
+
+	err = models.IssueDB.AddLog(issue)
+	if err != nil {
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
 	}
 }

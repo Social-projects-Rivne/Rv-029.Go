@@ -36,6 +36,8 @@ import ExpansionPanel, {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
 } from 'material-ui/ExpansionPanel'
+import Avatar from 'material-ui/Avatar';
+import FaceIcon from 'material-ui-icons/Face';
 import messages from "../services/messages";
 
 class IssueCard extends Component  {
@@ -45,7 +47,8 @@ class IssueCard extends Component  {
     anchorEl: null,
     setSubTaskOpen: false,
     parent: null,
-    checkedIssues: []
+    checkedIssues: [],
+    logInput: ''
   }
 
   static propTypes = {
@@ -55,6 +58,37 @@ class IssueCard extends Component  {
     classes: PropTypes.object.isRequired,
     issuesActions: PropTypes.object.isRequired,
     defaultPageActions: PropTypes.object.isRequired
+  }
+
+  handleLogInput = (e) => {
+    this.setState({
+      logInput: e.target.value
+    })
+  }
+
+  addLog = () => {
+    const { UUID } = this.props.data
+    const { onUpdate } = this.props
+    const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
+
+    axios.put(API_URL + `project/board/issue/add_issue_log`, {
+      issueID: this.props.data.UUID,
+      userID: this.props.data.UUID, // TODO
+      log: this.state.logInput
+    })
+      .then((res) => {
+        setNotificationMessage(res.data.Message)
+        this.props.onUpdate()
+        this.handleClose()
+      })
+      .catch((err) => {
+        if (err.response && err.response.data.Message) {
+          setErrorMessage(err.response.data.Message)
+        } else {
+          setErrorMessage("Server error occured")
+        }
+        this.handleClose()
+      })
   }
 
   handleOpenUpdateIssueClick = () => {
@@ -68,6 +102,7 @@ class IssueCard extends Component  {
       anchorEl: null,
       setSubTaskOpen: false,
       checkedSubTasks: [],
+      logInput: ''
     })
   }
 
@@ -220,7 +255,7 @@ class IssueCard extends Component  {
 
   render() {
     const { classes } = this.props
-    const { Name, Description, Status, Estimate, SprintID, UUID, Nesting } = this.props.data
+    const { Name, Description, Status, Estimate, SprintID, UUID, Nesting, Logs } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
     const {
@@ -255,9 +290,11 @@ class IssueCard extends Component  {
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
+
         <ExpansionPanelDetails>
           <Grid
             container
+            spacing={0}
             justify={'flex-end'}>
             <Grid item>
 
@@ -310,7 +347,52 @@ class IssueCard extends Component  {
                   </IconButton>
               )}
             </Grid>
+
+            <Grid container spacing={8}>
+            <Grid item xs={12}>
+              <TextField
+                id="logInput"
+                label="Log progress"
+                helperText="Any job you made working on this task"
+                onChange={this.handleLogInput}
+                fullWidth
+                margin="normal" />
+
+              <Button
+                onClick={this.addLog}
+                fullWidth
+                color={'primary'}>
+                send
+              </Button>
+            </Grid>
+
+              {/*{Logs ? (*/}
+
+                {/*<Grid item xs={12}>*/}
+                  {/*<Chip*/}
+                    {/*label="Log"*/}
+                    {/*onClick={()=>{}}*/}
+                    {/*className={classes.log}*/}
+                    {/*avatar={*/}
+                      {/*<Avatar>*/}
+                        {/*<FaceIcon />*/}
+                      {/*</Avatar>*/}
+                    {/*}*/}
+                  {/*/>*/}
+                {/*</Grid>*/}
+                {/**/}
+              {/*) : (null)}*/}
+
+
           </Grid>
+          </Grid>
+
+        {/*</ExpansionPanelDetails>*/}
+        {/*<ExpansionPanelDetails>*/}
+
+
+
+
         </ExpansionPanelDetails>
 
         <Dialog
@@ -439,7 +521,7 @@ const styles = {
   },
   settings: {
     display: 'inline-block'
-  }
+  },
 }
 
 const mapStateToProps = (state, ownProps) => {
