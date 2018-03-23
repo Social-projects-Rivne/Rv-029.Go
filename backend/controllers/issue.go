@@ -359,14 +359,9 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := new(struct {
-		IssueID gocql.UUID `json:"issueID"`
-		UserID  gocql.UUID `json:"userID"`
-		Log     string     `json:"log"`
-	})
+	req := make(map[string]interface{}, 0)
 
 	err = json.Unmarshal(body, &req)
-
 	if err != nil {
 		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
 
@@ -378,18 +373,28 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//newLog := make(map[gocql.UUID]string)
-	//newLog[req.UserID] = req.Log
+	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
+	if err != nil {
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
 
 	issue := &models.Issue{}
-	issue.UUID = req.IssueID
+	issue.UUID = issueUUID
 
 	err = models.IssueDB.FindByID(issue) // todo ERROR handler
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	issue.Logs = string(body)
+	logs := make([]string, 0)
+	logs = append(logs, string(body))
+
+	issue.Logs = logs
 
 	err = models.IssueDB.AddLog(issue)
 	if err != nil {

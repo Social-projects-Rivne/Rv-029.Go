@@ -1,2 +1,2 @@
 ALTER TABLE issues
-    ADD (logs text);
+    ADD (logs set<text>);

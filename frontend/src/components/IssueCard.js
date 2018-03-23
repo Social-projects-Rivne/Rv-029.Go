@@ -82,6 +82,7 @@ class IssueCard extends Component  {
     axios.put(API_URL + `project/board/issue/add_issue_log`, {
       issueID: this.props.data.UUID,
       userID: this.props.data.UUID, // TODO
+      date: this.getCurrentTime(),
       log: this.state.logInput
     })
       .then((res) => {
@@ -96,6 +97,21 @@ class IssueCard extends Component  {
         }
         this.handleClose()
       })
+  }
+
+  getCurrentTime = () => {
+    let now = new Date()
+    let dd = now.getDate()
+    let mm = now.getMonth()+1
+    let yyyy = now.getFullYear()
+    let h = now.getHours()
+    let m = now.getMinutes()
+    let s = now.getSeconds()
+
+    if(dd<10) { dd = '0'+dd }
+    if(mm<10) { mm = '0'+mm }
+
+    return `${mm}/${dd}/${yyyy} ${h}:${m}:${s}`
   }
 
   handleOpenUpdateIssueClick = () => {
@@ -376,26 +392,22 @@ class IssueCard extends Component  {
 
               {(this.props.sprints.issues) ? (
 
-                <List>
-                  <ListItem>
+                  // { }
+
+                    <List>
+                    <ListItem>
                     <Avatar>
-                      <FaceIcon />
+                    <FaceIcon />
                     </Avatar>
                     <ListItemText primary="Photos" secondary="Jan 9, 2014" />
-                  </ListItem>
-                </List>
+                    </ListItem>
+                    </List>
 
               ) : (null)}
 
 
             </Grid>
           </Grid>
-
-        {/*</ExpansionPanelDetails>*/}
-        {/*<ExpansionPanelDetails>*/}
-
-
-
 
         </ExpansionPanelDetails>
 

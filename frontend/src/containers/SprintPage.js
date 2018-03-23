@@ -98,7 +98,13 @@ class SprintPage extends Component {
                 if (response.data.Data == null) {
                     this.props.sprintsActions.setSprintIssues([])
                 } else {
-                    this.props.sprintsActions.setSprintIssues(this.props.transformIssues(response.data.Data))
+
+                    this.props.sprintsActions.setSprintIssues(
+                      this.props.transformIssues(
+                        this.transformIssueLogs(response.data.Data)
+                      )
+                    )
+
                 }
             })
             .catch((error) => {
@@ -111,7 +117,18 @@ class SprintPage extends Component {
     };
 
     transformIssueLogs = (issues) => {
+        for (let i = 0; i < issues.length; i++) {
 
+            if (issues[i].Logs.length) {
+
+              issues[i].Logs = issues[i].Logs.map((item, i) => {
+                    return JSON.parse(item)
+              })
+
+            }
+        }
+
+        return issues
     }
 
     static propTypes = {

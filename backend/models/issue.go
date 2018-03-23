@@ -59,7 +59,7 @@ type Issue struct {
 	Parent        gocql.UUID
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	Logs          string
+	Logs          []string
 }
 
 type IssueCRUD interface {
@@ -257,7 +257,7 @@ func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 				ProjectID:     row["project_id"].(gocql.UUID),
 				ProjectName:   row["project_name"].(string),
 				Parent:        row["parent"].(gocql.UUID),
-				Logs: 		   row["logs"].(string),
+				Logs: 		   row["logs"].([]string),
 				CreatedAt:     row["created_at"].(time.Time),
 				UpdatedAt:     row["updated_at"].(time.Time),
 			})
