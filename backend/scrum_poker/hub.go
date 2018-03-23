@@ -4,6 +4,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
+	"fmt"
 )
 
 type Hub struct {
@@ -13,9 +14,27 @@ type Hub struct {
 	Broadcast chan []byte
 	Sprint models.Sprint
 	Summary map[gocql.UUID]map[gocql.UUID]int // map[issueID]map[userID]estimate
+	Results map[gocql.UUID]map[int]float32 // map[issueID]map[userID]estimate
 }
 
 func (h *Hub) Calculate() {
+	for issueUUID, estimations := range h.Summary {
+		marks := make(map[int]float32, 0)
+		for _, mark := range estimations {
+			marks[mark] ++
+		}
+		for mark, count := range marks {
+			marks[mark] = count / float32(len(estimations))
+		}
+		h.Results[issueUUID] = marks
+	}
+
+
+
+	fmt.Println("Results:")
+	fmt.Printf("%+v\n", h.Results)
+	fmt.Println("Summary:")
+	fmt.Printf("%+v\n", h.Summary)
 	//todo: calculate result of estimation
 	//todo: if len(Clients) == len(issue estimations) -> send message with result to broadcast
 }
@@ -77,12 +96,11 @@ func (h *Hub) run() {
 			h.Clients[client.user.UUID] = client
 
 		case client := <-h.Unregister:
-
 			if _, ok := h.Clients[client.user.UUID]; ok {
+				//TODO: fix it
 				delete(h.Clients, client.user.UUID)
 				close(client.send)
 			}
-
 		case msg := <-h.Broadcast:
 			for _, client := range h.Clients {
 				select {

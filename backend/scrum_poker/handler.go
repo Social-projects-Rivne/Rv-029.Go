@@ -5,6 +5,8 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"fmt"
+	"reflect"
 )
 
 var upgrader = websocket.Upgrader{
@@ -25,24 +27,37 @@ type SocketResponse struct {
 var ActiveHubs = make(map[gocql.UUID]*Hub, 0)
 
 func SocketHandler(w http.ResponseWriter, r *http.Request) {
-
 	conn, _ := upgrader.Upgrade(w, r, nil)
 
-	go func() {
-		for {
-			_, msg, _ := conn.ReadMessage()
+	defer func() {
+		for sprintUUID, hub := range ActiveHubs {
+			for _, client := range hub.Clients {
+				if reflect.DeepEqual(&client.conn, &conn) {
+					hub.Unregister <- client
+				}
+			}
 
-			req := make(map[string]interface{}, 0)
-			json.Unmarshal(msg, &req)
-
-			switch req["action"] {
-			case "CREATE_ESTIMATION_ROOM":
-				RegisterHub(req, conn)
-			case "REGISTER_CLIENT":
-				RegisterClient(req, conn)
-			case "ESTIMATION":
-				SendEstimation(req, conn)
+			if len(hub.Clients) == 0 {
+				delete(ActiveHubs, sprintUUID)
 			}
 		}
+		fmt.Println("DISCONNECT")
+		fmt.Printf("%+v\n", ActiveHubs)
 	}()
+
+	for {
+		_, msg, _ := conn.ReadMessage()
+
+		req := make(map[string]interface{}, 0)
+		json.Unmarshal(msg, &req)
+
+		switch req["action"] {
+		case "CREATE_ESTIMATION_ROOM":
+			RegisterHub(req, conn)
+		case "REGISTER_CLIENT":
+			RegisterClient(req, conn)
+		case "ESTIMATION":
+			SendEstimation(req, conn)
+		}
+	}
 }
