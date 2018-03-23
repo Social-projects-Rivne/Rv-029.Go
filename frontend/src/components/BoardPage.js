@@ -19,11 +19,12 @@ import Button from 'material-ui/Button'
 import AddIcon from 'material-ui-icons/Add'
 import { FormGroup, FormControlLabel } from 'material-ui/Form'
 import Checkbox from 'material-ui/Checkbox'
-import TextField from 'material-ui/TextField';
-import Avatar from 'material-ui/Avatar';
-import PersonIcon from 'material-ui-icons/Person';
-import DeleteIcon from 'material-ui-icons/Delete';
-import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List';
+import TextField from 'material-ui/TextField'
+import Avatar from 'material-ui/Avatar'
+import PersonIcon from 'material-ui-icons/Person'
+import DeleteIcon from 'material-ui-icons/Delete'
+import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List'
+import { Link, browserHistory} from 'react-router'
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -316,7 +317,9 @@ class BoardPage extends Component{
                           (usersArr) ?
                               (usersArr.map((item, i) => (
                                   <ListItem key={i}>
+                                    <Link className={classes.link} to={'/profile/'+ item.ID}>
                                       <ListItemText primary={item.email}  />
+                                    </Link>
                                       <Button fab raised={true} onClick={this.deleteUserFromBoard(item.ID)} className={classes.button}>
                                           <DeleteIcon />
                                       </Button>
