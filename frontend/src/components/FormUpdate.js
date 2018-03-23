@@ -23,12 +23,12 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
 
     if (!checkValidation()) return
 
-    axios.post(API_URL + 'profile/update', {
+    axios.post(API_URL + 'profile/own/update', {
       name: form.name,
       surname: form.surname,
     })
     .then((res) => {
-      browserHistory.push('/profile')
+      browserHistory.push('/profile/own')
     })
     .catch((err) => {
 
@@ -94,14 +94,14 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         alignItems={'center'}
         justify={'space-around'}
         className={classes.buttons}>
-
+        
         <Button
           type='submit'
           color='primary'
           onClick={sendUserData}
           className={classes.button}>
           Submit
-        </Button>
+        </Button>       
       </Grid>
 
       <SnackBar

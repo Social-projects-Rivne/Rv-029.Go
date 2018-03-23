@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
@@ -269,7 +271,18 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 //GetUserInfo gives frontend information about user
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 
-	user := r.Context().Value("user").(models.User)
+	vars := mux.Vars(r)
+	userID, err := gocql.ParseUUID(vars["user_id"])
+	user := models.User{}
+	if vars["user_id"] == "own"{
+		user = r.Context().Value("user").(models.User)
+	}else{
+		user = models.User{
+			UUID: userID,
+		}
+		models.UserDB.FindByID(&user)			
+	}
+
 	var b gocql.UUID
 	a := make([]gocql.UUID, 0)
 	for k := range user.Projects {
@@ -277,13 +290,13 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		a = append(a, b)
 	}
 	projects, err := models.ProjectDB.GetProjectsNamesList(a)
-	if err != nil{
+	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
 	var i = 0
-	if len(projects) > 0{
+	if len(projects) > 0 {
 		for k := range user.Projects {
 			user.Projects[k] = projects[i].Name
 			i++

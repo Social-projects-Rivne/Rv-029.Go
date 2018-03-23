@@ -21,6 +21,11 @@ import Tabs, { Tab } from 'material-ui/Tabs'
 import Divider from 'material-ui/Divider'
 import List, { ListItem, ListItemText } from 'material-ui/List'
 import GridList, { GridListTile, GridListTileBar } from 'material-ui/GridList'
+import Avatar from 'material-ui/Avatar'
+import Hidden from 'material-ui/Hidden'
+import Chip from 'material-ui/Chip'
+import FaceIcon from 'material-ui-icons/Face'
+import DoneIcon from 'material-ui-icons/Done'
 
 class ViewUserProfile extends Component {
 
@@ -50,7 +55,7 @@ class ViewUserProfile extends Component {
   }
 
   getUserInfo = () => {
-    axios.get(API_URL + `profile`)
+    axios.get(API_URL + `profile/${this.props.ownProps.params.id}`)
       .then((response) => {
         this.props.userActions.setCurrentUser(this.sortUserProjects( response.data.Data ))
       })
@@ -75,129 +80,97 @@ class ViewUserProfile extends Component {
       <Grid container
             allignitems={"center"}
             justify={"center"}
-            className={classes.greed}>
-        <div className={classes.root}>
-          <div className={classes.wrapper}>
+           >
             <Paper className={classes.paper}>
-              <Grid container wrap="nowrap">
-                <ul className={classes.list}>
-                  <div>
-                    <li>
-                      <Grid className={classes.name} item>
-                        <img className={classes.img}src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
-                        <ul className={classes.listg}>
-                          <Typography  className={classes.listgelement} variant="headline" gutterBottom component="h2">
-                            {(user.userInfo) ? (user.userInfo.FirstName) : ('')}    {(user.userInfo) ? (user.userInfo.LastName) : ('')}  
-                          </Typography>
-                          <Typography className={classes.listgelement} variant="headline" gutterBottom component="h2">
-                            {(user.userInfo) ? (user.userInfo.Email) : ('')}
-                          </Typography>
-                          <Typography className={classes.listgelement} variant="headline" gutterBottom component="h2">
-                            {(user.userInfo) ? (user.userInfo.Role) : ('')}
-                          </Typography>
-                          <Link className={classes.a} to={'/profile/update'}>                    
-                            <Button variant="raised" color="primary">
-                              Edit
-                            </Button>
-                          </Link>
-                        </ul>
+                    <Grid container>
+                        <Grid item>
+                          <img className={classes.img} src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
+                          </Grid>
+                          <Grid item>
+                            <Typography variant="headline" gutterBottom component="h2">
+                              {(user.userInfo) ? (user.userInfo.FirstName) : ('')}    {(user.userInfo) ? (user.userInfo.LastName) : ('')}  
+                            </Typography>
+                            <Typography variant="headline" gutterBottom component="h2">
+                              {(user.userInfo) ? (user.userInfo.Email) : ('')}
+                            </Typography>
+                            <Typography variant="headline" gutterBottom component="h2">
+                              {(user.userInfo) ? (user.userInfo.Role) : ('')}
+                            </Typography>
+                            {(this.props.ownProps.params.id == 'own') ? (
+
+                            <Link className={classes.link} to={'/profile/own/update'}>         
+                              <Button variant="raised" color="primary">
+                                Edit
+                              </Button>
+                            </Link>
+
+                            ) : (null)}
+
+                        </Grid>   
                       </Grid>
-                    </li>
-                  </div>                  
-                    <br/>
-                  <li>
+
+                  <Grid container  
+                   allignitems={"center"}
+                    justify={"center"}>
+
+                    <Grid item>
                     <Typography variant="headline" gutterBottom component="h2">
                         Projects: 
                     </Typography>
-                    <div className={classes.projects}>
-                      <GridList className={classes.gridList} cols={2.5}>
+                    </Grid>
+
+                      <Grid item className={classes.chipContainer}>
+
+
                         {
+
                           (user.userInfo) ? (
                             user.userInfo.Projects.map((item, i) => (
-                          <Link className={classes.a} key={i} to={'/project/'+item.ID}>                    
-                            <GridListTile >
-                              {item.name}
-                            </GridListTile>
-                          </Link>
+
+                            <Link className={classes.link} key={i} to={'/project/'+item.ID}>             
+                                <Chip
+                                className={classes.chip}
+                                label={item.name}
+                                // onClick={}
+                                className={classes.chip}
+                              />
+                            </Link>
+                          
                         ))
-                      ) : (<h1>loh</h1>)}
-                      </GridList>
-                    </div>
-                  </li>
-                    <br/>
-                </ul>
-              </Grid>
+                      ) : (<h1>loh</h1>)
+                      
+                      }
+                  </Grid>
+                  </Grid>
+                          
+                        
             </Paper>
-          </div>
-        </div>
       </Grid>
     );
   }
 }
 
 
-const styles = theme => ({
-  root: {
-    overflow: 'hidden',
-    padding: `0 ${theme.spacing.unit * 3}px`,
+const styles = {
+  chipContainer: {
+    width: 500,
+    backgroundColor: '#64B5F6',
   },
-  gridList: {
-    flexWrap: 'nowrap',
-    transform: 'translateZ(0)',
-    height: '100%',
-  },
-  projects: {
-    width: '100%',
-    maxWidth: '360px',
-    backgroundColor: theme.palette.background.paper,
-  },
-  wrapper: {
-    maxWidth: 600,
+  chip: {
+    margin: '.1em .5em',
+    // display: 'flex'
   },
   paper: {
-    padding: theme.spacing.unit * 2,
-    height: "100%",
-    width: "600px",
+    margin: '2em 0',
+    padding: '1em'
   },
-  name: {
-    paddingTop: '3vh',
-    paddingLeft: '3vh', 
-    display: 'flex',
-    flexDirection: 'row',
-    paddingLeft: '3vh',
-    
-  },
-  listg: {
-    paddingLeft: '10vh',
-  },
-  listgelement: {
-    paddingBottom: '1vh',
-  },
-  a: {
+  img: {
+    border: '2px solid #FF9800',
+  },  
+  link: {
     textDecoration: 'none',
   },
-  greed:{
-    width:"100%",
-    minHeight: "100vh",
-    paddingTop:"2em",
-    paddingBottom: '2em',
-  },
-  pos: {
-    marginBottom: 12,
-    color: theme.palette.text.secondary,
-  },
-  photo: {
-    paddingTop:"2em",
-    paddingBottom: '2em',
-    float: 'left',
-  },
-  list: {
-    listStyleType: "none",  
-  },
-  img: {   
-    height: '20vh', 
-  },
-});
+}
 
 const mapStateToProps = (state, ownProps) => {
   return {

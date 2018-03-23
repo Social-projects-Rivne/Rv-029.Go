@@ -66,11 +66,11 @@ func applyUserRoutes(r *mux.Router) {
 }
 
 func applyProfileRoutes(r *mux.Router) {
-	r.HandleFunc("/", controllers.GetUserInfo).Methods("GET")
-	r.HandleFunc("", controllers.GetUserInfo).Methods("GET")
+	r.HandleFunc("/{user_id}/", controllers.GetUserInfo).Methods("GET")
+	r.HandleFunc("/{user_id}", controllers.GetUserInfo).Methods("GET")
 
-	r.HandleFunc("/update/", controllers.UpdateUserInfo).Methods("POST")
-	r.HandleFunc("/update", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/own/update/", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/own/update", controllers.UpdateUserInfo).Methods("POST")
 }
 
 func applyProjectsRoutes(r *mux.Router) {

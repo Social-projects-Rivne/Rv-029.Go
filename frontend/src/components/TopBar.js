@@ -131,7 +131,7 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                         {projectBoardsList}
                         <Divider />
                         <List component="nav">
-                            <Link className={classes.a} to={'/profile/'}>
+                            <Link className={classes.a} to={'/profile/own'}>
                                 <ListItem button>
                                     <ListItemText primary="Profile" />
                                 </ListItem>
