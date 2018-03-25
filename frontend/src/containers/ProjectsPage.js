@@ -27,6 +27,7 @@ const styles = theme => ({
         padding: theme.spacing.unit * 2,
     },
     list: {
+        maxWidth: '100%',
         paddingTop: 20,
         paddingLeft: 80,
         paddingRight: 80,

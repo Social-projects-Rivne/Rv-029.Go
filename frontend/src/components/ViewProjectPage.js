@@ -70,7 +70,7 @@ class ViewProjectPage extends Component {
           <Grid
             container
             className={classes.list}
-            justify="flex-start">
+            direction="column">
             {boards.currentBoards.map((item, i) => (
               <Grid key={i} item>
                 <BoardCard board={item}/>

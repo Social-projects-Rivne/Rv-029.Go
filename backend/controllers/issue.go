@@ -391,8 +391,15 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	user := r.Context().Value("user").(models.User)
+	req["userID"] = user.UUID
+
+	delete(req, "issueID")
+
+	logJSON, _ := json.Marshal(req)
+
 	logs := make([]string, 0)
-	logs = append(logs, string(body))
+	logs = append(logs, string(logJSON))
 
 	issue.Logs = logs
 

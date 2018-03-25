@@ -74,14 +74,54 @@ class IssueCard extends Component  {
     })
   }
 
+  getIssueLogs = () => {
+
+    const { currentProjectUsers } = this.props.projects
+    const { Logs } = this.props.data
+
+    let logs = []
+
+    if (currentProjectUsers.length && Logs) {
+
+      Logs.forEach((log) => {
+
+        for (let i = 0; i < currentProjectUsers.length; i++) {
+
+          if (log.userID === currentProjectUsers[i].UUID) {
+
+            // needs for sorting by date
+            if (typeof(log.date) === 'string') {
+              let dateArr = log.date.split(' ')
+              log.date = new Date(dateArr[0], dateArr[1], dateArr[2], dateArr[3], dateArr[4], dateArr[5])
+            }
+
+            logs.push({
+              ...log,
+              userName: currentProjectUsers[i].FirstName,
+              userLastName: currentProjectUsers[i].LastName,
+              photo: currentProjectUsers[i].Photo,
+            })
+          }
+        }
+      })
+    }
+
+    return logs.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date)
+    })
+  }
+
   addLog = () => {
     const { UUID } = this.props.data
     const { onUpdate } = this.props
     const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
 
+    if (!this.props.defaultPage.user) {
+
+    }
+
     axios.put(API_URL + `project/board/issue/add_issue_log`, {
       issueID: this.props.data.UUID,
-      userID: this.props.data.UUID, // TODO
       date: this.getCurrentTime(),
       log: this.state.logInput
     })
@@ -102,16 +142,13 @@ class IssueCard extends Component  {
   getCurrentTime = () => {
     let now = new Date()
     let dd = now.getDate()
-    let mm = now.getMonth()+1
+    let mm = now.getMonth()
     let yyyy = now.getFullYear()
     let h = now.getHours()
     let m = now.getMinutes()
     let s = now.getSeconds()
 
-    if(dd<10) { dd = '0'+dd }
-    if(mm<10) { mm = '0'+mm }
-
-    return `${mm}/${dd}/${yyyy} ${h}:${m}:${s}`
+    return `${yyyy} ${mm} ${dd} ${h} ${m} ${s}`
   }
 
   handleOpenUpdateIssueClick = () => {
@@ -288,6 +325,9 @@ class IssueCard extends Component  {
       setStatusUpdateIssueInput
     } = this.props.issuesActions
 
+    // sucks, but works
+    const logs = this.getIssueLogs()
+
     return (
       <ExpansionPanel expanded={this.state.isIssueOpen}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} onClick={this.toggleOpened}>
@@ -390,21 +430,22 @@ class IssueCard extends Component  {
                 </Button>
               </Grid>
 
-              {(this.props.sprints.issues) ? (
+                <List>
 
-                  // { }
+                  {logs.map((item, i) => (
 
-                    <List>
-                    <ListItem>
-                    <Avatar>
-                    <FaceIcon />
-                    </Avatar>
-                    <ListItemText primary="Photos" secondary="Jan 9, 2014" />
+                    <ListItem key={i}>
+                      <Avatar>
+                        <FaceIcon />
+                      </Avatar>
+                      <ListItemText
+                        primary={`${item.userName} ${item.userLastName}`}
+                        secondary={item.log} />
                     </ListItem>
-                    </List>
 
-              ) : (null)}
+                  ))}
 
+                </List>
 
             </Grid>
           </Grid>
@@ -545,6 +586,7 @@ const mapStateToProps = (state, ownProps) => {
     defaultPage: state.defaultPage,
     issues: state.issues,
     sprints: state.sprints,
+    projects: state.projects,
     ownProps
   }
 }
