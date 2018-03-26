@@ -73,7 +73,16 @@ func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
 		});
 		return
 	}
-	
+
+	if _, ok := ActiveHubs[sprintUUID]; ok {
+		conn.WriteJSON(SocketResponse{
+			Status: false,
+			Action: `CREATE_ESTIMATION_ROOM`,
+			Message: `room already exists`,
+		});
+		return
+	}
+
 	hub := newHub(sprint)
 
 	ActiveHubs[sprintUUID] = &hub
@@ -94,12 +103,13 @@ func (h *Hub) run() {
 
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
-
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client.user.UUID]; ok {
-				//TODO: fix it
 				delete(h.Clients, client.user.UUID)
 				close(client.send)
+				if len(h.Clients) == 0 {
+					delete(ActiveHubs, h.Sprint.ID)
+				}
 			}
 		case msg := <-h.Broadcast:
 			for _, client := range h.Clients {

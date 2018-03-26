@@ -5,7 +5,6 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"fmt"
 	"reflect"
 )
 
@@ -30,19 +29,13 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, _ := upgrader.Upgrade(w, r, nil)
 
 	defer func() {
-		for sprintUUID, hub := range ActiveHubs {
+		for _, hub := range ActiveHubs {
 			for _, client := range hub.Clients {
 				if reflect.DeepEqual(&client.conn, &conn) {
 					hub.Unregister <- client
 				}
 			}
-
-			if len(hub.Clients) == 0 {
-				delete(ActiveHubs, sprintUUID)
-			}
 		}
-		fmt.Println("DISCONNECT")
-		fmt.Printf("%+v\n", ActiveHubs)
 	}()
 
 	for {
