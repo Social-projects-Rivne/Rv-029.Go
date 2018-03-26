@@ -229,7 +229,7 @@ func (s *IssueStorage) GetBoardBacklogIssuesList(issue *Issue) ([]Issue, error) 
 //GetSprintIssueList returns all issues by board_id
 func (s *IssueStorage) GetSprintIssueList(issue *Issue) ([]Issue, error) {
 
-	issues := []Issue{}
+	issues := make([]Issue, 0)
 	var row map[string]interface{}
 
 	iterator := s.DB.Query(GET_SPRINT_ISSUE_LIST, issue.SprintID).Iter()

@@ -96,9 +96,7 @@ class SprintPage extends Component {
 
   getProjectUsers = () => {
 
-    // const { ProjectId } = this.props.sprints.currentSprint // FIXME: ProjectID = 00000...
-
-    const ProjectId = "1c2c2eda-3044-11e8-9c9f-88d7f6700d35" // only for debugging
+    const { ProjectId } = this.props.sprints.currentSprint
 
     axios.get(API_URL + `project/${ ProjectId }/users`)
       .then((response) => {

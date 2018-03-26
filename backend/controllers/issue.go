@@ -262,7 +262,6 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-
 	res := helpers.Response{Message: "Done", Data: sprintIssueList}
 	res.Success(w)
 }

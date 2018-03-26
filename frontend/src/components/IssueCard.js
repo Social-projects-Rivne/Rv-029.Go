@@ -89,7 +89,7 @@ class IssueCard extends Component  {
 
           if (log.userID === currentProjectUsers[i].UUID) {
 
-            // needs for sorting by date
+            // sort by date
             if (typeof(log.date) === 'string') {
               let dateArr = log.date.split(' ')
               log.date = new Date(dateArr[0], dateArr[1], dateArr[2], dateArr[3], dateArr[4], dateArr[5])
