@@ -4,6 +4,11 @@ import {
     HANDLE_NOTIFICATION_MESSAGE,
     HANDLE_PAGE_TITLE_CHANGE,
     HANDLE_ADD_USER_TO_PROJECT_TOGGLE,
+    HANDLE_PERMISSIONS_LOADED,
+    HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE,
+    HANDLE_IMPORT_USERS_TOGGLE,
+    HANDLE_SET_IMPORT_FILE,
+    HANDLE_ROLES_LOADED,
     HANDLE_SET_USER,
 } from '../constants/defaultPage'
 
@@ -41,5 +46,42 @@ export const setNotificationMessage = (content) => {
     return {
         type: HANDLE_NOTIFICATION_MESSAGE,
         payload: content
+    }
+}
+export const setPermissionsList = (permissions) => {
+    return {
+        type: HANDLE_PERMISSIONS_LOADED,
+        payload: permissions
+    }
+}
+export const setRolesList = (roles) => {
+    return {
+        type: HANDLE_ROLES_LOADED,
+        payload: roles
+    }
+}
+export const togglePermissionsDialog = (state, user = null) => {
+    return {
+        type: HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE,
+        payload: state,
+        user: state ? user : null
+    }
+}
+export const toggleImportUsersDialog = (state) => {
+    return {
+        type: HANDLE_IMPORT_USERS_TOGGLE,
+        payload: state,
+    }
+}
+export const setUsersFileToImport = (file) => {
+    return {
+        type: HANDLE_SET_IMPORT_FILE,
+        payload: file,
+    }
+}
+export const resetUsersFileToImport = () => {
+    return {
+        type: HANDLE_SET_IMPORT_FILE,
+        payload: null,
     }
 }

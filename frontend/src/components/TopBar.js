@@ -26,6 +26,10 @@ import Dialog, {
     DialogContentText,
     DialogTitle,
 } from 'material-ui/Dialog';
+import {API_URL} from "../constants/global";
+import messages from "../services/messages";
+import axios from "axios/index";
+import FormInput from "./FormInput";
 
 
 const styles = {
@@ -48,6 +52,16 @@ const styles = {
     },
     link: {
         textDecoration: 'none'
+    },
+    exampleImageInput: {
+        cursor: 'pointer',
+        position: 'absolute',
+        top: '0',
+        bottom: '0',
+        right: '0',
+        left: '0',
+        width: '100%',
+        opacity: '0'
     }
 };
 
@@ -58,16 +72,84 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
         browserHistory.push("/authorization/login")
     }
 
+    if (defaultPage.permissions.length == 0) {
+        axios.get(API_URL + `permissions/list`)
+            .then((response) => {
+                defaultPageActions.setPermissionsList(response.data.Data)
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
+    if (defaultPage.roles.length == 0) {
+        axios.get(API_URL + `roles/list`)
+            .then((response) => {
+                defaultPageActions.setRolesList(response.data.Data)
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.Message) {
+                    messages(error.response.data.Message)
+                } else {
+                    messages("Server error occured")
+                }
+            });
+    }
+
     const toggleDrawer = () => {
-        defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen)
+        defaultPageActions.toggleDrawer(!defaultPage.isDrawerOpen);
     };
 
     //
     const handleClickOpenAddUser = () => {
-        defaultPageActions.toggleAddUserToProject(true)
+        defaultPageActions.toggleAddUserToProject(true);
     };
-    const handleClose = () => {
+    const handleUserToProjectClose = () => {
         defaultPageActions.toggleAddUserToProject(false);
+    };
+
+    const handleUserToProjectWithPermissionsClose = () => {
+        defaultPageActions.togglePermissionsDialog(false);
+    };
+
+    const handleListItemClick = (item) => {
+        defaultPageActions.togglePermissionsDialog(true, item);
+    };
+
+    const handleFileSelected = (e) => {
+        defaultPageActions.setUsersFileToImport(e.target.files[0]);
+    };
+
+    const handleImportUsers = () => {
+        const formData = new FormData();
+
+        formData.append('import', defaultPage.file);
+
+        const config = {
+            headers: {
+                'content-type': 'multipart/form-data',
+                'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
+            }
+        };
+
+        return axios.post(API_URL + "user/import", formData, config)
+    };
+
+    const handleImportUsersOpen = () => {
+        defaultPageActions.toggleImportUsersDialog(true);
+    };
+
+    const handleImportUsersClose = () => {
+        defaultPageActions.toggleImportUsersDialog(false);
+    };
+
+    const handleAddUserToProject = (role) => {
+        handleUserToProjectClose()
+        handleUserToProjectWithPermissionsClose()
     };
 
     let projectBoardsList = null
@@ -126,6 +208,14 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                                     <ListItemText primary="Add Project" />
                                 </ListItem>
                             </Link>
+                            <Link onClick={handleImportUsersOpen} className={classes.link}>
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <Icon color="primary">add</Icon>
+                                    </ListItemIcon>
+                                    <ListItemText primary="Import Users From CSV" />
+                                </ListItem>
+                            </Link>
                         </List>
                         <Divider />
                         {projectBoardsList}
@@ -166,14 +256,14 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
             {/* ADD USER TO PROJECT DIALOG */}
             <Dialog
                 open={defaultPage.isUserToProjectOpen}
-                onClose={handleClose}
+                onClose={handleUserToProjectClose}
                 aria-labelledby="form-dialog-title" >
                 <DialogTitle id="form-dialog-title">Add user</DialogTitle>
                 <DialogContent>
                     <List>
-                        {(projects.currentProjectUsers.length > 0) ? (
-                            projects.currentProjectUsers.map((item, i) => (
-                                <ListItem button onClick={() => this.handleListItemClick(item)} key={i}>
+                        {(projects.users.length > 0) ? (
+                            projects.users.map((item, i) => (
+                                <ListItem button onClick={() => handleListItemClick(item)} key={i}>
                                     <ListItemAvatar>
                                         <Avatar className={classes.avatar}>
                                             <PersonIcon />
@@ -186,8 +276,56 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                     </List>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleUserToProjectClose} color="primary">
                         Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* ADD USER TO PROJECT WITH PERMISSIONS DIALOG */}
+            <Dialog
+                open={defaultPage.isUserToProjectPermissionsOpen}
+                onClose={handleUserToProjectWithPermissionsClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Add user</DialogTitle>
+                <DialogContent>
+                    <List>
+                        {(defaultPage.roles.length > 0) ? (
+                            defaultPage.roles.map((item, i) => (
+                                <ListItem button onClick={() => handleAddUserToProject(item)} key={i}>
+                                    { item }
+                                </ListItem>
+                            ))
+                        ) : ("No Roles")}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleUserToProjectWithPermissionsClose} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* IMPORT USERS */}
+            <Dialog
+                open={defaultPage.isImportUsersOpened}
+                onClose={handleImportUsersClose}
+                aria-labelledby="form-dialog-title" >
+                <DialogTitle id="form-dialog-title">Select *.csv file in appropriate format</DialogTitle>
+                <DialogContent>
+                    <div>
+                        <input
+                            type="file" name="file" id="file"
+                            className="input-file"
+                            onChange={handleFileSelected}
+                            accept="text/csv"
+                        />
+                    </div>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleImportUsersClose} color="default">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleImportUsers} color="primary">
+                        Import
                     </Button>
                 </DialogActions>
             </Dialog>

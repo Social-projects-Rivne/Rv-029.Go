@@ -44,6 +44,30 @@ class ViewProjectPage extends Component {
         messages("Server error occured")
       }
     })
+
+    axios.get(API_URL + `project/${this.props.ownProps.params.id}/users`)
+      .then((response) => {
+        this.props.projectsActions.setProjectUsers(response.data.Data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+            messages(error.response.data.Message)
+        } else {
+            messages("Server error occured")
+        }
+      });
+
+    axios.get(API_URL + `project/users`)
+      .then((response) => {
+        this.props.projectsActions.setUsersList(response.data.Data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+            messages(error.response.data.Message)
+        } else {
+            messages("Server error occured")
+        }
+      });
   }
 
   componentDidMount() {
