@@ -26,3 +26,13 @@ vendor/
 
 # pilu/fresh
 tmp/
+
+# VIM swap, backup and undo temporary files
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+Session.vim
+.netrwhist
+*~
+tags

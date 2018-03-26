@@ -13,7 +13,7 @@ import {API_URL} from "../constants/global";
 import messages from "../services/messages";
 import axios from "axios";
 import InjectTransformIssues from '../decorators/transformIssues';
-import CreateRoom from '../components/ScrumPocker/CreateRoom'
+import CreateRoom from '../components/scrumPocker/CreateRoom'
 
 const pageTitle = "Active Sprint";
 

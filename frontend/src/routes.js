@@ -31,6 +31,7 @@ import FormUpdate from "./components/FormUpdate"
 // import VeiwUserProfile from "./containers/ChangeUserInformation"
 
 import Socket from './components/Socket'
+import EstimationRoom from "./containers/EstimationRoom"
 
 // TODO move these out of here
 // e.g. routeEvents.js
@@ -91,6 +92,8 @@ export const routes = (
         <Route path="sprint/:id" component={SprintPage}/>
         <Route path="profile" component={VeiwUserProfile}/>
         <Route path="profile/update" component={FormUpdate}/>
+        <Route path="estimation/:id" component={EstimationRoom}/>
+
         {/* <Route path="profile/update" component={ChangeUserInformation}/> */}
       </Route>
 

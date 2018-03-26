@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link, browserHistory } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -139,8 +140,8 @@ class IssueCard extends Component  {
           onUpdate()
         })
         .catch((err) => {
-          if (response.response && response.response.data.Message) {
-              messages(response.response.data.Message, false)
+          if (err.response && err.response.data.Message) {
+              messages(err.response.data.Message, false)
           } else {
               messages("Server error occured", false)
           }
@@ -276,7 +277,13 @@ class IssueCard extends Component  {
                     anchorEl={this.state.anchorEl}
                     onClose={this.handleClose} >
 
-                    <MenuItem onClick={ this.handleSubTaskClick }>sub tasks</MenuItem>
+                    <MenuItem onClick={ this.handleSubTaskClick }>Sub tasks</MenuItem>
+
+                    <Link
+                      to={`/estimation/${UUID}`}
+                      className={classes.link}>
+                      <MenuItem onClick={ ()=>{} }>Start estimation</MenuItem>
+                    </Link>
                   </Menu>
                 </div>
               ) : ( "" )}
@@ -439,6 +446,9 @@ const styles = {
   },
   settings: {
     display: 'inline-block'
+  },
+  link: {
+    textDecoration: 'none'
   }
 }
 
