@@ -22,7 +22,7 @@ class Socket extends Component {
   }
 
   subscribe = () => {
-    const socket = new WebSocket("ws://localhost:8080/socketserver");
+    const socket = new WebSocket("ws://localhost:8080/socketserver?token=" + sessionStorage.getItem("token"));
 
     this.setState({
       socket: socket
