@@ -12,7 +12,7 @@ type Hub struct {
 	Register chan *Client
 	Unregister chan *Client
 	Broadcast chan []byte
-	Sprint models.Sprint
+	Issue models.Issue
 	Summary map[gocql.UUID]map[gocql.UUID]int // map[issueID]map[userID]estimate
 	Results map[gocql.UUID]map[int]float32 // map[issueID]map[userID]estimate
 }
@@ -39,42 +39,42 @@ func (h *Hub) Calculate() {
 	//todo: if len(Clients) == len(issue estimations) -> send message with result to broadcast
 }
 
-func newHub(sprint models.Sprint) Hub {
+func newHub(issue models.Issue) Hub {
 	return Hub{
 		Clients:    make(map[gocql.UUID]*Client),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Broadcast: make(chan []byte),
-		Sprint: sprint,
+		Issue: issue,
 	}
 }
 
 func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
-	sprintUUID, err := gocql.ParseUUID(req["sprintID"].(string))
+	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
-			Message: `invalid sprint id`,
+			Message: `invalid issue id`,
 		});
 		return
 	}
 	
-	sprint := models.Sprint{
-		ID: sprintUUID,
+	issue := models.Issue{
+		UUID: issueUUID,
 	}
 	
-	err = models.SprintDB.FindByID(&sprint)
+	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
-			Message: `sprint not found`,
+			Message: `issue not found`,
 		});
 		return
 	}
 
-	if _, ok := ActiveHubs[sprintUUID]; ok {
+	if _, ok := ActiveHubs[issueUUID]; ok {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
@@ -83,9 +83,9 @@ func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
 		return
 	}
 
-	hub := newHub(sprint)
+	hub := newHub(issue)
 
-	ActiveHubs[sprintUUID] = &hub
+	ActiveHubs[issueUUID] = &hub
 
 	go hub.run()
 
@@ -108,7 +108,7 @@ func (h *Hub) run() {
 				delete(h.Clients, client.user.UUID)
 				close(client.send)
 				if len(h.Clients) == 0 {
-					delete(ActiveHubs, h.Sprint.ID)
+					delete(ActiveHubs, h.Issue.UUID)
 				}
 			}
 		case msg := <-h.Broadcast:

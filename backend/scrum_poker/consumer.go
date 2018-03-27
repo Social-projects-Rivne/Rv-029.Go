@@ -46,32 +46,24 @@ func InitConsumer(topic string) {
 				}
 
 				if action, ok := jsonMessage["action"]; ok && action == "ESTIMATION" {
-					if sprintID, ok := jsonMessage["sprintID"]; ok {
-						sprintUUI, err := gocql.ParseUUID(sprintID.(string))
+					if issueID, ok := jsonMessage["issueID"]; ok {
+						issueUUID, err := gocql.ParseUUID(issueID.(string))
 						if err != nil {
 							//TODO: error
 						}
 
-						if hub, ok := ActiveHubs[sprintUUI]; ok {
-							// add results of estimation to hub
-							if issueID, ok := jsonMessage["issueID"]; ok {
-								issueUUID, err := gocql.ParseUUID(issueID.(string))
-								if err != nil {
-									//TODO: error
-								}
+						if hub, ok := ActiveHubs[issueUUID]; ok {
+							userUUID, err := gocql.ParseUUID(jsonMessage["userID"].(string))
+							if err != nil {
+								//TODO: error
+							}
 
-								userUUID, err := gocql.ParseUUID(jsonMessage["userID"].(string))
-								if err != nil {
-									//TODO: error
-								}
-
-								//TODO: check it
-								if summary, ok := hub.Summary[issueUUID]; ok {
-									summary[userUUID] = jsonMessage["estimate"].(int)
-								} else {
-									hub.Summary[issueUUID] = map[gocql.UUID]int {
-										userUUID: jsonMessage["estimate"].(int),
-									}
+							//TODO: check it
+							if summary, ok := hub.Summary[issueUUID]; ok {
+								summary[userUUID] = jsonMessage["estimate"].(int)
+							} else {
+								hub.Summary[issueUUID] = map[gocql.UUID]int {
+									userUUID: jsonMessage["estimate"].(int),
 								}
 							}
 

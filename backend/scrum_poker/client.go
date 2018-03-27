@@ -23,12 +23,12 @@ func RegisterClient(req map[string]interface{}, conn *websocket.Conn) {
 	client.conn = conn
 	client.send = make(chan []byte, 256)
 
-	sprintUUID, err := gocql.ParseUUID(req["sprintID"].(string))
+	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `REGISTER_CLIENT`,
-			Message: `invalid sprint id`,
+			Message: `invalid issue id`,
 		});
 		return
 	}
@@ -59,8 +59,8 @@ func RegisterClient(req map[string]interface{}, conn *websocket.Conn) {
 
 	client.user = user
 
-	if _, ok := ActiveHubs[sprintUUID]; ok {
-		client.hub = ActiveHubs[sprintUUID]
+	if _, ok := ActiveHubs[issueUUID]; ok {
+		client.hub = ActiveHubs[issueUUID]
 		client.hub.Register <- &client
 	} else {
 		conn.WriteJSON(SocketResponse{
@@ -82,17 +82,30 @@ func RegisterClient(req map[string]interface{}, conn *websocket.Conn) {
 }
 
 func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
-	sprintUUID, err := gocql.ParseUUID(req["sprintID"].(string))
+	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
-			Message: `invalid sprint id`,
+			Message: `invalid issue id`,
 		});
 		return
 	}
 
-	if _, ok := ActiveHubs[sprintUUID]; !ok {
+	issue := models.Issue{
+		UUID: issueUUID,
+	}
+	err = models.IssueDB.FindByID(&issue)
+	if err != nil {
+		conn.WriteJSON(SocketResponse{
+			Status: false,
+			Action: `ESTIMATION`,
+			Message: `issue not found`,
+		});
+		return
+	}
+
+	if _, ok := ActiveHubs[issueUUID]; !ok {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
@@ -111,34 +124,11 @@ func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
 		return
 	}
 
-	if _, ok := ActiveHubs[sprintUUID].Clients[userUUID]; !ok {
+	if _, ok := ActiveHubs[issueUUID].Clients[userUUID]; !ok {
 		conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `user is not connected to the room`,
-		});
-		return
-	}
-
-	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
-			Message: `invalid issue id`,
-		});
-		return
-	}
-
-	issue := models.Issue{
-		UUID: issueUUID,
-	}
-	err = models.IssueDB.FindByID(&issue)
-	if err != nil || issue.SprintID != sprintUUID {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
-			Message: `issue not found`,
 		});
 		return
 	}
