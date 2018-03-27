@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"fmt"
 )
 
 var upgrader = websocket.Upgrader{
@@ -104,6 +105,10 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			RegisterClient(req, conn)
 		case "ESTIMATION":
 			SendEstimation(req, conn)
+		case "GUEST":
+			fmt.Println("users")
+			GetClients(req, conn)
 		}
+
 	}
 }

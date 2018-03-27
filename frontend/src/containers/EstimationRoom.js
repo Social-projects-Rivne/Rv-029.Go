@@ -25,15 +25,19 @@ class EstimationRoom extends Component {
 
     socket.onopen = () => {
       this.createRoom()
+      // this.getUsers()
+
     }
 
     socket.onmessage = (evt) => {
-      let currentMessages = this.state.response
-      currentMessages.unshift(evt.data)
-
-      this.setState({
-        response: currentMessages
-      })
+      // let currentMessages = this.state.response
+      // currentMessages.unshift(evt.data)
+      //
+      // this.setState({
+      //   response: currentMessages
+      // })
+        var messages = evt.data;
+        console.log(messages)
     }
 
     socket.onclose = () => {
@@ -52,6 +56,20 @@ class EstimationRoom extends Component {
       })
 
       socket.send(msg)
+    }
+  }
+
+  getUsers = () => {
+    const { socket } = this.state,
+        { id } = this.props.ownProps.params
+
+    if (socket) {
+        let msg = JSON.stringify({
+            action: 'GUEST',
+            issueID: id
+        })
+
+        socket.send(msg)
     }
   }
 

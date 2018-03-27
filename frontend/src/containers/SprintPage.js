@@ -13,7 +13,6 @@ import {API_URL} from "../constants/global";
 import messages from "../services/messages";
 import axios from "axios";
 import InjectTransformIssues from '../decorators/transformIssues';
-import CreateRoom from '../components/scrumPocker/CreateRoom'
 
 const pageTitle = "Active Sprint";
 
@@ -123,7 +122,6 @@ class SprintPage extends Component {
 
         return (
             <Grid className={classes.root}>
-                <CreateRoom sprintID={this.props.ownProps.params.id} />
                 <Grid item xs={12} container>
                     <Grid item xs={4} className={classes.status}>
                         <Paper className={classes.paper} elevation={4}>
