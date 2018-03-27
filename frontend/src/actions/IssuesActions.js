@@ -4,7 +4,8 @@ import {
   HANDLE_NAME_UPDATE_ISSUE_INPUT,
   HANDLE_DESC_UPDATE_ISSUE_INPUT,
   HANDLE_STATUS_UPDATE_ISSUE_INPUT,
-  HANDLE_ESTIMATE_UPDATE_ISSUE_INPUT
+  HANDLE_ESTIMATE_UPDATE_ISSUE_INPUT,
+  SET_ISSUES_HIERARCHY
 } from '../constants/issues'
 
 export const setIssues = (issues) => {
@@ -49,3 +50,9 @@ export const setEstimateUpdateIssueInput = (estimate) => {
   }
 }
 
+export const setIssuesHierarchy = (obj) => {
+  return {
+    type: SET_ISSUES_HIERARCHY,
+    payload: obj
+  }
+}

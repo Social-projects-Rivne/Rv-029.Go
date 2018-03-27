@@ -311,16 +311,18 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
+	//
+	//type ReqPayload struct {
+	//	Child gocql.UUID
+	//	Parent gocql.UUID
+	//}
 
-	type req struct {
-		Issues []string `json:"issues"`
-		Parent string   `json:"parent"`
-	}
+	req := make([]struct{
+		Child gocql.UUID
+		Parent gocql.UUID
+	}, 0)
 
-	var reqData req
-
-	err = json.Unmarshal(body, &reqData)
-
+	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("Caught error (controllers/issue.SetParentIssue): %+v", err)
 
@@ -332,13 +334,17 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	parent, _ := gocql.ParseUUID(reqData.Parent)
-	children := make([]gocql.UUID, 0)
+	for _, value := range req {
+		err := models.IssueDB.SetParentIssue(value.Child, value.Parent)
 
-	for _, value := range reqData.Issues {
-		parsedUUID, _ := gocql.ParseUUID(value)
-		children = append(children, parsedUUID)
+		if err != nil {
+			response := helpers.Response{
+				StatusCode: http.StatusInternalServerError,
+			}
+
+			response.Failed(w)
+			return
+
+		}
 	}
-
-	models.IssueDB.SetParentIssue(children, parent)
 }

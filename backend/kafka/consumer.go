@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func InitConsumer(conn *websocket.Conn, topic string) {
+func InitConsumer(conn *websocket.Conn, topic string, partition int32) {
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
 	brokers := []string{"127.0.0.1:9092"}
@@ -23,7 +23,7 @@ func InitConsumer(conn *websocket.Conn, topic string) {
 		}
 	}()
 
-	consumer, err := master.ConsumePartition(topic, 0, sarama.OffsetOldest)
+	consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetOldest)
 	if err != nil {
 		panic(err)
 	}

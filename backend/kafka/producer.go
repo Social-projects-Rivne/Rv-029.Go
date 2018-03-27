@@ -11,7 +11,7 @@ import (
 
 var Producer sarama.SyncProducer
 
-func InitProducer() {
+func InitProducer() *sarama.SyncProducer {
 	config := sarama.NewConfig()
 	config.Producer.Retry.Max = 10
 	config.Producer.Return.Successes = true
@@ -22,7 +22,7 @@ func InitProducer() {
 		panic(err)
 	}
 
-	Producer = producer
+	return &producer
 }
 
 func RunProducer(conn *websocket.Conn, w http.ResponseWriter) {

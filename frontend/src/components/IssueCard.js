@@ -23,6 +23,9 @@ import Select from 'material-ui/Select'
 import TextField from 'material-ui/TextField'
 import Typography from 'material-ui/Typography'
 import SettingsIcon from 'material-ui-icons/Settings';
+import Tooltip from 'material-ui/Tooltip';
+import { FormGroup, FormControlLabel } from 'material-ui/Form'
+import Checkbox from 'material-ui/Checkbox'
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -39,7 +42,10 @@ class IssueCard extends Component  {
   state = {
     updateIssueOpen: false,
     isIssueOpen: false,
-    anchorEl: null
+    anchorEl: null,
+    setSubTaskOpen: false,
+    parent: null,
+    checkedIssues: []
   }
 
   static propTypes = {
@@ -59,7 +65,9 @@ class IssueCard extends Component  {
   handleClose = () => {
     this.setState({
       updateIssueOpen: false,
-      anchorEl: null
+      anchorEl: null,
+      setSubTaskOpen: false,
+      checkedSubTasks: [],
     })
   }
 
@@ -141,6 +149,60 @@ class IssueCard extends Component  {
     }
   }
 
+  handleCheckBoxChange = (child, parent) => e => {
+    const emptyID = "00000000-0000-0000-0000-000000000000"
+
+    let { checkedIssues } = this.state
+
+    let toChange = {}
+
+    if (e.target.checked) {
+      toChange.parent = parent
+      toChange.child = child
+    } else {
+      toChange.parent = emptyID
+      toChange.child = child
+    }
+
+    // if checkbox was clicked twice
+    for (let i = 0; i < checkedIssues.length; i++) {
+      if (checkedIssues[i].child === toChange.child) {
+        checkedIssues[i].parent = toChange.parent
+
+        this.setState({ checkedIssues })
+        return
+      }
+    }
+
+    checkedIssues.push(toChange)
+    this.setState({ checkedIssues })
+  }
+
+
+  setSubTasks = () => {
+    axios({
+      method: 'put',
+      url: API_URL + `project/board/issue/set_parent`,
+      data: this.state.checkedIssues
+    })
+      .then((res) => {
+        this.props.onUpdate()
+
+        this.setState({ checkedIssues: [] })
+      })
+      .catch((error) => {
+        this.setState({ checkedIssues: [] })
+
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      })
+
+    this.handleClose()
+  }
+
   toggleOpened = () => {
     this.setState({ isIssueOpen: !this.state.isIssueOpen })
   }
@@ -149,9 +211,16 @@ class IssueCard extends Component  {
     this.setState({ anchorEl: e.target })
   }
 
+  handleSubTaskClick = () => {
+    this.setState({
+      anchorEl: null,
+      setSubTaskOpen: true,
+    })
+  }
+
   render() {
-    const { classes, setSubTaskClick } = this.props
-    const { Name, Description, Status, Estimate, SprintID, UUID } = this.props.data
+    const { classes } = this.props
+    const { Name, Description, Status, Estimate, SprintID, UUID, Nesting } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
     const {
@@ -164,21 +233,24 @@ class IssueCard extends Component  {
     return (
       <ExpansionPanel expanded={this.state.isIssueOpen}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} onClick={this.toggleOpened}>
-          <Grid
-            container
-            alignItems={'center'}>
-            <Grid style={{ marginRight: '1em' }}>
-              <Chip label={Status} />
+          <Tooltip title={Nesting === '' ? '' : `Parents: ${Nesting}`}>
+            <Grid
+              container
+              alignItems={'center'}>
+              <Grid style={{ marginRight: '1em' }}>
+                <Chip label={Status} />
+              </Grid>
+              <Grid>
+                <Typography>{Name}</Typography>
+              </Grid>
             </Grid>
-            <Grid>
-              <Typography>{Name}</Typography>
-            </Grid>
-          </Grid>
+          </Tooltip>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Grid container >
             <Grid item xs={12}>
-              <Typography type={'title'}>{ `Estimate: ${Estimate}` }</Typography>
+              <Typography type={'body2'}>{Nesting === '' ? null : `Nesting: ${Nesting} ${Name}`}</Typography>
+              <Typography type={'body2'}>{ `Estimate: ${Estimate}` }</Typography>
               <Typography> {Description} </Typography>
             </Grid>
           </Grid>
@@ -191,11 +263,11 @@ class IssueCard extends Component  {
 
               {(SprintID === "00000000-0000-0000-0000-000000000000") ? (
                 <div className={classes.settings}>
-                  <IconButton
+                  <IconButton onClick={this.handleSettingsClick}
                     aria-haspopup="true"
                     aria-owns={this.state.anchorEl ? 'simple-menu' : null} >
 
-                    <SettingsIcon onClick={this.handleSettingsClick} />
+                    <SettingsIcon />
                   </IconButton>
 
                   <Menu
@@ -204,7 +276,7 @@ class IssueCard extends Component  {
                     anchorEl={this.state.anchorEl}
                     onClose={this.handleClose} >
 
-                    <MenuItem onClick={setSubTaskClick(UUID)}>sub tasks</MenuItem>
+                    <MenuItem onClick={ this.handleSubTaskClick }>sub tasks</MenuItem>
                   </Menu>
                 </div>
               ) : ( "" )}
@@ -297,6 +369,60 @@ class IssueCard extends Component  {
               Cancel
             </Button>
             <Button onClick={this.updateIssue} color="primary">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* ### Modal set sub tasks ### */}
+        <Dialog
+          open={this.state.setSubTaskOpen}
+          onClose={this.handleClose}
+          aria-labelledby="form-dialog-title" >
+          <DialogTitle id="form-dialog-title">Set sub tasks</DialogTitle>
+          <DialogContent>
+            <FormGroup>
+
+              {
+                this.props.issues.currentIssues.map((item, i) => {
+
+                  if (item.UUID === UUID) return null
+
+                  else if (item.Parent === "00000000-0000-0000-0000-000000000000") {
+                    return (
+
+                      <FormControlLabel
+                        key={i}
+                        label={item.Name}
+                        control={
+                          <Checkbox
+                            onChange={this.handleCheckBoxChange(item.UUID, UUID)} />
+                        }/>
+
+                    )
+                  } else if (item.Parent === UUID) {
+
+                    return (
+                      <FormControlLabel
+                        key={i}
+                        label={item.Name}
+                        control={
+                          <Checkbox
+                            defaultChecked // fixme: bug: requires double click
+                            onChange={this.handleCheckBoxChange(item.UUID, UUID)} />
+                        }/>
+                    )
+                  }
+                })
+              }
+
+            </FormGroup>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.setSubTasks} color="primary">
               Ok
             </Button>
           </DialogActions>

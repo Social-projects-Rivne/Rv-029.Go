@@ -270,7 +270,6 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 //GetUserInfo gives frontend information about user
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	userID, err := gocql.ParseUUID(vars["user_id"])
 	user := models.User{}

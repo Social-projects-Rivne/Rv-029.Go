@@ -2601,7 +2601,7 @@ module.exports = function(originalModule) {
 	            // Apply config defaults
 	            this.cfg = this.cfg.extend(cfg);
 
-	            // Store transform mode and key
+	            // Store buildTree mode and key
 	            this._xformMode = xformMode;
 	            this._key = key;
 
@@ -11468,7 +11468,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 var js = ''; /**
               * Export javascript style and css style vendor prefixes.
-              * Based on "transform" support test.
+              * Based on "buildTree" support test.
               */
 
 var css = '';
@@ -25089,7 +25089,7 @@ var EnterLeaveEventPlugin = {
 
 /**
  * This API should be called `delete` but we'd have to make sure to always
- * transform these to strings for IE support. When this transform is fully
+ * buildTree these to strings for IE support. When this buildTree is fully
  * supported we can rename it.
  */
 
@@ -38811,7 +38811,7 @@ var getPrototype = Object(__WEBPACK_IMPORTED_MODULE_0__overArg_js__["a" /* defau
  *
  * @private
  * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
+ * @param {Function} transform The argument buildTree.
  * @returns {Function} Returns the new function.
  */
 function overArg(func, transform) {
@@ -53330,7 +53330,7 @@ var Popover = function (_React$Component) {
         width: element.clientWidth,
         height: element.clientHeight
       };
-      // Get the transform origin point on the element itself
+      // Get the buildTree origin point on the element itself
       var transformOrigin = _this.getTransformOrigin(elemRect, contentAnchorOffset);
 
       // Calculate element positioning
@@ -53424,7 +53424,7 @@ var Popover = function (_React$Component) {
       };
     }
 
-    // Returns the vertical offset of inner content to anchor the transform on if provided
+    // Returns the vertical offset of inner content to anchor the buildTree on if provided
 
   }, {
     key: 'getContentAnchorOffset',
@@ -53450,7 +53450,7 @@ var Popover = function (_React$Component) {
       return contentAnchorOffset;
     }
 
-    // Return the base transform origin using the element
+    // Return the base buildTree origin using the element
     // and taking the content anchor offset into account if in use
 
   }, {
@@ -59064,7 +59064,7 @@ function getTranslateValue(props, node) {
     transform = node.fakeTransform;
   } else {
     var computedStyle = window.getComputedStyle(node);
-    transform = computedStyle.getPropertyValue('-webkit-transform') || computedStyle.getPropertyValue('transform');
+    transform = computedStyle.getPropertyValue('-webkit-buildTree') || computedStyle.getPropertyValue('transform');
   }
 
   var offsetX = 0;
@@ -59144,7 +59144,7 @@ var Slide = function (_React$Component) {
         easing: theme.transitions.easing.easeOut,
         delay: delay
       });
-      node.style.webkitTransition = theme.transitions.create('-webkit-transform', {
+      node.style.webkitTransition = theme.transitions.create('-webkit-buildTree', {
         duration: transitionDuration,
         easing: theme.transitions.easing.easeOut,
         delay: delay
@@ -59168,7 +59168,7 @@ var Slide = function (_React$Component) {
         easing: theme.transitions.easing.sharp,
         delay: delay
       });
-      node.style.webkitTransition = theme.transitions.create('-webkit-transform', {
+      node.style.webkitTransition = theme.transitions.create('-webkit-buildTree', {
         duration: transitionDuration,
         easing: theme.transitions.easing.sharp,
         delay: delay

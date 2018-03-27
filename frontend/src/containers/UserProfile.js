@@ -12,20 +12,18 @@ import {bindActionCreators} from 'redux'
 import {API_URL} from "../constants/global"
 import messages from "../services/messages"
 import axios from "axios"
-import * as userActions from "../actions/UserActions"
+import * as userActions from "../actions/UsersActions"
 import Paper from 'material-ui/Paper'
 import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'
 import AppBar from 'material-ui/AppBar'
 import Tabs, { Tab } from 'material-ui/Tabs'
 import Divider from 'material-ui/Divider'
-import List, { ListItem, ListItemText } from 'material-ui/List'
 import GridList, { GridListTile, GridListTileBar } from 'material-ui/GridList'
 import Avatar from 'material-ui/Avatar'
-import Hidden from 'material-ui/Hidden'
 import Chip from 'material-ui/Chip'
 import FaceIcon from 'material-ui-icons/Face'
-import DoneIcon from 'material-ui-icons/Done'
+import initialState from '../reducers/users'
 
 class ViewUserProfile extends Component {
 
@@ -84,7 +82,7 @@ class ViewUserProfile extends Component {
             <Paper className={classes.paper}>
                     <Grid container>
                         <Grid item>
-                          <img className={classes.img} src={(user.userInfo) ? (user.userInfo.Photo) : ('')}/>
+                          <img className={classes.img} src={(user.userInfo) ? (user.userInfo.Photo) : ('aaaa')}/>
                           </Grid>
                           <Grid item>
                             <Typography variant="headline" gutterBottom component="h2">
@@ -174,7 +172,7 @@ const styles = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    user: state.user,
+    user: state.users,
     defaultPage: state.defaultPage,
     ownProps
   }

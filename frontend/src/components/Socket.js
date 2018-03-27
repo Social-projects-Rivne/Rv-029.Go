@@ -7,7 +7,6 @@ import Card, { CardActions, CardContent } from 'material-ui/Card'
 import Typography from 'material-ui/Typography'
 import TextField from 'material-ui/TextField'
 
-
 class Socket extends Component {
   state = {
     message: '',
@@ -15,29 +14,9 @@ class Socket extends Component {
     response: []
   }
 
-  // subscribe = () => {
-  //   const socket = openSocket.connect("http://localhost:8080", {
-  //     extraHeaders: {
-  //       Connection: "upgrade"
-  //     }
-  //   })
-  //
-  //   socket.on('open', () => {
-  //       ws.send("ping");
-  //       console.log("firs message sent")
-  //   })
-  //
-  //   socket.on('message', () => {
-  //       console.log(evt.data)
-  //       if(evt.data === "pong") {
-  //         setTimeout(function(){ws.send("ping");}, 2000);
-  //       }
-  //   })
-  //
-  //   socket.on('close', () => {
-  //       console.log("connection close")
-  //   })
-  // }
+  componentDidMount() {
+    this.subscribe()
+  }
 
   subscribe = () => {
     const socket = new WebSocket("ws://localhost:8080/socketserver");
@@ -64,11 +43,62 @@ class Socket extends Component {
     }
   }
 
+  // sendMessage = () => {
+  //   const { socket } = this.state
+  //
+  //   let json = {action: 'CREATE_ESTIMATION_ROOM', sprintID: '12345', user: '123456'}
+  //
+  //   let jsonStr = JSON.stringify(json)
+  //
+  //   if (socket) {
+  //     socket.send(jsonStr);
+  //
+  //     this.setState({
+  //       message: ''
+  //     })
+  //   }
+  // }
+
+  createRoom = () => {
+      const { socket } = this.state
+
+      if (socket) {
+        let msg = JSON.stringify({
+          action: 'CREATE_ESTIMATION_ROOM',
+          sprintID: '83275e7b-26d4-11e8-9e3b-88d7f6700d35', // only for debugging
+        })
+
+        socket.send(msg)
+      }
+  }
+
+  registerClient = () => {
+    const { socket } = this.state
+
+    if (socket) {
+      let msg = JSON.stringify({
+        action: 'REGISTER_CLIENT',
+        sprintID: '83275e7b-26d4-11e8-9e3b-88d7f6700d35', // only for debugging
+        user: '123456'
+      })
+
+      socket.send(msg)
+    }
+  }
+
   sendMessage = () => {
     const { socket } = this.state
 
     if (socket) {
-      socket.send(this.state.message);
+
+      let msg = JSON.stringify({
+        action: 'ESTIMATION',
+        sprintID: '83275e7b-26d4-11e8-9e3b-88d7f6700d35', // only for debugging
+        user: '123456',
+        message: this.state.message
+      })
+
+      socket.send(msg)
 
       this.setState({
         message: ''
@@ -103,14 +133,20 @@ class Socket extends Component {
           <Button
             raised
             color="secondary"
-            onClick={this.subscribe}>
-            Connect
+            onClick={this.createRoom}>
+            Create Room
+          </Button>
+
+          <Button
+            raised
+            onClick={this.registerClient}>
+            Register
           </Button>
 
           <Button
             raised
             onClick={this.sendMessage}>
-            Send
+            Send Estimation
           </Button>
         </CardActions>
 
@@ -142,3 +178,30 @@ const styles = {
 
 export default withStyles(styles)(Socket);
 
+
+
+
+
+// subscribe = () => {
+//   const socket = openSocket.connect("http://localhost:8080", {
+//     extraHeaders: {
+//       Connection: "upgrade"
+//     }
+//   })
+//
+//   socket.on('open', () => {
+//       ws.send("ping");
+//       console.log("firs message sent")
+//   })
+//
+//   socket.on('message', () => {
+//       console.log(evt.data)
+//       if(evt.data === "pong") {
+//         setTimeout(function(){ws.send("ping");}, 2000);
+//       }
+//   })
+//
+//   socket.on('close', () => {
+//       console.log("connection close")
+//   })
+// }
