@@ -274,13 +274,13 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID, err := gocql.ParseUUID(vars["user_id"])
 	user := models.User{}
-	if vars["user_id"] == "own"{
+	if vars["user_id"] == "own" {
 		user = r.Context().Value("user").(models.User)
-	}else{
+	} else {
 		user = models.User{
 			UUID: userID,
 		}
-		models.UserDB.FindByID(&user)			
+		models.UserDB.FindByID(&user)
 	}
 
 	var b gocql.UUID
@@ -295,11 +295,16 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-	var i = 0
+	flag := true
 	if len(projects) > 0 {
 		for k := range user.Projects {
-			user.Projects[k] = projects[i].Name
-			i++
+			for i := 0; flag; i++ {
+				if k == projects[i].ID {
+					user.Projects[k] = projects[i].Name					
+					flag = false
+				}
+			}
+			flag = true
 		}
 	}
 	user.Photo = "static/nigga.jpeg"

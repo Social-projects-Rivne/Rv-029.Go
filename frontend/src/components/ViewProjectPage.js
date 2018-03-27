@@ -16,22 +16,19 @@ import axios from "axios"
 class ViewProjectPage extends Component {
 
   componentWillMount() {
-    if (this.props.projects.currentProject == null) {
-        axios.get(API_URL + `project/show/${this.props.ownProps.params.id}`)
-            .then((response) => {
-                this.props.projectsActions.setCurrentProject(response.data.Data)
-                this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
-            })
-            .catch((error) => {
-                if (error.response && error.response.data.Message) {
-                    messages(error.response.data.Message)
-                } else {
-                    messages("Server error occured")
-                }
-            })
-    } else {
-        this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
-    }
+
+    axios.get(API_URL + `project/show/${this.props.ownProps.params.id}`)
+        .then((response) => {
+            this.props.projectsActions.setCurrentProject(response.data.Data)
+            this.props.defaultPageActions.changePageTitle("Project " + this.props.projects.currentProject.Name)
+        })
+        .catch((error) => {
+            if (error.response && error.response.data.Message) {
+                messages(error.response.data.Message)
+            } else {
+                messages("Server error occured")
+            }
+        })
 
     axios.get(API_URL + `project/${this.props.ownProps.params.id}/board/list`)
     .then((response) => {

@@ -42,6 +42,7 @@ func (s ProjSortName) Less(i, j int) bool {
 //ProjectName is struct for getting project's names
 type ProjectName struct {
 	Name string
+	ID gocql.UUID
 }
 
 //Project type
@@ -191,6 +192,7 @@ func (p *ProjectStorage) GetProjectsNamesList(list []gocql.UUID) ([]ProjectName,
 
 			projects = append(projects, ProjectName{
 				Name: row["name"].(string),
+				ID	: row["id"].(gocql.UUID),
 			})
 		}
 	}
