@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Stepper, { Step, StepLabel, StepContent } from 'material-ui/Stepper';
+import Card from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
+
 import IconButton from 'material-ui/IconButton';
 import Filter1 from 'material-ui-icons/Filter1';
 import Filter3 from 'material-ui-icons/Filter3';
@@ -44,51 +46,87 @@ class VerticalLinearStepper extends React.Component {
 
   getStepContent = step => {
     const { classes } = this.props;
+    const { activeStep } = this.state;
+    const steps = getSteps();
 
     switch (step) {
       case 0:
-        return ( <Typography>For each ad campaign that you create, you can control how much you're willing to spend on clicks and conversions, which networks and geographical locations you want your ads to show on, and more. </Typography> )
+        return (
+          <div>
+
+            <Typography>
+              For each ad campaign that you create, you can control how much you're willing to spend on clicks and conversions, which networks and geographical locations you want your ads to show on, and more.
+            </Typography>
+
+            <div>
+              <Button
+                disabled={activeStep === 0}
+                onClick={this.handleBack}
+                className={classes.button} >
+                Back
+              </Button>
+              <Button
+                raised
+                color="primary"
+                onClick={this.handleNext}
+                className={classes.button} >
+                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              </Button>
+            </div>
+
+          </div>
+        )
       case 1:
         return (
           <div>
-            <Typography>An ad group contains one or more ads which target a shared set of keywords.</Typography>
+            <Typography>
+              An ad group contains one or more ads which target a shared set of keywords.
+            </Typography>
+
+            <div>
               <Button
-                className={classes.button}
+                disabled={activeStep === 0}
+                onClick={this.handleBack}
+                className={classes.button} >
+                Back
+              </Button>
+
+              <Button
                 raised
+                className={classes.button}
+                onClick={this.handleNext} //todo: register
                 color={'secondary'}>
                 Join
               </Button>
+            </div>
           </div>
         )
       case 2:
         return (
           <div>
-            <Typography>Try out different ad text to see what brings in the most customers, and learn how to enhance your ads using features like ad extensions. If you run into any problems with your ads, find out how to tell if they're running and how to resolve approval issues.</Typography>
-            {/*<Button color="primary" className={classes.estimateButton}>*/}
-              {/*1*/}
-            {/*</Button>*/}
-            {/*<Button color="primary" className={classes.estimateButton}>*/}
-              {/*3*/}
-            {/*</Button>*/}
-            {/*<Button color="primary" className={classes.estimateButton}>*/}
-              {/*5*/}
-            {/*</Button>*/}
-            {/*<Button color="primary" className={classes.estimateButton}>*/}
-              {/*8*/}
-            {/*</Button>*/}
+            <Typography>
+              Try out different ad text to see what brings in the most customers, and learn how to enhance your ads using features like ad extensions. If you run into any problems with your ads, find out how to tell if they're running and how to resolve approval issues.
+            </Typography>
 
-            <IconButton>
-              <Filter1 />
-            </IconButton>
-            <IconButton>
-              <Filter3 />
-            </IconButton>
-            <IconButton>
-              <Filter5 />
-            </IconButton>
-            <IconButton>
-              <Filter8 />
-            </IconButton>
+            <Button color="primary" className={classes.estimateButton}> 1 </Button>
+            <Button color="primary" className={classes.estimateButton}> 3 </Button>
+            <Button color="primary" className={classes.estimateButton}> 5 </Button>
+            <Button color="primary" className={classes.estimateButton}> 8 </Button>
+
+            <Button
+              disabled={activeStep === 0}
+              onClick={this.handleBack}
+              className={classes.button} >
+              Back
+            </Button>
+            <Button
+              raised
+              color="primary"
+              onClick={this.handleNext}
+              className={classes.button} >
+              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+            </Button>
+
           </div>
         )
       default:
@@ -102,47 +140,34 @@ class VerticalLinearStepper extends React.Component {
     const steps = getSteps();
 
     return (
-      <div className={classes.root}>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((label, index) => {
-            return (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-                <StepContent>
-                  <div className={classes.actionsContainer}>
+      <Card>
+        <div className={classes.root}>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {steps.map((label, index) => {
+              return (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                  <StepContent>
+                    <div className={classes.actionsContainer}>
 
-                    {this.getStepContent(index)}
+                      {this.getStepContent(index)}
 
-                    <div>
-                      <Button
-                        disabled={activeStep === 0}
-                        onClick={this.handleBack}
-                        className={classes.button} >
-                        Back
-                      </Button>
-                      <Button
-                        raised
-                        color="primary"
-                        onClick={this.handleNext}
-                        className={classes.button} >
-                        {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                      </Button>
                     </div>
-                  </div>
-                </StepContent>
-              </Step>
-            );
-          })}
-        </Stepper>
-        {activeStep === steps.length && (
-          <Paper square elevation={0} className={classes.resetContainer}>
-            <Typography>All steps completed - you&quot;re finished</Typography>
-            <Button onClick={this.handleReset} className={classes.button}>
-              Reset
-            </Button>
-          </Paper>
-        )}
-      </div>
+                  </StepContent>
+                </Step>
+              );
+            })}
+          </Stepper>
+          {activeStep === steps.length && (
+            <Paper square elevation={0} className={classes.resetContainer}>
+              <Typography>All steps completed - you&quot;re finished</Typography>
+              <Button onClick={this.handleReset} className={classes.button}>
+                Reset
+              </Button>
+            </Paper>
+          )}
+        </div>
+      </Card>
     );
   }
 }
