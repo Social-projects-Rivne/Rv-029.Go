@@ -25,7 +25,7 @@ class EstimationRoom extends Component {
 
     socket.onopen = () => {
       this.createRoom()
-      // this.getUsers()
+      this.getUsers()
 
     }
 
