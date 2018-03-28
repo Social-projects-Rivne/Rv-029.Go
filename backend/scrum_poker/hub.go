@@ -102,6 +102,7 @@ func (h *Hub) run() {
 
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
+			fmt.Printf("user %+v", h)
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)

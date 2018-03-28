@@ -1,21 +1,18 @@
 package scrum_poker
 
 import (
-	"github.com/gorilla/websocket"
 	"github.com/gocql/gocql"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 
 	"fmt"
 )
 
-func GetClients(req map[string]interface{}, conn *websocket.Conn)  {
+func GetClients(req map[string]interface{}, client *Client)  {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
-fmt.Println(ActiveHubs[issueUUID])
-
 
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `GUEST`,
 			Message: `invalid issue id`,
@@ -29,7 +26,7 @@ fmt.Println(ActiveHubs[issueUUID])
 
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `GUEST`,
 			Message: `issue not found`,
@@ -39,7 +36,7 @@ fmt.Println(ActiveHubs[issueUUID])
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
 		fmt.Println(ActiveHubs[issueUUID].Clients)
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `GUEST`,
 			Message: `Hello guest`,

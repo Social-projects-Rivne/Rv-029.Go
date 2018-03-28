@@ -8,6 +8,7 @@ import (
 	"time"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"encoding/json"
+	"fmt"
 )
 
 type Client struct {
@@ -39,7 +40,7 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		})
 		return
 	}
-
+	fmt.Println(ActiveHubs[issueUUID].Clients)
 	client.conn.WriteJSON(SocketResponse{
 		Status: true,
 		Action: `REGISTER_CLIENT`,
