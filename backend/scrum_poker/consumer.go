@@ -46,26 +46,18 @@ func InitConsumer(topic string) {
 				}
 
 				if action, ok := jsonMessage["action"]; ok && action == "ESTIMATION" {
-					if issueID, ok := jsonMessage["issueID"]; ok {
+					if issueID, ok := jsonMessage["issue_uuid"]; ok {
 						issueUUID, err := gocql.ParseUUID(issueID.(string))
 						if err != nil {
-							//TODO: error
+							log.Println("Invalid issue id received from kafka")
 						}
 
 						if hub, ok := ActiveHubs[issueUUID]; ok {
-							userUUID, err := gocql.ParseUUID(jsonMessage["userID"].(string))
+							userUUID, err := gocql.ParseUUID(jsonMessage["user_uuid"].(string))
 							if err != nil {
-								//TODO: error
+								log.Println("Invalid user id received from kafka")
 							}
-
-							//TODO: check it
-							if summary, ok := hub.Summary[issueUUID]; ok {
-								summary[userUUID] = jsonMessage["estimate"].(int)
-							} else {
-								hub.Summary[issueUUID] = map[gocql.UUID]int {
-									userUUID: jsonMessage["estimate"].(int),
-								}
-							}
+							hub.Summary[userUUID] = int(jsonMessage["estimate"].(float64))
 
 							hub.Calculate()
 						}

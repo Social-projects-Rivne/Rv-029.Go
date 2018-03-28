@@ -68,9 +68,9 @@ class Socket extends Component {
       if (socket) {
         let msg = JSON.stringify({
           action: 'CREATE_ESTIMATION_ROOM',
-          sprintID: this.state.sprintID, // only for debugging
+          issueID: this.state.issueID, // only for debugging
         })
-
+        console.log(msg);
         socket.send(msg)
       }
   }
@@ -82,8 +82,7 @@ class Socket extends Component {
     if (socket) {
       let msg = JSON.stringify({
         action: 'REGISTER_CLIENT',
-        sprintID: this.state.sprintID, // only for debugging
-        userID: this.state.userID
+        issueID: this.state.issueID, // only for debugging
       })
       console.log(msg);
       socket.send(msg)
@@ -94,11 +93,8 @@ class Socket extends Component {
     const { socket } = this.state
 
     if (socket) {
-
       let msg = JSON.stringify({
         action: 'ESTIMATION',
-        sprintID: this.state.sprintID, // only for debugging
-        userID: this.state.userID,
         issueID: this.state.issueID,
         estimate: this.state.estimate
       })
@@ -109,18 +105,6 @@ class Socket extends Component {
         estimate: ''
       })
     }
-  }
-
-  handleSprintChange = (e) => {
-    this.setState({
-      sprintID: e.target.value
-    })
-  }
-
-  handleUserChange = (e) => {
-    this.setState({
-      userID: e.target.value
-    })
   }
 
   handleIssueChange = (e) => {
@@ -144,19 +128,6 @@ class Socket extends Component {
             Socket Server
           </Typography>
 
-          <TextField
-            className={this.props.classes.textField}
-            label="Sprint ID"
-            value={this.state.sprintID}
-            onChange={this.handleSprintChange}
-            fullWidth
-            margin="normal" />
-          <TextField fullWidth
-            className={this.props.classes.textField}
-            label="User ID"
-            value={this.state.userID}
-            onChange={this.handleUserChange}
-            margin="normal" />
           <TextField fullWidth
             className={this.props.classes.textField}
             label="Issue ID"
@@ -191,19 +162,6 @@ class Socket extends Component {
             Send Estimation
           </Button>
         </CardActions>
-        USERS:
-          <p>8f3c2d42-25ec-11e8-aec7-00224d6aa6bb</p>
-          <p>8f3dc19a-25ec-11e8-aecc-00224d6aa6bb</p>
-          <p>a58978cf-25ed-11e8-b36c-00224d6aa6bb</p>
-          <p>e7fd60d4-1ae5-11e8-a5f0-00224d6aa6bb</p>
-          <p>cdc912ac-25ec-11e8-bff1-00224d6aa6bb</p>
-          <p>e7fd9b6f-1ae5-11e8-a5f1-00224d6aa6bb</p>
-          <p>e7fe3960-1ae5-11e8-a5f6-00224d6aa6bb</p>
-          <p>e7fd2c8f-1ae5-11e8-a5ef-00224d6aa6bb</p>
-          <p>8f3e0e77-25ec-11e8-aece-00224d6aa6bb</p>
-          <p>cdc88ff8-25ec-11e8-bfec-00224d6aa6bb</p>
-        Sprints:
-          <p>8f6b61c7-25ec-11e8-af4d-00224d6aa6bb</p>
         Issues:
           <p>910cbb11-25ec-11e8-b8d7-00224d6aa6bb</p>
           <p>910ce356-25ec-11e8-b8d8-00224d6aa6bb</p>

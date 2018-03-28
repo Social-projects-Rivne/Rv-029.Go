@@ -12,23 +12,21 @@ type Hub struct {
 	Unregister chan *Client
 	Broadcast chan []byte
 	Issue models.Issue
-	Summary map[gocql.UUID]map[gocql.UUID]int // map[issueID]map[userID]estimate
-	Results map[gocql.UUID]map[int]float32 // map[issueID]map[userID]estimate
+	Summary map[gocql.UUID]int
+	Results map[int]float32
 }
 
 func (h *Hub) Calculate() {
-	for issueUUID, estimations := range h.Summary {
-		marks := make(map[int]float32, 0)
-		for _, mark := range estimations {
-			marks[mark] ++
-		}
+	marks := make(map[int]float32, 0)
+	for _, mark := range h.Summary {
+		marks[mark] ++
+
 		for mark, count := range marks {
-			marks[mark] = count / float32(len(estimations))
+			marks[mark] = count / float32(len(h.Summary))
 		}
-		h.Results[issueUUID] = marks
+
+		h.Results = marks
 	}
-
-
 
 	fmt.Println("Results:")
 	fmt.Printf("%+v\n", h.Results)
@@ -45,6 +43,8 @@ func newHub(issue models.Issue) Hub {
 		Unregister: make(chan *Client),
 		Broadcast: make(chan []byte),
 		Issue: issue,
+		Summary:	make(map[gocql.UUID]int, 0),
+		Results:	make(map[int]float32, 0),
 	}
 }
 
@@ -58,11 +58,10 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 		})
 		return
 	}
-	
+
 	issue := models.Issue{
 		UUID: issueUUID,
 	}
-	
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
 		client.conn.WriteJSON(SocketResponse{
