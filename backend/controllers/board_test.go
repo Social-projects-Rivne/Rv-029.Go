@@ -105,95 +105,96 @@ func TestDeleteBoardDBError(t *testing.T) {
 
 // ######## CREATE BOARD ########
 
-// func TestCreateBoardSuccess(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	defer mockCtrl.Finish()
+func TestCreateBoardSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
 
-// 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
-// 	models.InitProjectDB(mockProjectCRUD)
-// 	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	
+	models.InitProjectDB(mockProjectCRUD)
+	models.InitBoardDB(mockBoardCRUD)
+	
+	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
 
-// 	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
-// 	// models.InitBoardDB(mockBoardCRUD)
-// 	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(nil).Times(1)
+	body := bytes.NewBufferString(`{"name": "boardName", "description": "boardDescription"}`)
 
-// 	body := bytes.NewBufferString(`{"name": "boardName", "desc": "boardDescription"}`)
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", body)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	r := *mux.NewRouter()
-// 	res := httptest.NewRecorder()
-// 	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", body)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	handler := http.HandlerFunc(CreateBoard)
+	r.Handle("/project/{project_id}/board/create/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
 
-// 	handler := http.HandlerFunc(CreateBoard)
-// 	r.Handle("/project/{project_id}/board/create/", handler).Methods("POST")
-// 	r.ServeHTTP(res, req)
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
 
-// 	if status := res.Code; status != http.StatusOK {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusOK)
-// 	}
+	expected := `{"Status":true,"Message":"Board has created","StatusCode":200,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+}
 
-// 	expected := `{"Status":true,"Message":"Board has created","StatusCode":200,"Data":null}`
-// 	if res.Body.String() != expected {
-// 		t.Errorf("handler returned unexpected body: got %v want %v",
-// 			res.Body.String(), expected)
-// 	}
-// }
+func TestCreateBoardBadVariable(t *testing.T) {
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
 
-// func TestCreateBoardBadVariable(t *testing.T) {
-// 	r := *mux.NewRouter()
-// 	res := httptest.NewRecorder()
+	body := bytes.NewBufferString(`{"name": "boardName", "description": "boardDescription"}`)
 
-// 	body := bytes.NewBufferString(`{"name": "boardName", "desc": "boardDescription"}`)
+	req, err := http.NewRequest("POST", "/project/does-not-valid-id/board/create/", body)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	req, err := http.NewRequest("POST", "/project/does-not-valid-id/board/create/", body)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	handler := http.HandlerFunc(CreateBoard)
+	r.Handle("/project/{project_id}/board/create/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
 
-// 	handler := http.HandlerFunc(CreateBoard)
-// 	r.Handle("/project/{project_id}/board/create/", handler).Methods("POST")
-// 	r.ServeHTTP(res, req)
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
 
-// 	if status := res.Code; status != http.StatusBadRequest {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusBadRequest)
-// 	}
-// }
+func TestCreateBoardDBError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
 
-// func TestCreateBoardDBError(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	defer mockCtrl.Finish()
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+	models.InitProjectDB(mockProjectCRUD)
+	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
 
-// 	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
-// 	models.InitProjectDB(mockProjectCRUD)
-// 	mockProjectCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	models.InitBoardDB(mockBoardCRUD)
+	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(errors.New("DB Error")).Times(1)
 
-// 	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
-// 	models.InitBoardDB(mockBoardCRUD)
-// 	mockBoardCRUD.EXPECT().Insert(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
 
-// 	r := *mux.NewRouter()
-// 	res := httptest.NewRecorder()
+	body := bytes.NewBufferString(`{"name": "boardName", "description": "boardDescription"}`)
 
-// 	body := bytes.NewBufferString(`{"name": "boardName", "desc": "boardDescription"}`)
+	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", body)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	req, err := http.NewRequest("POST", "/project/9325624a-0ba2-22e8-ba34-c06ebf83499a/board/create/", body)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	handler := http.HandlerFunc(CreateBoard)
+	r.Handle("/project/{project_id}/board/create/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
 
-// 	handler := http.HandlerFunc(CreateBoard)
-// 	r.Handle("/project/{project_id}/board/create/", handler).Methods("POST")
-// 	r.ServeHTTP(res, req)
-
-// 	if status := res.Code; status != http.StatusInternalServerError {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusInternalServerError)
-// 	}
-// }
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+}
 
 // ######## UPDATE BOARD ########
 

@@ -66,7 +66,7 @@ type IssueCRUD interface {
 	Update(*Issue) error
 	Delete(*Issue) error
 	FindByID(*Issue) error
-	GetBoardIssueList(*Issue) ([]Issue, error)
+	GetBoardIssuesList(*Issue) ([]Issue, error)
 	GetSprintIssueList(*Issue) ([]Issue, error)
 	GetBoardBacklogIssuesList(*Issue) ([]Issue, error)
 	SetParentIssue(gocql.UUID, gocql.UUID) error
@@ -138,7 +138,7 @@ func (s *IssueStorage) FindByID(issue *Issue) error {
 }
 
 //GetBoardIssueList returns all issues by board_id
-func (s *IssueStorage) GetBoardIssueList(issue *Issue) ([]Issue, error) {
+func (s *IssueStorage) GetBoardIssuesList(issue *Issue) ([]Issue, error) {
 
 	issues := []Issue{}
 	var row map[string]interface{}
@@ -182,7 +182,7 @@ func (s *IssueStorage) GetBoardIssueList(issue *Issue) ([]Issue, error) {
 	return issues, nil
 }
 
-//GetBoardIssueList returns all issues by board_id what is in backlog
+//GetBoardIssuesList returns all issues by board_id what is in backlog
 func (s *IssueStorage) GetBoardBacklogIssuesList(issue *Issue) ([]Issue, error) {
 
 	issues := []Issue{}

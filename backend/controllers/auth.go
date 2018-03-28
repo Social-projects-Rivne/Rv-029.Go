@@ -144,10 +144,8 @@ func ConfirmRegistration(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-	fmt.Println(confirmRegistrationRequestData)
 	user := models.User{}
 	user.Status = 1
-	fmt.Println(user)
 	if err = models.UserDB.Update(&user); err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -214,7 +212,6 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 //ResetPassword ..
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var resetRequestData validator.ResetPasswordRequestData
-	fmt.Println(resetRequestData)
 	err := decodeAndValidate(r, &resetRequestData)
 
 	if err != nil {
@@ -279,7 +276,6 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		user = models.User{
 			UUID: userID,
 		}
-		fmt.Println("Bib")
 		models.UserDB.FindByID(&user)		
 	}
 

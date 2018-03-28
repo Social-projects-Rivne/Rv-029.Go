@@ -71,17 +71,17 @@ func (mr *MockIssueCRUDMockRecorder) GetBoardBacklogIssuesList(arg0 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardBacklogIssuesList", reflect.TypeOf((*MockIssueCRUD)(nil).GetBoardBacklogIssuesList), arg0)
 }
 
-// GetBoardIssueList mocks base method
-func (m *MockIssueCRUD) GetBoardIssueList(arg0 *models.Issue) ([]models.Issue, error) {
-	ret := m.ctrl.Call(m, "GetBoardIssueList", arg0)
+// GetBoardIssuesList mocks base method
+func (m *MockIssueCRUD) GetBoardIssuesList(arg0 *models.Issue) ([]models.Issue, error) {
+	ret := m.ctrl.Call(m, "GetBoardIssuesList", arg0)
 	ret0, _ := ret[0].([]models.Issue)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetBoardIssueList indicates an expected call of GetBoardIssueList
-func (mr *MockIssueCRUDMockRecorder) GetBoardIssueList(arg0 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardIssueList", reflect.TypeOf((*MockIssueCRUD)(nil).GetBoardIssueList), arg0)
+// GetBoardIssuesList indicates an expected call of GetBoardIssuesList
+func (mr *MockIssueCRUDMockRecorder) GetBoardIssuesList(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBoardIssuesList", reflect.TypeOf((*MockIssueCRUD)(nil).GetBoardIssuesList), arg0)
 }
 
 // GetSprintIssueList mocks base method

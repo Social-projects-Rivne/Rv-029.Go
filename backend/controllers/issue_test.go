@@ -410,46 +410,46 @@ func TestUpdateIssueUpdateDBError(t *testing.T) {
 }
 
 
-// func TestBoardIssueslistSuccess(t *testing.T) {
-// 	mockCtrl := gomock.NewController(t)
-// 	defer mockCtrl.Finish()
+func TestBoardIssueslistSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
 
-// 	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
-// 	models.InitIssueDB(mockIssueCRUD)
-// 	mockIssueCRUD.EXPECT().GetBoardIssueList(gomock.Any()).Return(nil,nil).Times(1)
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	mockIssueCRUD.EXPECT().GetBoardBacklogIssuesList(gomock.Any()).Return(nil,nil).Times(1)
 
-// 	requestData := &struct {
-// 		Name string
-// 		Description string
-// 	}{
-// 		"issueName",
-// 		"issueDescription",
-// 	}
+	requestData := &struct {
+		Name string
+		Description string
+	}{
+		"issueName",
+		"issueDescription",
+	}
 
-// 	body, _ := json.Marshal(requestData)
+	body, _ := json.Marshal(requestData)
 
-// 	r := *mux.NewRouter()
-// 	res := httptest.NewRecorder()
-// 	req, err := http.NewRequest("GET", "/project/board/93ab624a-1cb2-228a-ba34-c06ebf83322c/issue/list/", strings.NewReader(string(body)))
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/project/board/93ab624a-1cb2-228a-ba34-c06ebf83322c/issue/list/", strings.NewReader(string(body)))
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	handler := http.HandlerFunc(BoardIssueslist)
-// 	r.Handle("/project/board/{board_id}/issue/list/", handler).Methods("GET")
-// 	r.ServeHTTP(res, req)
+	handler := http.HandlerFunc(BoardIssueslist)
+	r.Handle("/project/board/{board_id}/issue/list/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
 
-// 	if status := res.Code; status != http.StatusOK {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusOK)
-// 	}
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
 
-// 	expected := `{"Status":true,"Message":"Done","StatusCode":200,"Data":null}`
-// 	if res.Body.String() != expected {
-// 		t.Errorf("handler returned unexpected body: got %v want %v",
-// 			res.Body.String(), expected)
-// 	}
-// }
+	expected := `{"Status":true,"Message":"Done","StatusCode":200,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+}
 
 
 func TestSprintIssueslistSuccess(t *testing.T) {
