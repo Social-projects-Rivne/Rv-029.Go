@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import SnackBar from '../components/scrumPocker/SnackBar'
-import Users from '../components/scrumPocker/Users'
-import Issue from '../components/scrumPocker/Issue'
-import Estimation from '../components/scrumPocker/Estimation'
+import * as scrumPokerActions from "../actions/scrumPoker";
+import SnackBar from '../components/scrumPoker/SnackBar'
+import Users from '../components/scrumPoker/Users'
+import Issue from '../components/scrumPoker/Issue'
+import Estimation from '../components/scrumPoker/Estimation'
 import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
-import * as projectsActions from "../actions/ProjectsActions";
-import * as defaultPageActions from "../actions/DefaultPageActions";
-import * as sprintsActions from "../actions/SprintsActions";
 
 class EstimationRoom extends Component {
 
@@ -30,7 +28,6 @@ class EstimationRoom extends Component {
     })
 
     socket.onopen = () => {
-      console.log('onopen')
       this.createRoom()
     }
 
@@ -47,23 +44,35 @@ class EstimationRoom extends Component {
     const res = JSON.parse(jsonResponse),
           { action, message, status } = res
 
-    switch(action) { // fixme: hardcode
+    switch (action) {
       case 'CREATE_ESTIMATION_ROOM':
+
+        // do not show warning message if room already exists
+        if (message === 'room already exists') { return }
+
         this.setState({
           responseData: res
         })
+        break
       case 'REGISTER_CLIENT':
+        if (status) {
+          this.props.scrumPokerActions.increaseStep()
+        }
+
         this.setState({
           responseData: res
         })
+        break
       case 'ESTIMATION':
         this.setState({
           responseData: res
         })
+        break
       case 'ESTIMATION_RESULT':
         this.setState({
           responseData: res
         })
+        break
     }
   }
 
@@ -100,7 +109,6 @@ class EstimationRoom extends Component {
           { id } = this.props.ownProps.params
 
     if (socket) {
-
       let msg = JSON.stringify({
         action: 'ESTIMATION',
         issueID: id,
@@ -116,8 +124,8 @@ class EstimationRoom extends Component {
   }
 
   render() {
-    const { classes } = this.props,
-          { responseData } = this.state
+    const { responseData } = this.state,
+          { scrumPoker, scrumPokerActions, classes } = this.props
 
     return (
       <div className={classes.root}>
@@ -138,6 +146,8 @@ class EstimationRoom extends Component {
           <Grid item xs={8}>
 
             <Estimation
+              actions={scrumPokerActions}
+              activeStep={scrumPoker.activeStep}
               sendEstimate={this.sendEstimate}
               registerClient={this.registerClient} />
 
@@ -167,18 +177,14 @@ const styles = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    sprints: state.sprints,
-    projects: state.projects,
-    defaultPage: state.defaultPage,
+    scrumPoker: state.scrumPoker,
     ownProps
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    sprintsActions: bindActionCreators(sprintsActions, dispatch),
-    projectsActions: bindActionCreators(projectsActions, dispatch),
-    defaultPageActions: bindActionCreators(defaultPageActions, dispatch)
+    scrumPokerActions: bindActionCreators(scrumPokerActions, dispatch)
   }
 }
 
