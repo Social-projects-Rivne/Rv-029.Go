@@ -44,6 +44,11 @@ class VerticalLinearStepper extends React.Component {
     });
   };
 
+  join = () => {
+    this.props.registerClient()
+    this.handleNext()
+  }
+
   getStepContent = step => {
     const { classes } = this.props;
     const { activeStep } = this.state;
@@ -70,7 +75,7 @@ class VerticalLinearStepper extends React.Component {
                 color="primary"
                 onClick={this.handleNext}
                 className={classes.button} >
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                Next
               </Button>
             </div>
 
@@ -94,7 +99,7 @@ class VerticalLinearStepper extends React.Component {
               <Button
                 raised
                 className={classes.button}
-                onClick={this.handleNext} //todo: register
+                onClick={this.join}
                 color={'secondary'}>
                 Join
               </Button>
@@ -124,7 +129,7 @@ class VerticalLinearStepper extends React.Component {
               color="primary"
               onClick={this.handleNext}
               className={classes.button} >
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+              Estimate
             </Button>
 
           </div>

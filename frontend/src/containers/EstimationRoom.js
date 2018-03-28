@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import SnackBar from '../components/scrumPocker/SnackBar'
 import Users from '../components/scrumPocker/Users'
 import Issue from '../components/scrumPocker/Issue'
 import Estimation from '../components/scrumPocker/Estimation'
-import {withStyles} from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
 import * as projectsActions from "../actions/ProjectsActions";
 import * as defaultPageActions from "../actions/DefaultPageActions";
 import * as sprintsActions from "../actions/SprintsActions";
 
 class EstimationRoom extends Component {
+
+  state = {
+    responseData: null,
+    estimate: null
+  }
 
   componentDidMount() {
     this.connect()
@@ -24,20 +30,40 @@ class EstimationRoom extends Component {
     })
 
     socket.onopen = () => {
+      console.log('onopen')
       this.createRoom()
     }
 
     socket.onmessage = (evt) => {
-      let currentMessages = this.state.response
-      currentMessages.unshift(evt.data)
-
-      this.setState({
-        response: currentMessages
-      })
+      this.actionHandler(evt.data)
     }
 
     socket.onclose = () => {
       console.log("connection close")
+    }
+  }
+
+  actionHandler = (jsonResponse) => {
+    const res = JSON.parse(jsonResponse),
+          { action, message, status } = res
+
+    switch(action) { // fixme: hardcode
+      case 'CREATE_ESTIMATION_ROOM':
+        this.setState({
+          responseData: res
+        })
+      case 'REGISTER_CLIENT':
+        this.setState({
+          responseData: res
+        })
+      case 'ESTIMATION':
+        this.setState({
+          responseData: res
+        })
+      case 'ESTIMATION_RESULT':
+        this.setState({
+          responseData: res
+        })
     }
   }
 
@@ -90,7 +116,8 @@ class EstimationRoom extends Component {
   }
 
   render() {
-    const { classes } = this.props
+    const { classes } = this.props,
+          { responseData } = this.state
 
     return (
       <div className={classes.root}>
@@ -116,6 +143,10 @@ class EstimationRoom extends Component {
 
           </Grid>
         </Grid>
+
+        <SnackBar
+          options={ responseData } />
+
       </div>
     )
   }
