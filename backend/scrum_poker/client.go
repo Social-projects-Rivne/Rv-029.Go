@@ -1,94 +1,61 @@
 package scrum_poker
 
 import (
+	"encoding/json"
 	"github.com/Shopify/sarama"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
 	"strconv"
 	"time"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	"encoding/json"
 )
 
 type Client struct {
-	hub *Hub
 	conn *websocket.Conn
 	send chan []byte
 	user *models.User
 }
 
-func RegisterClient(req map[string]interface{}, conn *websocket.Conn) {
-
-	client := Client{}
-	client.conn = conn
-	client.send = make(chan []byte, 256)
+func RegisterClient(req map[string]interface{}, client *Client) {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `REGISTER_CLIENT`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `REGISTER_CLIENT`,
 			Message: `invalid issue id`,
-		});
+		})
 		return
 	}
 
-	userUUID, err := gocql.ParseUUID(req["userID"].(string))
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `REGISTER_CLIENT`,
-			Message: `invalid user id`,
-		});
-		return
-	}
-
-	user := &models.User{
-		UUID: userUUID,
-	}
-
-	err = models.UserDB.FindByID(user)
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `REGISTER_CLIENT`,
-			Message: `user not found`,
-		});
-		return
-	}
-
-	client.user = user
-
-	if _, ok := ActiveHubs[issueUUID]; ok {
-		client.hub = ActiveHubs[issueUUID]
-		client.hub.Register <- &client
+	if hub, ok := ActiveHubs[issueUUID]; ok {
+		hub = ActiveHubs[issueUUID]
+		hub.Register <- client
 	} else {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `REGISTER_CLIENT`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `REGISTER_CLIENT`,
 			Message: `room not found`,
-		});
+		})
 		return
 	}
 
-	go client.WriteWorker()
-
-	conn.WriteJSON(SocketResponse{
-		Status: true,
-		Action: `REGISTER_CLIENT`,
+	client.conn.WriteJSON(SocketResponse{
+		Status:  true,
+		Action:  `REGISTER_CLIENT`,
 		Message: `you was successfully connected to the estimation room`,
-	});
+	})
 	return
 }
 
-func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
+func SendEstimation(req map[string]interface{}, client *Client) {
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
 			Message: `invalid issue id`,
-		});
+		})
 		return
 	}
 
@@ -97,59 +64,73 @@ func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
 	}
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
 			Message: `issue not found`,
-		});
+		})
 		return
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; !ok {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
 			Message: `room not found`,
-		});
+		})
 		return
 	}
 
-	userUUID, err := gocql.ParseUUID(req["userID"].(string))
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
-			Message: `invalid user id`,
-		});
-		return
-	}
-
-	if _, ok := ActiveHubs[issueUUID].Clients[userUUID]; !ok {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
+	if _, ok := ActiveHubs[issueUUID].Clients[client.user.UUID]; !ok {
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
 			Message: `user is not connected to the room`,
-		});
+		})
 		return
 	}
 
-	if value, ok := req["estimate"]; !ok || value.(int) < 0 || value.(int) > 10 {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
-			Message: `estimation is not set or have invalid value`,
-		});
+	var estimate int
+	if value, ok := req["estimate"]; !ok {
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
+			Message: `estimation is not set`,
+		})
 		return
+	} else {
+		estimate, err = strconv.Atoi(value.(string))
+		if err != nil || estimate < 0 || estimate > 10 {
+			client.conn.WriteJSON(SocketResponse{
+				Status:  false,
+				Action:  `ESTIMATION`,
+				Message: `estimation has invalid value`,
+			})
+			return
+		}
 	}
 
 	strTime := strconv.Itoa(int(time.Now().Unix()))
-	jsonVal, err := json.Marshal(req)
+	jsonVal, err := json.Marshal(struct {
+		Action    string     `json:"action"`
+		UserUUID  gocql.UUID `json:"user_uuid"`
+		IssueUUID gocql.UUID `json:"issue_uuid"`
+		Estimate  int        `json:"estimate"`
+		CreatedAt string     `json:"created_at"`
+	}{
+		Action:    req["action"].(string),
+		UserUUID:  client.user.UUID,
+		IssueUUID: issueUUID,
+		Estimate:  estimate,
+		CreatedAt: time.Now().Format("2006-01-02 03:04:05"),
+	})
+
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
 			Message: `invalid json encoding`,
-		});
+		})
 		return
 	}
 
@@ -161,19 +142,19 @@ func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
 
 	_, _, err = Producer.SendMessage(producerMessage)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
+		client.conn.WriteJSON(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
 			Message: `estimation was not saved`,
-		});
+		})
 		return
 	}
 
-	conn.WriteJSON(SocketResponse{
-		Status: true,
-		Action: `ESTIMATION`,
+	client.conn.WriteJSON(SocketResponse{
+		Status:  true,
+		Action:  `ESTIMATION`,
 		Message: `your estimate was successfully saved`,
-	});
+	})
 }
 
 func (c *Client) WriteWorker() {
@@ -208,9 +189,9 @@ func (c *Client) WriteWorker() {
 			}
 
 			err = w.Close()
-			if err != nil { return }
+			if err != nil {
+				return
+			}
 		}
 	}
 }
-
-

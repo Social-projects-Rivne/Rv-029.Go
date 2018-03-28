@@ -3,7 +3,6 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
-	"github.com/gorilla/websocket"
 	"fmt"
 )
 
@@ -13,23 +12,21 @@ type Hub struct {
 	Unregister chan *Client
 	Broadcast chan []byte
 	Issue models.Issue
-	Summary map[gocql.UUID]map[gocql.UUID]int // map[issueID]map[userID]estimate
-	Results map[gocql.UUID]map[int]float32 // map[issueID]map[userID]estimate
+	Summary map[gocql.UUID]int
+	Results map[int]float32
 }
 
 func (h *Hub) Calculate() {
-	for issueUUID, estimations := range h.Summary {
-		marks := make(map[int]float32, 0)
-		for _, mark := range estimations {
-			marks[mark] ++
-		}
+	marks := make(map[int]float32, 0)
+	for _, mark := range h.Summary {
+		marks[mark] ++
+
 		for mark, count := range marks {
-			marks[mark] = count / float32(len(estimations))
+			marks[mark] = count / float32(len(h.Summary))
 		}
-		h.Results[issueUUID] = marks
+
+		h.Results = marks
 	}
-
-
 
 	fmt.Println("Results:")
 	fmt.Printf("%+v\n", h.Results)
@@ -46,40 +43,41 @@ func newHub(issue models.Issue) Hub {
 		Unregister: make(chan *Client),
 		Broadcast: make(chan []byte),
 		Issue: issue,
+		Summary:	make(map[gocql.UUID]int, 0),
+		Results:	make(map[int]float32, 0),
 	}
 }
 
-func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
+func RegisterHub(req map[string]interface{}, client *Client) {
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
 			Message: `invalid issue id`,
-		});
+		})
 		return
 	}
-	
+
 	issue := models.Issue{
 		UUID: issueUUID,
 	}
-	
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
 			Message: `issue not found`,
-		});
+		})
 		return
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
 			Message: `room already exists`,
-		});
+		})
 		return
 	}
 
@@ -89,11 +87,11 @@ func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
 
 	go hub.run()
 
-	conn.WriteJSON(SocketResponse{
+	client.conn.WriteJSON(SocketResponse{
 		Status: true,
 		Action: `CREATE_ESTIMATION_ROOM`,
 		Message: `room was successfully created`,
-	});
+	})
 	return
 }
 
