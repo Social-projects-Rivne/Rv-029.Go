@@ -119,23 +119,28 @@ class ViewUserProfile extends Component {
 
                       <Grid item className={classes.chipContainer}>
 
+                        {(user.userInfo && user.userInfo.Projects.length) ? (null) : (
+                          <Typography>
+                            No projects found
+                          </Typography>    
+                        )}
 
                         {
 
                           (user.userInfo) ? (
                             user.userInfo.Projects.map((item, i) => {
-                              console.log(item)
+
+                              
                               return (
                               <Link className={classes.link} key={i} to={'/project/'+item.ID}>             
                                 <Chip
                                   className={classes.chip}
                                   label={item.name}
-                                  //onClick={}
                               />
                               </Link>
                               )
                         })
-                      ) : (<h1>loh</h1>)
+                      ) : (null)
                       
                       }
                   </Grid>
