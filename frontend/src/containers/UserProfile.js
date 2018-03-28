@@ -157,7 +157,6 @@ class ViewUserProfile extends Component {
 const styles = {
   chipContainer: {
     width: 500,
-    backgroundColor: '#64B5F6',
   },
   chip: {
     margin: '.1em .5em',
