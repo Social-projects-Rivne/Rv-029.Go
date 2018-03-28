@@ -9,6 +9,7 @@ import RadioButtonChecked from 'material-ui-icons/RadioButtonChecked';
 
 export default class Users extends Component {
   render() {
+      console.log(this.props.users)
     return (
       <Card>
         <CardContent>
@@ -16,27 +17,21 @@ export default class Users extends Component {
             Active Users
           </Typography>
 
-          <List>
-            <ListItem>
-              <Avatar>
-                <ImageIcon />
-              </Avatar>
-              <ListItemText primary="Albert Einstein" secondary="ready"/>
-              <ListItemIcon>
-                <RadioButtonChecked />
-              </ListItemIcon>
-            </ListItem>
+            <List>
+              {(this.props.users) ?
+                  (this.props.users.map((item, i) => (
+                      <ListItem key={i}>
+                              <Avatar>
+                                  <ImageIcon />
+                              </Avatar>
+                          <ListItemText primary={item.Email} secondary="ready"/>
+                          <ListItemIcon>
+                              <RadioButtonChecked />
+                          </ListItemIcon>
+                      </ListItem>
+                  ))) : (<ListItem>Room is empty</ListItem>)}
+            </List>
 
-            <ListItem>
-              <Avatar>
-                <ImageIcon />
-              </Avatar>
-              <ListItemText primary="Albert Einstein" secondary="estimating..."/>
-              <ListItemIcon>
-                <RadioButtonUnchecked />
-              </ListItemIcon>
-            </ListItem>
-          </List>
         </CardContent>
       </Card>
     )

@@ -35,7 +35,15 @@ func GetClients(req map[string]interface{}, client *Client)  {
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
-		fmt.Println(ActiveHubs[issueUUID].Clients)
+		for k, v := range ActiveHubs[issueUUID].Clients {
+			fmt.Println("££££££££££££££££££££££££££")
+			fmt.Printf("key[%s] value[%s]\n", k, v.user)
+			fmt.Println("££££££££££££££££££££££££££")
+
+
+
+		}
+		//fmt.Println(ActiveHubs[issueUUID].Clients)
 		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `GUEST`,

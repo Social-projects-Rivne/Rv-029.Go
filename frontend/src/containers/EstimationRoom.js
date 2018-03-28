@@ -12,6 +12,10 @@ import * as sprintsActions from "../actions/SprintsActions";
 
 class EstimationRoom extends Component {
 
+    state = {
+        users: [],
+    };
+
   componentDidMount() {
     this.connect()
   }
@@ -36,8 +40,17 @@ class EstimationRoom extends Component {
       // this.setState({
       //   response: currentMessages
       // })
+
         var messages = evt.data;
-        console.log(messages)
+        console.log(messages);
+        if(messages.action == "GUEST"){
+            console.log(messages.data);
+          if(messages.data){
+              this.users = messages.data
+          }
+        }
+
+
     }
 
     socket.onclose = () => {
@@ -123,7 +136,8 @@ class EstimationRoom extends Component {
             <Issue
               issueID={this.props.ownProps.params.id} />
 
-            <Users />
+            <Users
+              users={this.users} />
 
           </Grid>
           <Grid item xs={8}>
