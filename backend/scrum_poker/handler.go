@@ -29,6 +29,7 @@ var ActiveHubs = make(map[gocql.UUID]*Hub, 0)
 var ConnectedUsers = make(map[gocql.UUID]*Client, 0)
 
 func SocketHandler(w http.ResponseWriter, r *http.Request) {
+	var client *Client
 	conn, _ := upgrader.Upgrade(w, r, nil)
 	jwtToken := r.URL.Query().Get("token")
 
@@ -62,13 +63,15 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			})
 		}
 
-		client := Client{}
-		client.conn = conn
-		client.send = make(chan []byte, 256)
-		client.user = &user
+		client = &Client{
+			conn: conn,
+			send: make(chan []byte, 256),
+			user: &user,
+		}
+
 		go client.WriteWorker()
 
-		ConnectedUsers[user.UUID] = &client
+		ConnectedUsers[user.UUID] = client
 
 		conn.WriteJSON(SocketResponse{
 			Status: true,
@@ -76,11 +79,13 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			Message: `you was successfully connected to the socket server`,
 		})
 
+		// on disconnect remove from ConnectedUsers
 		defer func() {
 			delete(ConnectedUsers, user.UUID)
 		}()
 	}
 
+	// on disconnect remove from hub clients
 	defer func() {
 		for _, hub := range ActiveHubs {
 			for _, client := range hub.Clients {
@@ -99,11 +104,11 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		switch req["action"] {
 		case "CREATE_ESTIMATION_ROOM":
-			RegisterHub(req, conn)
+			RegisterHub(req, client)
 		case "REGISTER_CLIENT":
-			RegisterClient(req, conn)
+			RegisterClient(req, client)
 		case "ESTIMATION":
-			SendEstimation(req, conn)
+			SendEstimation(req, client)
 		}
 	}
 }
