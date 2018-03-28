@@ -279,7 +279,8 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		user = models.User{
 			UUID: userID,
 		}
-		models.UserDB.FindByID(&user)
+		fmt.Println("Bib")
+		models.UserDB.FindByID(&user)		
 	}
 
 	var b gocql.UUID

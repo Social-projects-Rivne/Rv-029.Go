@@ -110,7 +110,7 @@ func (mr *MockIssueCRUDMockRecorder) Insert(arg0 interface{}) *gomock.Call {
 }
 
 // SetParentIssue mocks base method
-func (m *MockIssueCRUD) SetParentIssue(arg0 []gocql.UUID, arg1 gocql.UUID) error {
+func (m *MockIssueCRUD) SetParentIssue(arg0, arg1 gocql.UUID) error {
 	ret := m.ctrl.Call(m, "SetParentIssue", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
