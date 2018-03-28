@@ -11,84 +11,51 @@ import (
 )
 
 type Client struct {
-	hub *Hub
 	conn *websocket.Conn
 	send chan []byte
 	user *models.User
 }
 
-func RegisterClient(req map[string]interface{}, conn *websocket.Conn) {
-
-	client := Client{}
-	client.conn = conn
-	client.send = make(chan []byte, 256)
+func RegisterClient(req map[string]interface{}, client *Client) {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `REGISTER_CLIENT`,
 			Message: `invalid issue id`,
-		});
+		})
 		return
 	}
 
-	userUUID, err := gocql.ParseUUID(req["userID"].(string))
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `REGISTER_CLIENT`,
-			Message: `invalid user id`,
-		});
-		return
-	}
-
-	user := &models.User{
-		UUID: userUUID,
-	}
-
-	err = models.UserDB.FindByID(user)
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `REGISTER_CLIENT`,
-			Message: `user not found`,
-		});
-		return
-	}
-
-	client.user = user
-
-	if _, ok := ActiveHubs[issueUUID]; ok {
-		client.hub = ActiveHubs[issueUUID]
-		client.hub.Register <- &client
+	if hub, ok := ActiveHubs[issueUUID]; ok {
+		hub = ActiveHubs[issueUUID]
+		hub.Register <- client
 	} else {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `REGISTER_CLIENT`,
 			Message: `room not found`,
-		});
+		})
 		return
 	}
 
-	go client.WriteWorker()
-
-	conn.WriteJSON(SocketResponse{
+	client.conn.WriteJSON(SocketResponse{
 		Status: true,
 		Action: `REGISTER_CLIENT`,
 		Message: `you was successfully connected to the estimation room`,
-	});
+	})
 	return
 }
 
-func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
+func SendEstimation(req map[string]interface{}, client *Client){
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `invalid issue id`,
-		});
+		})
 		return
 	}
 
@@ -97,59 +64,49 @@ func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
 	}
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `issue not found`,
-		});
+		})
 		return
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; !ok {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `room not found`,
-		});
+		})
 		return
 	}
 
-	userUUID, err := gocql.ParseUUID(req["userID"].(string))
-	if err != nil {
-		conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `ESTIMATION`,
-			Message: `invalid user id`,
-		});
-		return
-	}
-
-	if _, ok := ActiveHubs[issueUUID].Clients[userUUID]; !ok {
-		conn.WriteJSON(SocketResponse{
+	if _, ok := ActiveHubs[issueUUID].Clients[client.user.UUID]; !ok {
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `user is not connected to the room`,
-		});
+		})
 		return
 	}
 
 	if value, ok := req["estimate"]; !ok || value.(int) < 0 || value.(int) > 10 {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `estimation is not set or have invalid value`,
-		});
+		})
 		return
 	}
 
 	strTime := strconv.Itoa(int(time.Now().Unix()))
 	jsonVal, err := json.Marshal(req)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `invalid json encoding`,
-		});
+		})
 		return
 	}
 
@@ -161,19 +118,19 @@ func SendEstimation(req map[string]interface{}, conn *websocket.Conn){
 
 	_, _, err = Producer.SendMessage(producerMessage)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `ESTIMATION`,
 			Message: `estimation was not saved`,
-		});
+		})
 		return
 	}
 
-	conn.WriteJSON(SocketResponse{
+	client.conn.WriteJSON(SocketResponse{
 		Status: true,
 		Action: `ESTIMATION`,
 		Message: `your estimate was successfully saved`,
-	});
+	})
 }
 
 func (c *Client) WriteWorker() {

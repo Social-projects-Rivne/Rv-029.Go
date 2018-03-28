@@ -3,7 +3,6 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
-	"github.com/gorilla/websocket"
 	"fmt"
 )
 
@@ -49,14 +48,14 @@ func newHub(issue models.Issue) Hub {
 	}
 }
 
-func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
+func RegisterHub(req map[string]interface{}, client *Client) {
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
 			Message: `invalid issue id`,
-		});
+		})
 		return
 	}
 	
@@ -66,20 +65,20 @@ func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
 	
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
 			Message: `issue not found`,
-		});
+		})
 		return
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
-		conn.WriteJSON(SocketResponse{
+		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `CREATE_ESTIMATION_ROOM`,
 			Message: `room already exists`,
-		});
+		})
 		return
 	}
 
@@ -89,11 +88,11 @@ func RegisterHub(req map[string]interface{}, conn *websocket.Conn) {
 
 	go hub.run()
 
-	conn.WriteJSON(SocketResponse{
+	client.conn.WriteJSON(SocketResponse{
 		Status: true,
 		Action: `CREATE_ESTIMATION_ROOM`,
 		Message: `room was successfully created`,
-	});
+	})
 	return
 }
 
