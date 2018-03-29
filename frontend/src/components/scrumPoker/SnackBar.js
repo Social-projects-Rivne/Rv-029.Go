@@ -13,6 +13,12 @@ class SnackBar extends Component {
 
     if (next.options) {
 
+      // do not show warning message if room already exists
+      if (next.options.message === 'room already exists') { return }
+
+      // do not show same message twice
+      if (next.options.message === this.state.message) { return }
+
       this.setState({
         open: !!next.options,
         message: next.options.message,

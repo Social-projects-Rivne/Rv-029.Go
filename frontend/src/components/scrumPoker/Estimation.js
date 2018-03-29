@@ -18,7 +18,7 @@ function getSteps() {
 class VerticalLinearStepper extends React.Component {
   state = {
     activeStep: 0,
-    activeButton: null
+    estimation: null
   };
 
   componentWillReceiveProps(nextProps) {
@@ -50,7 +50,11 @@ class VerticalLinearStepper extends React.Component {
   }
 
   handleActiveButton = index => () => {
-    this.setState({ activeButton: index })
+    this.setState({ estimation: index })
+  }
+
+  sendEstimate = (est) => () => {
+    this.props.sendEstimate(est)
   }
 
   getStepContent = step => {
@@ -123,7 +127,7 @@ class VerticalLinearStepper extends React.Component {
               return <Button
                 key={i}
                 color="primary"
-                raised={this.state.activeButton === item}
+                raised={this.state.estimation === item}
                 onClick={this.handleActiveButton(item)}
                 className={classes.estimateButton}>
                   { item }
@@ -140,7 +144,7 @@ class VerticalLinearStepper extends React.Component {
               <Button
                 raised
                 color="primary"
-                onClick={this.handleNext}
+                onClick={this.sendEstimate(this.state.estimation)}
                 className={classes.button} >
                 Estimate
               </Button>
@@ -179,7 +183,7 @@ class VerticalLinearStepper extends React.Component {
           </Stepper>
           {activeStep === steps.length && (
             <Paper square elevation={0} className={classes.resetContainer}>
-              <Typography>All steps completed - you&quot;re finished</Typography>
+              <Typography>Please wait until all yuor teammates complete estimation</Typography>
               <Button onClick={this.handleReset} className={classes.button}>
                 Reset
               </Button>
