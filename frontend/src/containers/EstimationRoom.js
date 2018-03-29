@@ -1,17 +1,18 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as scrumPokerActions from "../actions/ScrumPokerAction";
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
+import * as scrumPokerActions from "../actions/ScrumPokerAction"
 import SnackBar from '../components/scrumPoker/SnackBar'
 import Users from '../components/scrumPoker/Users'
 import Issue from '../components/scrumPoker/Issue'
 import Estimation from '../components/scrumPoker/Estimation'
-import { withStyles } from 'material-ui/styles';
-import Grid from 'material-ui/Grid';
+import {withStyles} from 'material-ui/styles'
+import Grid from 'material-ui/Grid'
 
 class EstimationRoom extends Component {
 
   state = {
+    users: [],
     responseData: null,
   }
 
@@ -20,7 +21,7 @@ class EstimationRoom extends Component {
   }
 
   connect = () => {
-    const socket = new WebSocket(`ws://localhost:8080/socketserver?token=${sessionStorage.getItem('token')}`);
+    const socket = new WebSocket(`ws://localhost:8080/socketserver?token=${sessionStorage.getItem('token')}`)
 
     this.setState({
       socket: socket
@@ -28,6 +29,8 @@ class EstimationRoom extends Component {
 
     socket.onopen = () => {
       this.createRoom()
+      this.getUsers()
+
     }
 
     socket.onmessage = (evt) => {
@@ -41,10 +44,10 @@ class EstimationRoom extends Component {
 
   actionHandler = (jsonResponse) => {
     const res = JSON.parse(jsonResponse),
-          { action, message, status } = res
+      {action, message, status, data} = res
 
     // set state for notification message
-    this.setState({ responseData: res })
+    this.setState({responseData: res})
 
     switch (action) {
       case 'CREATE_ESTIMATION_ROOM':
@@ -62,12 +65,15 @@ class EstimationRoom extends Component {
         break
       case 'ESTIMATION_RESULT':
         break
+      case 'GUEST':
+        this.setState({users: data})
+        break
     }
   }
 
   createRoom = () => {
-    const { socket } = this.state,
-          { id } = this.props.ownProps.params
+    const {socket} = this.state,
+          {id} = this.props.ownProps.params
 
     if (socket) {
       let msg = JSON.stringify({
@@ -79,9 +85,23 @@ class EstimationRoom extends Component {
     }
   }
 
+  getUsers = () => {
+    const {socket} = this.state,
+      {id} = this.props.ownProps.params
+
+    if (socket) {
+      let msg = JSON.stringify({
+        action: 'GUEST',
+        issueID: id
+      })
+
+      socket.send(msg)
+    }
+  }
+
   registerClient = () => {
-    const { socket } = this.state,
-          { id } = this.props.ownProps.params
+    const {socket} = this.state,
+      {id} = this.props.ownProps.params
 
     if (socket) {
       let msg = JSON.stringify({
@@ -94,8 +114,8 @@ class EstimationRoom extends Component {
   }
 
   sendEstimate = (est) => {
-    const { socket } = this.state,
-          { id } = this.props.ownProps.params
+    const {socket} = this.state,
+      {id} = this.props.ownProps.params
 
     if (socket) {
       let msg = JSON.stringify({
@@ -110,8 +130,8 @@ class EstimationRoom extends Component {
   }
 
   render() {
-    const { responseData } = this.state,
-          { scrumPoker, scrumPokerActions, classes } = this.props
+    const {responseData} = this.state,
+      {scrumPoker, scrumPokerActions, classes} = this.props
 
     return (
       <div className={classes.root}>
@@ -119,14 +139,15 @@ class EstimationRoom extends Component {
           container
           spacing={40}
           justify={'center'}
-          className={classes.container} >
+          className={classes.container}>
 
           <Grid item xs={4}>
 
             <Issue
-              issueID={this.props.ownProps.params.id} />
+              issueID={this.props.ownProps.params.id}/>
 
-            <Users />
+            <Users
+              users={this.state.users}/>
 
           </Grid>
           <Grid item xs={8}>
@@ -135,13 +156,13 @@ class EstimationRoom extends Component {
               actions={scrumPokerActions}
               activeStep={scrumPoker.activeStep}
               sendEstimate={this.sendEstimate}
-              registerClient={this.registerClient} />
+              registerClient={this.registerClient}/>
 
           </Grid>
         </Grid>
 
         <SnackBar
-          options={ responseData } />
+          options={responseData}/>
 
       </div>
     )
@@ -175,5 +196,5 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export default withStyles(styles)(
-    connect(mapStateToProps, mapDispatchToProps)(EstimationRoom)
+  connect(mapStateToProps, mapDispatchToProps)(EstimationRoom)
 )

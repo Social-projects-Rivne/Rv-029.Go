@@ -113,6 +113,8 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			RegisterClient(req, client)
 		case "ESTIMATION":
 			SendEstimation(req, client)
+		case "GUEST":
+			GetClients(req, client)
 		}
 	}
 }

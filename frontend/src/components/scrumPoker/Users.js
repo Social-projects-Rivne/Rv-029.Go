@@ -17,26 +17,20 @@ export default class Users extends Component {
           </Typography>
 
           <List>
-            <ListItem>
-              <Avatar>
-                <ImageIcon />
-              </Avatar>
-              <ListItemText primary="Albert Einstein" secondary="ready"/>
-              <ListItemIcon>
-                <RadioButtonChecked />
-              </ListItemIcon>
-            </ListItem>
-
-            <ListItem>
-              <Avatar>
-                <ImageIcon />
-              </Avatar>
-              <ListItemText primary="Albert Einstein" secondary="estimating..."/>
-              <ListItemIcon>
-                <RadioButtonUnchecked />
-              </ListItemIcon>
-            </ListItem>
+            {(this.props.users) ?
+              (this.props.users.map((item, i) => (
+                <ListItem key={i}>
+                  <Avatar>
+                      <ImageIcon />
+                  </Avatar>
+                  <ListItemText primary={item.Email} secondary="ready"/>
+                  <ListItemIcon>
+                      <RadioButtonChecked />
+                  </ListItemIcon>
+                </ListItem>
+              ))) : (<ListItem>Room is empty</ListItem>)}
           </List>
+
         </CardContent>
       </Card>
     )
