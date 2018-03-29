@@ -6,6 +6,7 @@ import sprints from './sprints'
 import issues from './issues'
 import users from './users'
 import defaultPage from './defaultPage'
+import scrumPoker from './scrumPoker'
 import { routerReducer } from 'react-router-redux'
 
 export default combineReducers({
@@ -16,6 +17,7 @@ export default combineReducers({
   boards,
   sprints,
   issues,
-  users
+  users,
+  scrumPoker
 })
 

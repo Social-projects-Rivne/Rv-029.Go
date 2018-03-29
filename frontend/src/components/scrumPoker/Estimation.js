@@ -7,12 +7,6 @@ import Button from 'material-ui/Button';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 
-import IconButton from 'material-ui/IconButton';
-import Filter1 from 'material-ui-icons/Filter1';
-import Filter3 from 'material-ui-icons/Filter3';
-import Filter5 from 'material-ui-icons/Filter5';
-import Filter8 from 'material-ui-icons/Filter8';
-
 function getSteps() {
   return [
     'You are in estimation room',
@@ -24,18 +18,25 @@ function getSteps() {
 class VerticalLinearStepper extends React.Component {
   state = {
     activeStep: 0,
+    activeButton: null
   };
 
+  componentWillReceiveProps(nextProps) {
+
+    if (this.state.activeStep !== nextProps.activeStep) {
+      this.setState({
+        activeStep: nextProps.activeStep
+      })
+    }
+
+  }
+
   handleNext = () => {
-    this.setState({
-      activeStep: this.state.activeStep + 1,
-    });
+    this.props.actions.increaseStep()
   };
 
   handleBack = () => {
-    this.setState({
-      activeStep: this.state.activeStep - 1,
-    });
+    this.props.actions.decreaseStep()
   };
 
   handleReset = () => {
@@ -43,6 +44,14 @@ class VerticalLinearStepper extends React.Component {
       activeStep: 0,
     });
   };
+
+  join = () => {
+    this.props.registerClient()
+  }
+
+  handleActiveButton = index => () => {
+    this.setState({ activeButton: index })
+  }
 
   getStepContent = step => {
     const { classes } = this.props;
@@ -70,7 +79,7 @@ class VerticalLinearStepper extends React.Component {
                 color="primary"
                 onClick={this.handleNext}
                 className={classes.button} >
-                {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                Next
               </Button>
             </div>
 
@@ -94,7 +103,7 @@ class VerticalLinearStepper extends React.Component {
               <Button
                 raised
                 className={classes.button}
-                onClick={this.handleNext} //todo: register
+                onClick={this.join}
                 color={'secondary'}>
                 Join
               </Button>
@@ -102,30 +111,40 @@ class VerticalLinearStepper extends React.Component {
           </div>
         )
       case 2:
+        let estimation = [1, 3, 5 ,8]
+
         return (
           <div>
             <Typography>
               Try out different ad text to see what brings in the most customers, and learn how to enhance your ads using features like ad extensions. If you run into any problems with your ads, find out how to tell if they're running and how to resolve approval issues.
             </Typography>
 
-            <Button color="primary" className={classes.estimateButton}> 1 </Button>
-            <Button color="primary" className={classes.estimateButton}> 3 </Button>
-            <Button color="primary" className={classes.estimateButton}> 5 </Button>
-            <Button color="primary" className={classes.estimateButton}> 8 </Button>
+            {estimation.map((item, i) => {
+              return <Button
+                key={i}
+                color="primary"
+                raised={this.state.activeButton === item}
+                onClick={this.handleActiveButton(item)}
+                className={classes.estimateButton}>
+                  { item }
+                </Button>
+            })}
 
-            <Button
-              disabled={activeStep === 0}
-              onClick={this.handleBack}
-              className={classes.button} >
-              Back
-            </Button>
-            <Button
-              raised
-              color="primary"
-              onClick={this.handleNext}
-              className={classes.button} >
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            <div>
+              <Button
+                disabled={activeStep === 0}
+                onClick={this.handleBack}
+                className={classes.button} >
+                Back
+              </Button>
+              <Button
+                raised
+                color="primary"
+                onClick={this.handleNext}
+                className={classes.button} >
+                Estimate
+              </Button>
+            </div>
 
           </div>
         )
