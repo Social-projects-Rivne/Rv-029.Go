@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as scrumPokerActions from "../actions/scrumPoker";
+import * as scrumPokerActions from "../actions/ScrumPokerAction";
 import SnackBar from '../components/scrumPoker/SnackBar'
 import Users from '../components/scrumPoker/Users'
 import Issue from '../components/scrumPoker/Issue'
@@ -13,7 +13,6 @@ class EstimationRoom extends Component {
 
   state = {
     responseData: null,
-    estimate: null
   }
 
   componentDidMount() {
@@ -44,34 +43,24 @@ class EstimationRoom extends Component {
     const res = JSON.parse(jsonResponse),
           { action, message, status } = res
 
+    // set state for notification message
+    this.setState({ responseData: res })
+
     switch (action) {
       case 'CREATE_ESTIMATION_ROOM':
 
-        // do not show warning message if room already exists
-        if (message === 'room already exists') { return }
-
-        this.setState({
-          responseData: res
-        })
         break
       case 'REGISTER_CLIENT':
         if (status) {
-          this.props.scrumPokerActions.increaseStep()
+          this.props.scrumPokerActions.setStep(2)
         }
-
-        this.setState({
-          responseData: res
-        })
         break
       case 'ESTIMATION':
-        this.setState({
-          responseData: res
-        })
+        if (status) {
+          this.props.scrumPokerActions.setStep(3)
+        }
         break
       case 'ESTIMATION_RESULT':
-        this.setState({
-          responseData: res
-        })
         break
     }
   }
@@ -104,7 +93,7 @@ class EstimationRoom extends Component {
     }
   }
 
-  sendEstimate = () => {
+  sendEstimate = (est) => {
     const { socket } = this.state,
           { id } = this.props.ownProps.params
 
@@ -112,14 +101,11 @@ class EstimationRoom extends Component {
       let msg = JSON.stringify({
         action: 'ESTIMATION',
         issueID: id,
-        estimate: this.state.estimate,
+        estimate: est
       })
 
       socket.send(msg)
 
-      this.setState({
-        estimate: ''
-      })
     }
   }
 

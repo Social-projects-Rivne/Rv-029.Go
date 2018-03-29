@@ -1,6 +1,7 @@
 import {
   INCREASE_STEP,
-  DECREASE_STEP
+  DECREASE_STEP,
+  SET_STEP
 } from '../constants/scrumPoker'
 
 const initialState = {
@@ -15,6 +16,8 @@ export default (state = initialState, action) => {
       return { ...state, activeStep: state.activeStep + 1 }
     case DECREASE_STEP:
       return { ...state, activeStep: state.activeStep - 1 }
+    case SET_STEP:
+      return { ...state, activeStep: payload }
     default:
       return state
   }
