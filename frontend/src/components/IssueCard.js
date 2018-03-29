@@ -36,7 +36,17 @@ import ExpansionPanel, {
   ExpansionPanelSummary,
   ExpansionPanelDetails,
 } from 'material-ui/ExpansionPanel'
+import Avatar from 'material-ui/Avatar';
+import FaceIcon from 'material-ui-icons/Face';
 import messages from "../services/messages";
+
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import ImageIcon from 'material-ui-icons/Image';
+import WorkIcon from 'material-ui-icons/Work';
+import BeachAccessIcon from 'material-ui-icons/BeachAccess';
+import Divider from 'material-ui/Divider';
+
+
 
 class IssueCard extends Component  {
   state = {
@@ -45,7 +55,8 @@ class IssueCard extends Component  {
     anchorEl: null,
     setSubTaskOpen: false,
     parent: null,
-    checkedIssues: []
+    checkedIssues: [],
+    logInput: ''
   }
 
   static propTypes = {
@@ -55,6 +66,89 @@ class IssueCard extends Component  {
     classes: PropTypes.object.isRequired,
     issuesActions: PropTypes.object.isRequired,
     defaultPageActions: PropTypes.object.isRequired
+  }
+
+  handleLogInput = (e) => {
+    this.setState({
+      logInput: e.target.value
+    })
+  }
+
+  getIssueLogs = () => {
+
+    const { currentProjectUsers } = this.props.projects
+    const { Logs } = this.props.data
+
+    let logs = []
+
+    if (currentProjectUsers.length && Logs) {
+
+      Logs.forEach((log) => {
+
+        for (let i = 0; i < currentProjectUsers.length; i++) {
+
+          if (log.userID === currentProjectUsers[i].UUID) {
+
+            // sort by date
+            if (typeof(log.date) === 'string') {
+              let dateArr = log.date.split(' ')
+              log.date = new Date(dateArr[0], dateArr[1], dateArr[2], dateArr[3], dateArr[4], dateArr[5])
+            }
+
+            logs.push({
+              ...log,
+              userName: currentProjectUsers[i].FirstName,
+              userLastName: currentProjectUsers[i].LastName,
+              photo: currentProjectUsers[i].Photo,
+            })
+          }
+        }
+      })
+    }
+
+    return logs.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date)
+    })
+  }
+
+  addLog = () => {
+    const { UUID } = this.props.data
+    const { onUpdate } = this.props
+    const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
+
+    if (!this.props.defaultPage.user) {
+
+    }
+
+    axios.put(API_URL + `project/board/issue/add_issue_log`, {
+      issueID: this.props.data.UUID,
+      date: this.getCurrentTime(),
+      log: this.state.logInput
+    })
+      .then((res) => {
+        this.props.onUpdate()
+        this.handleClose()
+      })
+      .catch((err) => {
+        if (err.response && err.response.data.Message) {
+          setErrorMessage(err.response.data.Message)
+        } else {
+          setErrorMessage("Server error occured")
+        }
+        this.handleClose()
+      })
+  }
+
+  getCurrentTime = () => {
+    let now = new Date()
+    let dd = now.getDate()
+    let mm = now.getMonth()
+    let yyyy = now.getFullYear()
+    let h = now.getHours()
+    let m = now.getMinutes()
+    let s = now.getSeconds()
+
+    return `${yyyy} ${mm} ${dd} ${h} ${m} ${s}`
   }
 
   handleOpenUpdateIssueClick = () => {
@@ -68,6 +162,7 @@ class IssueCard extends Component  {
       anchorEl: null,
       setSubTaskOpen: false,
       checkedSubTasks: [],
+      logInput: ''
     })
   }
 
@@ -220,7 +315,7 @@ class IssueCard extends Component  {
 
   render() {
     const { classes } = this.props
-    const { Name, Description, Status, Estimate, SprintID, UUID, Nesting } = this.props.data
+    const { Name, Description, Status, Estimate, SprintID, UUID, Nesting, Logs } = this.props.data
     const { issueName, issueDesc, issueEstimate, issueStatus } = this.props.issues
 
     const {
@@ -229,6 +324,9 @@ class IssueCard extends Component  {
       setEstimateUpdateIssueInput,
       setStatusUpdateIssueInput
     } = this.props.issuesActions
+
+    // sucks, but works
+    const logs = this.getIssueLogs()
 
     return (
       <ExpansionPanel expanded={this.state.isIssueOpen}>
@@ -255,9 +353,11 @@ class IssueCard extends Component  {
             </Grid>
           </Grid>
         </ExpansionPanelDetails>
+
         <ExpansionPanelDetails>
           <Grid
             container
+            spacing={0}
             justify={'flex-end'}>
             <Grid item>
 
@@ -310,7 +410,46 @@ class IssueCard extends Component  {
                   </IconButton>
               )}
             </Grid>
+
+            <Grid container spacing={8}>
+              <Grid item xs={12}>
+                <TextField
+                  id="logInput"
+                  label="Log progress"
+                  helperText="Any job you made working on this task"
+                  onChange={this.handleLogInput}
+                  value={this.state.logInput}
+                  fullWidth
+                  margin="normal" />
+
+                <Button
+                  onClick={this.addLog}
+                  fullWidth
+                  color={'primary'}>
+                  send
+                </Button>
+              </Grid>
+
+                <List>
+
+                  {logs.map((item, i) => (
+
+                    <ListItem key={i}>
+                      <Avatar>
+                        <FaceIcon />
+                      </Avatar>
+                      <ListItemText
+                        primary={`${item.userName} ${item.userLastName}`}
+                        secondary={item.log} />
+                    </ListItem>
+
+                  ))}
+
+                </List>
+
+            </Grid>
           </Grid>
+
         </ExpansionPanelDetails>
 
         <Dialog
@@ -439,7 +578,7 @@ const styles = {
   },
   settings: {
     display: 'inline-block'
-  }
+  },
 }
 
 const mapStateToProps = (state, ownProps) => {
@@ -447,6 +586,7 @@ const mapStateToProps = (state, ownProps) => {
     defaultPage: state.defaultPage,
     issues: state.issues,
     sprints: state.sprints,
+    projects: state.projects,
     ownProps
   }
 }

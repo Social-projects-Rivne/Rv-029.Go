@@ -16,6 +16,10 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
+	"bytes"
+	"strings"
+	"io"
+	"encoding/csv"
 )
 
 type errorResponse struct {
@@ -334,4 +338,75 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 	return
 
+}
+
+// Import users from csv file
+func Import(w http.ResponseWriter, r *http.Request)  {
+	var respLogs []string
+	var Buf bytes.Buffer
+	// get file from request
+	file, _, err := r.FormFile("import")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	// copy the file data to the buffer
+	io.Copy(&Buf, file)
+	contents := Buf.String()
+
+	// create reader
+	reader := csv.NewReader(strings.NewReader(contents))
+
+	// read file content line by line
+	for i := 0 ; ; i++  {
+		line, err := reader.Read()
+		// check if not the end of file
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			log.Println(err)
+			response := helpers.Response{Status: false, Message: fmt.Sprintf("error during reading file content. error: %+v", err), StatusCode: http.StatusInternalServerError}
+			response.Failed(w)
+			return
+		}
+		if i == 0 { // skip headers
+			continue
+		}
+
+		user := models.User{
+			Email: line[0],
+		}
+		// check if user with such email already exists
+		err = models.UserDB.FindByEmail(&user)
+		if err != nil { // user not exists
+			user.UUID = gocql.TimeUUID()
+			user.FirstName = line[1]
+			user.LastName = line[2]
+			user.Salt = password.GenerateSalt(8)
+			user.Password = password.EncodePassword(password.EncodeMD5(line[3]), user.Salt)
+			user.Role = line[3]
+			user.Status = 1
+			user.CreatedAt = time.Now()
+			user.UpdatedAt = time.Now()
+
+			err = models.UserDB.Insert(&user)
+			if err != nil {
+				respLogs = append(respLogs, fmt.Sprintf("Error occurred: %v", err))
+				response := helpers.Response{Status: false, Message: fmt.Sprintf("error during importing users. error: %+v", err), StatusCode: http.StatusInternalServerError}
+				response.Failed(w)
+				return
+			}
+
+			respLogs = append(respLogs, fmt.Sprintf("User with email %s successfully imported", line[0]))
+		} else {
+			respLogs = append(respLogs, fmt.Sprintf("User with email %s already exists", line[0]))
+		}
+	}
+
+	Buf.Reset()
+
+	response := helpers.Response{Message: "Done", Data: respLogs, StatusCode: http.StatusOK}
+	response.Success(w)
+	return
 }

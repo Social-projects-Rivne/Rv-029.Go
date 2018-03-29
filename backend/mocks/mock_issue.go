@@ -34,6 +34,18 @@ func (m *MockIssueCRUD) EXPECT() *MockIssueCRUDMockRecorder {
 	return m.recorder
 }
 
+// AddLog mocks base method
+func (m *MockIssueCRUD) AddLog(arg0 *models.Issue) error {
+	ret := m.ctrl.Call(m, "AddLog", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddLog indicates an expected call of AddLog
+func (mr *MockIssueCRUDMockRecorder) AddLog(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddLog", reflect.TypeOf((*MockIssueCRUD)(nil).AddLog), arg0)
+}
+
 // Delete mocks base method
 func (m *MockIssueCRUD) Delete(arg0 *models.Issue) error {
 	ret := m.ctrl.Call(m, "Delete", arg0)

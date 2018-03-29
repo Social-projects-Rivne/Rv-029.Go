@@ -262,7 +262,6 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-
 	res := helpers.Response{Message: "Done", Data: sprintIssueList}
 	res.Success(w)
 }
@@ -313,8 +312,8 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := make([]struct{
-		Child gocql.UUID
+	req := make([]struct {
+		Child  gocql.UUID
 		Parent gocql.UUID
 	}, 0)
 
@@ -342,5 +341,75 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 			return
 
 		} // todo: return OK
+	}
+}
+
+func AddIssueLog(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: move to decodeAndValidate
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	req := make(map[string]interface{}, 0)
+
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
+	if err != nil {
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	issue := &models.Issue{}
+	issue.UUID = issueUUID
+
+	err = models.IssueDB.FindByID(issue) // todo ERROR handler
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	user := r.Context().Value("user").(models.User)
+	req["userID"] = user.UUID
+
+	delete(req, "issueID")
+
+	logJSON, _ := json.Marshal(req)
+
+	logs := make([]string, 0)
+	logs = append(logs, string(logJSON))
+
+	issue.Logs = logs
+
+	err = models.IssueDB.AddLog(issue)
+	if err != nil {
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
 	}
 }

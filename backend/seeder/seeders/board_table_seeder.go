@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-	//"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"log"
 
 	"github.com/gocql/gocql"
