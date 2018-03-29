@@ -33,8 +33,8 @@ type User struct {
 	Email     string
 	FirstName string
 	LastName  string
-	Password  string
-	Salt      string
+	Password  string `json:"-"`
+	Salt      string `json:"-"`
 	Role      string
 	Status    int
 	Projects  map[gocql.UUID]string

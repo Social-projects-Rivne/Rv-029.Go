@@ -7,33 +7,39 @@ import (
 )
 
 type Hub struct {
-	Clients map[gocql.UUID]*Client
-	Register chan *Client
+	Clients    map[gocql.UUID]*Client
+	Register   chan *Client
 	Unregister chan *Client
-	Broadcast chan []byte
-	Issue models.Issue
-	Summary map[gocql.UUID]int
-	Results map[int]float32
+	Broadcast  chan *SocketResponse
+	Issue      models.Issue
+	Summary    map[gocql.UUID]int
+	Results    map[int]float32
 }
 
 func (h *Hub) Calculate() {
 	marks := make(map[int]float32, 0)
 	for _, mark := range h.Summary {
-		marks[mark] ++
-
-		for mark, count := range marks {
-			marks[mark] = count / float32(len(h.Summary))
-		}
-
-		h.Results = marks
+		marks[mark]++
 	}
 
-	fmt.Println("Results:")
-	fmt.Printf("%+v\n", h.Results)
-	fmt.Println("Summary:")
-	fmt.Printf("%+v\n", h.Summary)
-	//todo: calculate result of estimation
-	//todo: if len(Clients) == len(issue estimations) -> send message with result to broadcast
+	for mark, count := range marks {
+		h.Results[mark] = count / float32(len(h.Summary))
+	}
+
+	if len(h.Summary) >= len(h.Clients) {
+		h.Broadcast <- &SocketResponse{
+			Status:  true,
+			Action:  `ESTIMATION_RESULTS`,
+			Message: `estimation completed`,
+			Data: struct {
+				Summary map[gocql.UUID]int `json:"summary"`
+				Results map[int]float32    `json:"results"`
+			}{
+				h.Summary,
+				h.Results,
+			},
+		}
+	}
 }
 
 func newHub(issue models.Issue) Hub {
@@ -41,19 +47,19 @@ func newHub(issue models.Issue) Hub {
 		Clients:    make(map[gocql.UUID]*Client),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
-		Broadcast: make(chan []byte),
-		Issue: issue,
-		Summary:	make(map[gocql.UUID]int, 0),
-		Results:	make(map[int]float32, 0),
+		Broadcast:  make(chan *SocketResponse),
+		Issue:      issue,
+		Summary:    make(map[gocql.UUID]int, 0),
+		Results:    make(map[int]float32, 0),
 	}
 }
 
 func RegisterHub(req map[string]interface{}, client *Client) {
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `CREATE_ESTIMATION_ROOM`,
+		client.send(SocketResponse{
+			Status:  false,
+			Action:  `CREATE_ESTIMATION_ROOM`,
 			Message: `invalid issue id`,
 		})
 		return
@@ -64,18 +70,18 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 	}
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `CREATE_ESTIMATION_ROOM`,
+		client.send(SocketResponse{
+			Status:  false,
+			Action:  `CREATE_ESTIMATION_ROOM`,
 			Message: `issue not found`,
 		})
 		return
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
-		client.conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `CREATE_ESTIMATION_ROOM`,
+		client.send(SocketResponse{
+			Status:  false,
+			Action:  `CREATE_ESTIMATION_ROOM`,
 			Message: `room already exists`,
 		})
 		return
@@ -87,9 +93,9 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 
 	go hub.run()
 
-	client.conn.WriteJSON(SocketResponse{
-		Status: true,
-		Action: `CREATE_ESTIMATION_ROOM`,
+	client.send(SocketResponse{
+		Status:  true,
+		Action:  `CREATE_ESTIMATION_ROOM`,
 		Message: `room was successfully created`,
 	})
 	return
@@ -102,21 +108,19 @@ func (h *Hub) run() {
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
 		case client := <-h.Unregister:
+			fmt.Printf("Number of clients in hun before deleting: %v\n", len(h.Clients))
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)
-				close(client.send)
+				fmt.Printf("Number of clients in hun after deleting: %v\n", len(h.Clients))
+				//close(client.send)
 				if len(h.Clients) == 0 {
 					delete(ActiveHubs, h.Issue.UUID)
+					fmt.Printf("Number of active hubs after deleting: %v\n", len(ActiveHubs))
 				}
 			}
 		case msg := <-h.Broadcast:
 			for _, client := range h.Clients {
-				select {
-				case client.send <- msg:
-				default:
-					close(client.send)
-					delete(h.Clients, client.user.UUID)
-				}
+				client.send(msg)
 			}
 		}
 	}

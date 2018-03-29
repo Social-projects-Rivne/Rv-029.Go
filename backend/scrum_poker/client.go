@@ -7,20 +7,28 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
 	"strconv"
+	"sync"
 	"time"
 )
 
 type Client struct {
 	conn *websocket.Conn
-	send chan []byte
+	//send chan []byte
 	user *models.User
+	mu   sync.Mutex
+}
+
+func (c *Client) send(v interface{}) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.conn.WriteJSON(v)
 }
 
 func RegisterClient(req map[string]interface{}, client *Client) {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `REGISTER_CLIENT`,
 			Message: `invalid issue id`,
@@ -32,7 +40,7 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		hub = ActiveHubs[issueUUID]
 		hub.Register <- client
 	} else {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `REGISTER_CLIENT`,
 			Message: `room not found`,
@@ -40,18 +48,25 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		return
 	}
 
-	client.conn.WriteJSON(SocketResponse{
+	client.send(SocketResponse{
 		Status:  true,
 		Action:  `REGISTER_CLIENT`,
 		Message: `you was successfully connected to the estimation room`,
 	})
+
+	ActiveHubs[issueUUID].Broadcast <- &SocketResponse{
+		Status:  true,
+		Action:  `NEW_USER_IN_ROOM`,
+		Message: `new user connected to the room`,
+		Data: client.user,
+	}
 	return
 }
 
 func SendEstimation(req map[string]interface{}, client *Client) {
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `invalid issue id`,
@@ -64,7 +79,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 	}
 	err = models.IssueDB.FindByID(&issue)
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `issue not found`,
@@ -73,7 +88,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; !ok {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `room not found`,
@@ -82,7 +97,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 	}
 
 	if _, ok := ActiveHubs[issueUUID].Clients[client.user.UUID]; !ok {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `user is not connected to the room`,
@@ -92,7 +107,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 
 	var estimate int
 	if value, ok := req["estimate"]; !ok {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `estimation is not set`,
@@ -101,7 +116,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 	} else {
 		estimate, err = strconv.Atoi(value.(string))
 		if err != nil || estimate < 0 || estimate > 10 {
-			client.conn.WriteJSON(SocketResponse{
+			client.send(SocketResponse{
 				Status:  false,
 				Action:  `ESTIMATION`,
 				Message: `estimation has invalid value`,
@@ -126,7 +141,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 	})
 
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `invalid json encoding`,
@@ -142,7 +157,7 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 
 	_, _, err = Producer.SendMessage(producerMessage)
 	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
+		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,
 			Message: `estimation was not saved`,
@@ -150,48 +165,49 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 		return
 	}
 
-	client.conn.WriteJSON(SocketResponse{
+	client.send(SocketResponse{
 		Status:  true,
 		Action:  `ESTIMATION`,
 		Message: `your estimate was successfully saved`,
 	})
 }
 
-func (c *Client) WriteWorker() {
-	const (
-		writeWait = 10 * time.Second
-	)
-
-	defer func() {
-		c.conn.Close()
-	}()
-
-	for {
-		select {
-		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if !ok {
-				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
-			}
-
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-
-			w.Write(message)
-
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write([]byte{'\n'})
-				w.Write(<-c.send)
-			}
-
-			err = w.Close()
-			if err != nil {
-				return
-			}
-		}
-	}
-}
+//
+//func (c *Client) WriteWorker() {
+//	const (
+//		writeWait = 10 * time.Second
+//	)
+//
+//	defer func() {
+//		c.conn.Close()
+//	}()
+//
+//	for {
+//		select {
+//		case message, ok := <-c.send:
+//			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+//			if !ok {
+//				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+//				return
+//			}
+//
+//			w, err := c.conn.NextWriter(websocket.TextMessage)
+//			if err != nil {
+//				return
+//			}
+//
+//			w.Write(message)
+//
+//			n := len(c.send)
+//			for i := 0; i < n; i++ {
+//				w.Write([]byte{'\n'})
+//				w.Write(<-c.send)
+//			}
+//
+//			err = w.Close()
+//			if err != nil {
+//				return
+//			}
+//		}
+//	}
+//}

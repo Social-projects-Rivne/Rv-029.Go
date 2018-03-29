@@ -2,12 +2,13 @@ package scrum_poker
 
 import (
 	"encoding/json"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"reflect"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"fmt"
 )
 
 var upgrader = websocket.Upgrader{
@@ -19,10 +20,10 @@ var upgrader = websocket.Upgrader{
 }
 
 type SocketResponse struct {
-	Status bool `json:"status"`
-	Action string `json:"action,omitempty"`
-	Message string `json:"message"`
-	Data interface{} `json:"data,omitempty"`
+	Status  bool        `json:"status"`
+	Action  string      `json:"action,omitempty"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 var ActiveHubs = make(map[gocql.UUID]*Hub, 0)
@@ -45,8 +46,8 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 		userUUID, err := gocql.ParseUUID(userID.(string))
 		if err != nil {
 			conn.WriteJSON(SocketResponse{
-				Status: false,
-				Action: `CONNECTION`,
+				Status:  false,
+				Action:  `CONNECTION`,
 				Message: `invalid token`,
 			})
 		}
@@ -57,25 +58,25 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 		err = models.UserDB.FindByID(&user)
 		if err != nil {
 			conn.WriteJSON(SocketResponse{
-				Status: false,
-				Action: `CONNECTION`,
+				Status:  false,
+				Action:  `CONNECTION`,
 				Message: `user not found`,
 			})
 		}
 
 		client = &Client{
 			conn: conn,
-			send: make(chan []byte, 256),
+			//send: make(chan []byte, 256),
 			user: &user,
 		}
 
-		go client.WriteWorker()
+		//go client.WriteWorker()
 
 		ConnectedUsers[user.UUID] = client
 
 		conn.WriteJSON(SocketResponse{
-			Status: true,
-			Action: `CONNECTION`,
+			Status:  true,
+			Action:  `CONNECTION`,
 			Message: `you was successfully connected to the socket server`,
 		})
 
@@ -87,10 +88,13 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	// on disconnect remove from hub clients
 	defer func() {
+		fmt.Printf("Number of active hubs before deleting: %v\n", len(ActiveHubs))
+
 		for _, hub := range ActiveHubs {
-			for _, client := range hub.Clients {
-				if reflect.DeepEqual(&client.conn, &conn) {
-					hub.Unregister <- client
+			for _, hubClient := range hub.Clients {
+				if reflect.DeepEqual(&hubClient, &client) {
+					hub.Calculate()
+					hub.Unregister <- client //TODO: fix it
 				}
 			}
 		}
