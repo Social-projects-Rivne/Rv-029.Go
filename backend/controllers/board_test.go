@@ -425,3 +425,233 @@ func TestBoardsListDBError(t *testing.T) {
 			status, http.StatusInternalServerError)
 	}
 }
+
+// ######## AssignUserToBoard ########
+
+func TestAssignUserToBoardSucces(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	models.InitBoardDB(mockBoardCRUD)
+	mockBoardCRUD.EXPECT().AddUserToBoard(gomock.Any(),gomock.Any(),gomock.Any()).Return(nil).Times(1)
+
+	body := bytes.NewBufferString(`{"email": "nigga@gmail.com", "user_id": "9325624a-0ba2-22e8-ba34-c06ebf83499a"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/assign-user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", body)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AssignUserToBoard)
+	r.Handle("/board/assign-user/{board_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}
+
+func TestAssignUserToBoardBadJSON(t *testing.T) {
+
+	body := bytes.NewBufferString(`{"Wrong": "nigga@gmail.com", "user_id": "9325624a-0ba2-22e8-ba34-c06ebf83499a"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/assign-user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", body)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AssignUserToBoard)
+	r.Handle("/board/assign-user/{board_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
+func TestAssignUserToBoardBadBoardIDVariable(t *testing.T) {
+	// mockCtrl := gomock.NewController(t)
+	// defer mockCtrl.Finish()
+
+	// mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	// models.InitBoardDB(mockBoardCRUD)
+	// mockBoardCRUD.EXPECT().AddUserToBoard(gomock.Any(),gomock.Any(),gomock.Any()).Return(nil).Times(1)
+	
+	body := bytes.NewBufferString(`{"email": "nigga@gmail.com", "user_id": "9325624a-0ba2-22e8-ba34-c06ebf83499a"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/assign-user/wrong/", body)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AssignUserToBoard)
+	r.Handle("/board/assign-user/{board_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
+func TestAssignUserToBoardBadUserIDVariable(t *testing.T) {
+	// mockCtrl := gomock.NewController(t)
+	// defer mockCtrl.Finish()
+
+	// mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	// models.InitBoardDB(mockBoardCRUD)
+	// mockBoardCRUD.EXPECT().AddUserToBoard(gomock.Any(),gomock.Any(),gomock.Any()).Return(nil).Times(1)
+	
+	body := bytes.NewBufferString(`{"email": "nigga@gmail.com", "user_id": "Wrong"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/assign-user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", body)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AssignUserToBoard)
+	r.Handle("/board/assign-user/{board_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
+func TestAssignUserToBoardDBError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	models.InitBoardDB(mockBoardCRUD)
+	mockBoardCRUD.EXPECT().AddUserToBoard(gomock.Any(),gomock.Any(),gomock.Any()).Return(errors.New("DB Error")).Times(1)
+	
+	body := bytes.NewBufferString(`{"email": "nigga@gmail.com", "user_id": "9325624a-0ba2-22e8-ba34-c06ebf83499a"}`)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/assign-user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", body)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AssignUserToBoard)
+	r.Handle("/board/assign-user/{board_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+}
+
+// ######## DeleteUserFromBoard ########
+
+func TestDeleteUserFromBoardSucces(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	models.InitBoardDB(mockBoardCRUD)
+	mockBoardCRUD.EXPECT().DeleteUserFromBoard(gomock.Any(),gomock.Any()).Return(nil).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/9325624a-0ba2-22e8-ba34-c06ebf83499a/user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(DeleteUserFromBoard)
+	r.Handle("/board/{board_id}/user/{user_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+}
+
+func TestDeleteUserFromBoardBadBoardIDVariable(t *testing.T) {
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/wrong/user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(DeleteUserFromBoard)
+	r.Handle("/board/{board_id}/user/{user_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
+func TestDeleteUserFromBoardBadUserIDVariable(t *testing.T) {
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/9325624a-0ba2-22e8-ba34-c06ebf83499a/user/Wrong/", nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(DeleteUserFromBoard)
+	r.Handle("/board/{board_id}/user/{user_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+}
+
+func TestDeleteUserFromBoardDBError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockBoardCRUD := mocks.NewMockBoardCRUD(mockCtrl)
+	models.InitBoardDB(mockBoardCRUD)
+	mockBoardCRUD.EXPECT().DeleteUserFromBoard(gomock.Any(),gomock.Any()).Return(errors.New("DB Error")).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/board/9325624a-0ba2-22e8-ba34-c06ebf83499a/user/9325624a-0ba2-22e8-ba34-c06ebf83499a/", nil)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(DeleteUserFromBoard)
+	r.Handle("/board/{board_id}/user/{user_id}/", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+}

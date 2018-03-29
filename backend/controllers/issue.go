@@ -283,7 +283,7 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = id
 	if err := models.IssueDB.FindByID(issue); err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -298,8 +298,9 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+// todo: refactor decode and validate
 func SetParentIssue(w http.ResponseWriter, r *http.Request) {
-
+	
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Caught error (controllers/issue.SetParentIssue): %+v", err)
@@ -311,11 +312,6 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-	//
-	//type ReqPayload struct {
-	//	Child gocql.UUID
-	//	Parent gocql.UUID
-	//}
 
 	req := make([]struct{
 		Child gocql.UUID
@@ -345,6 +341,6 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 			response.Failed(w)
 			return
 
-		}
+		} // todo: return OK
 	}
 }
