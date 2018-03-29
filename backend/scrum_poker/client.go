@@ -53,13 +53,6 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		Action:  `REGISTER_CLIENT`,
 		Message: `you was successfully connected to the estimation room`,
 	})
-
-	ActiveHubs[issueUUID].Broadcast <- &SocketResponse{
-		Status:  true,
-		Action:  `NEW_USER_IN_ROOM`,
-		Message: `new user connected to the room`,
-		Data: client.user,
-	}
 	return
 }
 

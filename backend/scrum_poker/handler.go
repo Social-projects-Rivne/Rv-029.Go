@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"reflect"
-	"fmt"
 )
 
 var upgrader = websocket.Upgrader{
@@ -80,24 +79,27 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			Message: `you was successfully connected to the socket server`,
 		})
 
-		// on disconnect remove from ConnectedUsers
-		defer func() {
-			delete(ConnectedUsers, user.UUID)
-		}()
 	}
 
 	// on disconnect remove from hub clients
 	defer func() {
-		fmt.Printf("Number of active hubs before deleting: %v\n", len(ActiveHubs))
-
 		for _, hub := range ActiveHubs {
-			for _, hubClient := range hub.Clients {
-				if reflect.DeepEqual(&hubClient, &client) {
-					hub.Calculate()
-					hub.Unregister <- client //TODO: fix it
+			if len(hub.Clients) > 0 {
+				for userID, hubClient := range hub.Clients {
+					if reflect.DeepEqual(userID, client.user.UUID) {
+						hub.Calculate()
+						hub.Unregister <- hubClient
+					}
 				}
 			}
+
+			if len(hub.Clients) > 0 {
+				delete(ActiveHubs, hub.Issue.UUID)
+			}
 		}
+
+		// on disconnect remove from ConnectedUsers
+		delete(ConnectedUsers, client.user.UUID)
 	}()
 
 	for {

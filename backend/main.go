@@ -70,15 +70,6 @@ func main() {
 	models.InitSprintDB(&models.SprintStorage{APP.DB})
 	models.InitRoleDB(&models.RoleStorage{APP.DB})
 
-	scrum_poker.InitProducer()
-	scrum_poker.InitConsumer("test-topic-1")
-
-	defer func() {
-		if err := scrum_poker.Producer.Close(); err != nil {
-			panic(err)
-		}
-	}()
-
 	var cmd string
 
 	jwt.Config = &APP.Config.JWT
@@ -102,6 +93,15 @@ func main() {
 	case "db:seed":
 		seeder.Run()
 	default:
+		scrum_poker.InitProducer()
+		scrum_poker.InitConsumer("test-topic-1")
+
+		defer func() {
+			if err := scrum_poker.Producer.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
 		handler := cors.New(cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},

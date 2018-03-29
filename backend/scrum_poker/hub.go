@@ -3,7 +3,6 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
-	"fmt"
 )
 
 type Hub struct {
@@ -107,16 +106,28 @@ func (h *Hub) run() {
 
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
+
+			h.Broadcast <- &SocketResponse{
+				Status:  true,
+				Action:  `NEW_USER_IN_ROOM`,
+				Message: `new user connected to the room`,
+				Data: client.user,
+			}
 		case client := <-h.Unregister:
-			fmt.Printf("Number of clients in hun before deleting: %v\n", len(h.Clients))
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)
-				fmt.Printf("Number of clients in hun after deleting: %v\n", len(h.Clients))
 				//close(client.send)
-				if len(h.Clients) == 0 {
-					delete(ActiveHubs, h.Issue.UUID)
-					fmt.Printf("Number of active hubs after deleting: %v\n", len(ActiveHubs))
-				}
+			}
+
+			if len(h.Clients) == 0 {
+				delete(ActiveHubs, h.Issue.UUID)
+			}
+
+			h.Broadcast <- &SocketResponse{
+				Status:  true,
+				Action:  `USER_DISCONNECT_FROM_ROOM`,
+				Message: `user disconnected from the room`,
+				Data: client.user,
 			}
 		case msg := <-h.Broadcast:
 			for _, client := range h.Clients {
