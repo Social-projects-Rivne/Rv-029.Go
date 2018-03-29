@@ -3,8 +3,6 @@ package scrum_poker
 import (
 	"github.com/gocql/gocql"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
-
-	"fmt"
 )
 
 func GetClients(req map[string]interface{}, client *Client)  {
@@ -35,20 +33,15 @@ func GetClients(req map[string]interface{}, client *Client)  {
 	}
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
-		for k, v := range ActiveHubs[issueUUID].Clients {
-			fmt.Println("££££££££££££££££££££££££££")
-			fmt.Printf("key[%s] value[%s]\n", k, v.user)
-			fmt.Println("££££££££££££££££££££££££££")
-
-
-
+		users := make([]*models.User, 0)
+		for _, v := range ActiveHubs[issueUUID].Clients {
+			users = append(users, v.user)
 		}
-		//fmt.Println(ActiveHubs[issueUUID].Clients)
 		client.conn.WriteJSON(SocketResponse{
 			Status: false,
 			Action: `GUEST`,
 			Message: `Hello guest`,
-			Data: "asdfsdf",
+			Data: users,
 		})
 		return
 	}

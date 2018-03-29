@@ -34,19 +34,18 @@ class EstimationRoom extends Component {
     }
 
     socket.onmessage = (evt) => {
-      // let currentMessages = this.state.response
-      // currentMessages.unshift(evt.data)
-      //
-      // this.setState({
-      //   response: currentMessages
-      // })
 
-        var messages = evt.data;
-        console.log(messages);
-        if(messages.action == "GUEST"){
-            console.log(messages.data);
-          if(messages.data){
-              this.users = messages.data
+        const res = JSON.parse(evt.data),
+        {action, message, status, data} = res
+
+        if(action == "GUEST"){
+            console.log("guest");
+          if(data){
+              console.log("data" + data);
+              this.setState({
+                  users: data
+              })
+              console.log(this.data)
           }
         }
 
@@ -137,7 +136,7 @@ class EstimationRoom extends Component {
               issueID={this.props.ownProps.params.id} />
 
             <Users
-              users={this.users} />
+              users={this.state.users} />
 
           </Grid>
           <Grid item xs={8}>
