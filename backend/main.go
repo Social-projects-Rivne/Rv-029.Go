@@ -68,14 +68,6 @@ func main() {
 	models.InitSprintDB(&models.SprintStorage{APP.DB})
 	models.InitRoleDB(&models.RoleStorage{APP.DB})
 
-	kafka.InitProducer()
-
-	defer func() {
-		if err := kafka.Producer.Close(); err != nil {
-			panic(err)
-		}
-	}()
-
 	var cmd string
 
 	jwt.Config = &APP.Config.JWT
@@ -99,6 +91,14 @@ func main() {
 	case "db:seed":
 		seeder.Run()
 	default:
+		kafka.InitProducer()
+
+		defer func() {
+			if err := kafka.Producer.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
 		handler := cors.New(cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"},
