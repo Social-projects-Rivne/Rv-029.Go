@@ -3,6 +3,7 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
+	"fmt"
 )
 
 type Hub struct {
@@ -16,29 +17,33 @@ type Hub struct {
 }
 
 func (h *Hub) Calculate() {
-	marks := make(map[int]float32, 0)
-	for _, mark := range h.Summary {
-		marks[mark]++
-	}
+	fmt.Println("CALC STARTED")
+	if len(h.Summary) > 0 {
+		marks := make(map[int]float32, 0)
+		for _, mark := range h.Summary {
+			marks[mark]++
+		}
 
-	for mark, count := range marks {
-		h.Results[mark] = count / float32(len(h.Summary))
-	}
+		for mark, count := range marks {
+			h.Results[mark] = count / float32(len(h.Summary))
+		}
 
-	if len(h.Summary) >= len(h.Clients) {
-		h.Broadcast <- &SocketResponse{
-			Status:  true,
-			Action:  `ESTIMATION_RESULTS`,
-			Message: `estimation completed`,
-			Data: struct {
-				Summary map[gocql.UUID]int `json:"summary"`
-				Results map[int]float32    `json:"results"`
-			}{
-				h.Summary,
-				h.Results,
-			},
+		if len(h.Summary) >= len(h.Clients) && len(h.Clients) > 0 {
+			h.Broadcast <- &SocketResponse{
+				Status:  true,
+				Action:  `ESTIMATION_RESULTS`,
+				Message: `estimation completed`,
+				Data: struct {
+					Summary map[gocql.UUID]int `json:"summary"`
+					Results map[int]float32    `json:"results"`
+				}{
+					h.Summary,
+					h.Results,
+				},
+			}
 		}
 	}
+	fmt.Println("CALC ENDED")
 }
 
 func newHub(issue models.Issue) Hub {
@@ -102,37 +107,50 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 
 func (h *Hub) run() {
 	for {
+		fmt.Println("HUB WORKER!")
 		select {
 
 		case client := <-h.Register:
+			fmt.Printf("Register user %v", client.user.UUID)
 			h.Clients[client.user.UUID] = client
 
-			h.Broadcast <- &SocketResponse{
-				Status:  true,
-				Action:  `NEW_USER_IN_ROOM`,
-				Message: `new user connected to the room`,
-				Data: client.user,
-			}
+			//FIXME
+			//if len(h.Clients) > 1 {
+			//	h.Broadcast <- &SocketResponse{
+			//		Status:  true,
+			//		Action:  `NEW_USER_IN_ROOM`,
+			//		Message: `new user connected to the room`,
+			//		Data: client.user,
+			//	}
+			//}
 		case client := <-h.Unregister:
+			fmt.Printf("Unregister user %v", client.user.UUID)
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)
 				//close(client.send)
-			}
+				if len(h.Clients) == 0 {
+					fmt.Println("Hub is empty - remove it")
+					delete(ActiveHubs, h.Issue.UUID)
+				}
 
-			if len(h.Clients) == 0 {
-				delete(ActiveHubs, h.Issue.UUID)
-			}
-
-			h.Broadcast <- &SocketResponse{
-				Status:  true,
-				Action:  `USER_DISCONNECT_FROM_ROOM`,
-				Message: `user disconnected from the room`,
-				Data: client.user,
+				//FIXME
+				//if len(h.Clients) > 0 {
+				//	h.Broadcast <- &SocketResponse{
+				//		Status:  true,
+				//		Action:  `USER_DISCONNECT_FROM_ROOM`,
+				//		Message: `user disconnected from the room`,
+				//		Data: client.user,
+				//	}
+				//}
 			}
 		case msg := <-h.Broadcast:
-			for _, client := range h.Clients {
-				client.send(msg)
+			fmt.Printf("Broadcast %+v", msg)
+			if len(h.Clients) > 0 {
+				for _, client := range h.Clients {
+					client.send(msg)
+				}
 			}
 		}
 	}
+	fmt.Println("THIS SHOULD BE NEVER PRINTED")
 }

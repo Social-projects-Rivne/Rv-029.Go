@@ -24,6 +24,10 @@ func (c *Client) send(v interface{}) error {
 	return c.conn.WriteJSON(v)
 }
 
+func (c *Client) disconnect() error {
+	return c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+}
+
 func RegisterClient(req map[string]interface{}, client *Client) {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))

@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"reflect"
+	"fmt"
 )
 
 var upgrader = websocket.Upgrader{
@@ -83,19 +84,33 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	// on disconnect remove from hub clients
 	defer func() {
-		for _, hub := range ActiveHubs {
+		fmt.Printf("Number of active hubs: %v\n", len(ActiveHubs))
+		for key, hub := range ActiveHubs {
+			fmt.Printf("Number of clients in hub %v: %v\n", key, len(hub.Clients))
 			if len(hub.Clients) > 0 {
-				for userID, hubClient := range hub.Clients {
+				for userID, _ := range hub.Clients {
+					fmt.Printf("%v vs. %v\n", userID, client.user.UUID)
 					if reflect.DeepEqual(userID, client.user.UUID) {
+						fmt.Println("I'm in!")
 						hub.Calculate()
-						hub.Unregister <- hubClient
+						fmt.Println("Hub calculated")
+						hub.Unregister <- client
+						fmt.Println("I'm out!")
 					}
 				}
 			}
-
-			if len(hub.Clients) > 0 {
-				delete(ActiveHubs, hub.Issue.UUID)
-			}
+			//
+			//if len(hub.Clients) == 0 {
+			//	fmt.Println("Hub is empty")
+			//	delete(ActiveHubs, hub.Issue.UUID)
+			//} else {
+			//	hub.Broadcast <- &SocketResponse{
+			//		Status:  true,
+			//		Action:  `USER_DISCONNECT_FROM_ROOM`,
+			//		Message: `user disconnected from the room`,
+			//		Data: client.user,
+			//	}
+			//}
 		}
 
 		// on disconnect remove from ConnectedUsers
