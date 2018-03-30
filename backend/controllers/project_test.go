@@ -603,3 +603,34 @@ func TestProjectUsersListDBError(t *testing.T) {
 	}
 
 }
+
+
+// ######## USERS TO ADD PROJECT LIST ########
+
+
+func TestUsersToAddProjectListSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	
+	mockUserCRUD.EXPECT().List().Return(nil,nil).Times(1)
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/project/users/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(UsersToAddProjectList)
+	r.Handle("/project/users/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}

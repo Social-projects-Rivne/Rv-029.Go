@@ -621,7 +621,7 @@ func TestSprintIssueslistUpdateDBError(t *testing.T) {
 }
 
 
-// ######## SHOW ISSUES ########
+// ######## SHOW ISSUE ########
 
 func TestShowIssueSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -722,3 +722,202 @@ func TestShowIssueDBError(t *testing.T) {
 // 	}
 
 // }
+
+
+// ######## ADD ISSUE TO SPRINT ########
+
+
+func TestAddIssueToSprintSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockIssueCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
+	mockIssueCRUD.EXPECT().Update(gomock.Any()).Return(nil).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestAddIssueToSprintBadSprintIDVariable(t *testing.T) {
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/Wrong/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+
+}
+
+func TestAddIssueToSprintBadIssueIDVariable(t *testing.T) {
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/Wrong", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorIssueFindByID(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorSprintFindByID(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(errors.New("DB Error")).Times(1)	
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorIssueDelete(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)	
+	mockIssueCRUD.EXPECT().Delete(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorIssueUpdate(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)	
+	mockIssueCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
+	mockIssueCRUD.EXPECT().Update(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+	
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
