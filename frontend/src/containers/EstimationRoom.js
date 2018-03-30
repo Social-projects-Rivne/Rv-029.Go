@@ -14,12 +14,16 @@ class EstimationRoom extends Component {
   state = {
     users: [],
     responseData: null,
+    socket: null,
   }
 
   componentDidMount() {
-    this.connect()
+      this.connect()
   }
 
+  componentWillUnmount() {
+      this.state.socket.close();
+  }
   connect = () => {
     const socket = new WebSocket(`ws://localhost:8080/socketserver?token=${sessionStorage.getItem('token')}`)
 
@@ -30,7 +34,6 @@ class EstimationRoom extends Component {
     socket.onopen = () => {
       this.createRoom()
       this.getUsers()
-
     }
 
     socket.onmessage = (evt) => {
@@ -45,7 +48,7 @@ class EstimationRoom extends Component {
   actionHandler = (jsonResponse) => {
     const res = JSON.parse(jsonResponse),
       {action, message, status, data} = res
-
+      console.log(res)
     // set state for notification message
     this.setState({responseData: res})
 
@@ -68,6 +71,9 @@ class EstimationRoom extends Component {
       case 'GUEST':
         this.setState({users: data})
         break
+      case 'NEW_USER_IN_ROOM':
+          console.log(data)
+          break
     }
   }
 
