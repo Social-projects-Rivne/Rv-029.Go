@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+const LIMIT = 0.6
+
 type Hub struct {
 	Clients    map[gocql.UUID]*Client
 	Register   chan *Client
@@ -18,27 +20,40 @@ type Hub struct {
 
 func (h *Hub) Calculate() {
 	fmt.Println("CALC STARTED")
+
+	var estimate int
+	message := "estimation didn't get 60%"
+
 	if len(h.Summary) > 0 {
 		marks := make(map[int]float32, 0)
 		for _, mark := range h.Summary {
 			marks[mark]++
 		}
 
-		for mark, count := range marks {
-			h.Results[mark] = count / float32(len(h.Summary))
+		// count estimation percent of concrete mark
+		for mark, countOfPeople := range marks {
+			h.Results[mark] = countOfPeople / float32(len(h.Summary))
+
+			if h.Results[mark] >= LIMIT {
+				estimate = mark
+				message = "estimation completed"
+			}
+
 		}
 
 		if len(h.Summary) >= len(h.Clients) && len(h.Clients) > 0 {
 			h.Broadcast <- &SocketResponse{
 				Status:  true,
 				Action:  `ESTIMATION_RESULTS`,
-				Message: `estimation completed`,
+				Message: message,
 				Data: struct {
 					Summary map[gocql.UUID]int `json:"summary"`
 					Results map[int]float32    `json:"results"`
+					Estimate int `json:"estimate,omitempty"`
 				}{
 					h.Summary,
 					h.Results,
+					estimate,
 				},
 			}
 		}
