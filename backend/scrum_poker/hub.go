@@ -3,7 +3,6 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
-	"fmt"
 )
 
 type Hub struct {
@@ -17,7 +16,6 @@ type Hub struct {
 }
 
 func (h *Hub) Calculate() {
-	fmt.Println("CALC STARTED")
 	if len(h.Summary) > 0 {
 		marks := make(map[int]float32, 0)
 		for _, mark := range h.Summary {
@@ -43,7 +41,6 @@ func (h *Hub) Calculate() {
 			}
 		}
 	}
-	fmt.Println("CALC ENDED")
 }
 
 func newHub(issue models.Issue) Hub {
@@ -107,44 +104,19 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 
 func (h *Hub) run() {
 	for {
-		fmt.Println("HUB WORKER!")
 		select {
 
 		case client := <-h.Register:
-			fmt.Printf("Register user %v", client.user.UUID)
 			h.Clients[client.user.UUID] = client
-
-			//FIXME
-			//if len(h.Clients) > 1 {
-			//	h.Broadcast <- &SocketResponse{
-			//		Status:  true,
-			//		Action:  `NEW_USER_IN_ROOM`,
-			//		Message: `new user connected to the room`,
-			//		Data: client.user,
-			//	}
-			//}
 		case client := <-h.Unregister:
-			fmt.Printf("Unregister user %v", client.user.UUID)
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)
 				//close(client.send)
 				if len(h.Clients) == 0 {
-					fmt.Println("Hub is empty - remove it")
 					delete(ActiveHubs, h.Issue.UUID)
 				}
-
-				//FIXME
-				//if len(h.Clients) > 0 {
-				//	h.Broadcast <- &SocketResponse{
-				//		Status:  true,
-				//		Action:  `USER_DISCONNECT_FROM_ROOM`,
-				//		Message: `user disconnected from the room`,
-				//		Data: client.user,
-				//	}
-				//}
 			}
 		case msg := <-h.Broadcast:
-			fmt.Printf("Broadcast %+v", msg)
 			if len(h.Clients) > 0 {
 				for _, client := range h.Clients {
 					client.send(msg)
@@ -152,5 +124,4 @@ func (h *Hub) run() {
 			}
 		}
 	}
-	fmt.Println("THIS SHOULD BE NEVER PRINTED")
 }
