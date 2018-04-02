@@ -100,7 +100,8 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 		return
 	}
 
-	if _, ok := ActiveHubs[issueUUID].Clients[client.user.UUID]; !ok {
+
+	if _, ok := ActiveHubs[issueUUID].Clients[client]; !ok {
 		client.send(SocketResponse{
 			Status:  false,
 			Action:  `ESTIMATION`,

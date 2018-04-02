@@ -3,12 +3,13 @@ package scrum_poker
 import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
+	"reflect"
 )
 
 const LIMIT = 0.6
 
 type Hub struct {
-	Clients    map[gocql.UUID]*Client
+	Clients    map[*Client]gocql.UUID
 	Register   chan *Client
 	Unregister chan *Client
 	Broadcast  chan *SocketResponse
@@ -18,8 +19,6 @@ type Hub struct {
 }
 
 func (h *Hub) Calculate() {
-	fmt.Println("CALC STARTED")
-
 	var estimate int
 	message := "estimation didn't get 60%"
 
@@ -61,7 +60,7 @@ func (h *Hub) Calculate() {
 
 func newHub(issue models.Issue) Hub {
 	return Hub{
-		Clients:    make(map[gocql.UUID]*Client),
+		Clients:    make(map[*Client]gocql.UUID),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Broadcast:  make(chan *SocketResponse),
@@ -123,18 +122,20 @@ func (h *Hub) run() {
 		select {
 
 		case client := <-h.Register:
-			h.Clients[client.user.UUID] = client
+			h.Clients[client] = client.user.UUID
 		case client := <-h.Unregister:
-			if _, ok := h.Clients[client.user.UUID]; ok {
-				delete(h.Clients, client.user.UUID)
-				//close(client.send)
-				if len(h.Clients) == 0 {
-					delete(ActiveHubs, h.Issue.UUID)
+			for hclient, _ := range h.Clients {
+				if reflect.DeepEqual(hclient, client) {
+					delete(h.Clients, client)
+					//close(client.send)
+					if len(h.Clients) == 0 {
+						delete(ActiveHubs, h.Issue.UUID)
+					}
 				}
 			}
 		case msg := <-h.Broadcast:
 			if len(h.Clients) > 0 {
-				for _, client := range h.Clients {
+				for client, _ := range h.Clients {
 					client.send(msg)
 				}
 			}

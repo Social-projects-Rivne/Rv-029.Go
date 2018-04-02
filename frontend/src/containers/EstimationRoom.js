@@ -37,6 +37,7 @@ class EstimationRoom extends Component {
     }
 
     socket.onmessage = (evt) => {
+      console.log(evt.data);
       this.actionHandler(evt.data)
     }
 
@@ -65,8 +66,10 @@ class EstimationRoom extends Component {
         if (status) {
           this.props.scrumPokerActions.setStep(3)
         }
+          console.log(res);
         break
-      case 'ESTIMATION_RESULT':
+      case 'ESTIMATION_RESULTS':
+        console.log(res);
         break
       case 'GUEST':
         this.setState({users: data})
@@ -127,11 +130,10 @@ class EstimationRoom extends Component {
       let msg = JSON.stringify({
         action: 'ESTIMATION',
         issueID: id,
-        estimate: est
+        estimate: est.toString()
       })
 
       socket.send(msg)
-
     }
   }
 

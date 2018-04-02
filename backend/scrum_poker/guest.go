@@ -34,7 +34,7 @@ func GetClients(req map[string]interface{}, client *Client)  {
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
 		users := make([]*models.User, 0)
-		for _, v := range ActiveHubs[issueUUID].Clients {
+		for v, _ := range ActiveHubs[issueUUID].Clients {
 			users = append(users, v.user)
 		}
 		client.conn.WriteJSON(SocketResponse{
