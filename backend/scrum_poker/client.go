@@ -44,11 +44,13 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		hub = ActiveHubs[issueUUID]
 		hub.Register <- client
 
-		hub.Broadcast <- &SocketResponse{
-			Status:  true,
-			Action:  `NEW_USER_IN_ROOM`,
-			Message: `new user connected to the room`,
-			Data: client.user,
+		if len(hub.Guests) > 0 {
+			hub.BroadcastGusets <- &SocketResponse{
+				Status:  true,
+				Action:  `NEW_USER_IN_ROOM`,
+				Message: `new user connected to the room`,
+				Data:    client.user,
+			}
 		}
 	} else {
 		client.send(SocketResponse{

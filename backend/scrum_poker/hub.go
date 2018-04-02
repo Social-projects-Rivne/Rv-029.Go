@@ -6,13 +6,17 @@ import (
 )
 
 type Hub struct {
-	Clients    map[gocql.UUID]*Client
-	Register   chan *Client
-	Unregister chan *Client
-	Broadcast  chan *SocketResponse
-	Issue      models.Issue
-	Summary    map[gocql.UUID]int
-	Results    map[int]float32
+	Clients    		map[gocql.UUID]*Client
+	Guests    		map[gocql.UUID]*Client
+	Register   		chan *Client
+	Unregister 		chan *Client
+	RegisterGuest   chan *Client
+	UnregisterGuest chan *Client
+	Broadcast  		chan *SocketResponse
+	BroadcastGusets chan *SocketResponse
+	Issue      		models.Issue
+	Summary    		map[gocql.UUID]int
+	Results    		map[int]float32
 }
 
 func (h *Hub) Calculate() {
@@ -106,8 +110,23 @@ func (h *Hub) run() {
 	for {
 		select {
 
+		case guest := <-h.RegisterGuest:
+			h.Guests[guest.user.UUID] = guest
+		case guest := <-h.UnregisterGuest:
+			if _, ok := h.Guests[guest.user.UUID]; ok {
+				delete(h.Guests, guest.user.UUID)
+				if len(h.Guests) == 0 {
+					delete(ActiveHubs, h.Issue.UUID)
+				}
+			}
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
+		case msg := <-h.BroadcastGusets:
+			if len(h.Guests) > 0 {
+				for _, guest := range h.Guests {
+					guest.send(msg)
+				}
+			}
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)
@@ -123,5 +142,6 @@ func (h *Hub) run() {
 				}
 			}
 		}
+
 	}
 }
