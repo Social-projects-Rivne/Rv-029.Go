@@ -39,12 +39,6 @@ class VerticalLinearStepper extends React.Component {
     this.props.actions.decreaseStep()
   };
 
-  handleReset = () => {
-    this.setState({
-      activeStep: 0,
-    });
-  };
-
   join = () => {
     this.props.registerClient()
   }
@@ -184,7 +178,7 @@ class VerticalLinearStepper extends React.Component {
           {activeStep === steps.length && (
             <Paper square elevation={0} className={classes.resetContainer}>
               <Typography>Please wait until all yuor teammates complete estimation</Typography>
-              <Button onClick={this.handleReset} className={classes.button}>
+              <Button onClick={() => {this.props.actions.setStep(0)}} className={classes.button}>
                 Reset
               </Button>
             </Paper>

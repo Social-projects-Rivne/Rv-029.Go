@@ -1,7 +1,11 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
+import axios from "axios";
 import {bindActionCreators} from 'redux'
 import * as scrumPokerActions from "../actions/ScrumPokerAction"
+import * as defaultPageActions from "../actions/DefaultPageActions"
+import { API_URL } from '../constants/global'
+import messages from "../services/messages"
 import SnackBar from '../components/scrumPoker/SnackBar'
 import Users from '../components/scrumPoker/Users'
 import Issue from '../components/scrumPoker/Issue'
@@ -15,15 +19,23 @@ class EstimationRoom extends Component {
     users: [],
     responseData: null,
     socket: null,
+    issueName: '',
+    issueDesc: '',
+    issueStatus: ''
+  }
+
+  componentWillMount() {
+    this.getIssue()
   }
 
   componentDidMount() {
-      this.connect()
+    this.connect()
   }
 
   componentWillUnmount() {
-      this.state.socket.close();
+    this.state.socket.close();
   }
+
   connect = () => {
     const socket = new WebSocket(`ws://localhost:8080/socketserver?token=${sessionStorage.getItem('token')}`)
 
@@ -47,26 +59,27 @@ class EstimationRoom extends Component {
 
   actionHandler = (jsonResponse) => {
     const res = JSON.parse(jsonResponse),
-      {action, message, status, data} = res
-      console.log(res)
+          {action, message, status, data} = res
+
     // set state for notification message
     this.setState({responseData: res})
 
     switch (action) {
       case 'CREATE_ESTIMATION_ROOM':
-
         break
       case 'REGISTER_CLIENT':
-        if (status) {
-          this.props.scrumPokerActions.setStep(2)
-        }
+        if (status) { this.props.scrumPokerActions.setStep(2) }
         break
       case 'ESTIMATION':
-        if (status) {
-          this.props.scrumPokerActions.setStep(3)
-        }
+        if (status) { this.props.scrumPokerActions.setStep(3) }
         break
-      case 'ESTIMATION_RESULT':
+      case 'ESTIMATION_RESULTS':
+
+        if (status) {
+          this.props.scrumPokerActions.setEstResult(data.estimate)
+          this.updateIssue(data.estimate)
+        }
+
         break
       case 'GUEST':
         this.setState({users: data})
@@ -75,6 +88,49 @@ class EstimationRoom extends Component {
           console.log(data)
           break
     }
+  }
+
+  getIssue = () => {
+    const { id } = this.props.ownProps.params
+
+    axios.get(`${API_URL}project/board/issue/show/${ id }`)
+      .then((res) => {
+        this.setState({
+          issueName: res.data.Name,
+          issueDesc: res.data.Description,
+          issueStatus: res.data.Status
+        })
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occurred")
+        }
+      })
+  }
+
+  updateIssue = (result) => {
+    const { id } = this.props.ownProps.params
+    const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
+
+    axios.put(API_URL + `project/board/issue/update/${ id }`, {
+      name: this.state.issueName,
+      description: this.state.issueDesc,
+      status: this.state.issueStatus,
+      estimate: result
+    })
+      .then((res) => {
+        setNotificationMessage(res.data.Message)
+      })
+      .catch((err) => {
+        if (err.response && err.response.data.Message) {
+          setErrorMessage(err.response.data.Message)
+        } else {
+          setErrorMessage("Server error occured")
+        }
+        this.handleClose()
+      })
   }
 
   createRoom = () => {
@@ -127,7 +183,7 @@ class EstimationRoom extends Component {
       let msg = JSON.stringify({
         action: 'ESTIMATION',
         issueID: id,
-        estimate: est
+        estimate: est.toString()
       })
 
       socket.send(msg)
@@ -150,7 +206,8 @@ class EstimationRoom extends Component {
           <Grid item xs={4}>
 
             <Issue
-              issueID={this.props.ownProps.params.id}/>
+              name={this.state.issueName}
+              estimationResult={this.props.scrumPoker.estimationResult}/>
 
             <Users
               users={this.state.users}/>
@@ -197,7 +254,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    scrumPokerActions: bindActionCreators(scrumPokerActions, dispatch)
+    scrumPokerActions: bindActionCreators(scrumPokerActions, dispatch),
+    defaultPageActions: bindActionCreators(defaultPageActions, dispatch)
   }
 }
 
