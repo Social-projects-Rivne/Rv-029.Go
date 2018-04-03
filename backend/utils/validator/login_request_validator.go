@@ -12,7 +12,7 @@ type LoginRequestData struct {
 }
 
 func (d *LoginRequestData) Validate(r *http.Request) error {
-	err := d.ValidateEmail(d.Email)
+	err := d.ValidateRequired(d.Email)
 	if err != nil {
 		log.Printf("Error in utils/validator/login_request_validator.go error: %+v",err)
 		return err

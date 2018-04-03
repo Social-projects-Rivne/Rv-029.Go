@@ -8,7 +8,6 @@ import (
 func GetClients(req map[string]interface{}, client *Client)  {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
-
 	if err != nil {
 		client.conn.WriteJSON(SocketResponse{
 			Status: false,
@@ -35,7 +34,7 @@ func GetClients(req map[string]interface{}, client *Client)  {
 	if hub, ok := ActiveHubs[issueUUID]; ok {
 
 		hub = ActiveHubs[issueUUID]
-		hub.Register <- client
+		hub.RegisterGuest <- client
 
 		users := make([]*models.User, 0)
 		for _, v := range ActiveHubs[issueUUID].Clients {
@@ -51,51 +50,5 @@ func GetClients(req map[string]interface{}, client *Client)  {
 	}
 
 
-
-}
-
-func RegisterGuest (req map[string]interface{}, client *Client){
-	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
-
-	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `GUEST_REGISTER`,
-			Message: `invalid issue id`,
-		})
-		return
-	}
-
-	issue := models.Issue{
-		UUID: issueUUID,
-	}
-
-	err = models.IssueDB.FindByID(&issue)
-	if err != nil {
-		client.conn.WriteJSON(SocketResponse{
-			Status: false,
-			Action: `GUEST_REGISTER`,
-			Message: `issue not found`,
-		})
-		return
-	}
-
-	if hub, ok := ActiveHubs[issueUUID]; ok {
-		hub = ActiveHubs[issueUUID]
-		hub.RegisterGuest <- client
-
-		client.send(SocketResponse{
-			Status:  false,
-			Action:  `GUEST_REGISTER`,
-			Message: `qqqqqqq`,
-		})
-	} else {
-		client.send(SocketResponse{
-			Status:  false,
-			Action:  `GUEST_REGISTER`,
-			Message: `room not found`,
-		})
-		return
-	}
 
 }

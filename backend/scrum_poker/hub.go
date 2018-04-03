@@ -9,6 +9,7 @@ type Hub struct {
 	Clients    		map[gocql.UUID]*Client
 	Guests    		map[gocql.UUID]*Client
 	Register   		chan *Client
+	Www   			chan string
 	Unregister 		chan *Client
 	RegisterGuest   chan *Client
 	UnregisterGuest chan *Client
@@ -49,13 +50,17 @@ func (h *Hub) Calculate() {
 
 func newHub(issue models.Issue) Hub {
 	return Hub{
-		Clients:    make(map[gocql.UUID]*Client),
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
-		Broadcast:  make(chan *SocketResponse),
-		Issue:      issue,
-		Summary:    make(map[gocql.UUID]int, 0),
-		Results:    make(map[int]float32, 0),
+		Clients:    	 make(map[gocql.UUID]*Client),
+		Guests:    	 	 make(map[gocql.UUID]*Client),
+		Register:   	 make(chan *Client),
+		Unregister: 	 make(chan *Client),
+		RegisterGuest:   make(chan *Client),
+		UnregisterGuest: make(chan *Client),
+		Broadcast:   	 make(chan *SocketResponse),
+		BroadcastGusets: make(chan *SocketResponse),
+		Issue:       	 issue,
+		Summary:     	 make(map[gocql.UUID]int, 0),
+		Results:     	 make(map[int]float32, 0),
 	}
 }
 
@@ -110,8 +115,7 @@ func (h *Hub) run() {
 	for {
 		select {
 
-		case guest := <-h.RegisterGuest:
-			h.Guests[guest.user.UUID] = guest
+
 		case guest := <-h.UnregisterGuest:
 			if _, ok := h.Guests[guest.user.UUID]; ok {
 				delete(h.Guests, guest.user.UUID)
@@ -121,6 +125,8 @@ func (h *Hub) run() {
 			}
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
+		case guest := <-h.RegisterGuest:
+			h.Guests[guest.user.UUID] = guest
 		case msg := <-h.BroadcastGusets:
 			if len(h.Guests) > 0 {
 				for _, guest := range h.Guests {

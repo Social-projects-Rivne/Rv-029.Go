@@ -2,12 +2,13 @@ package scrum_poker
 
 import (
 	"encoding/json"
+	"net/http"
+	"reflect"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
-	"net/http"
-	"reflect"
 )
 
 var upgrader = websocket.Upgrader{
@@ -90,12 +91,13 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 						hub.Calculate()
 						hub.Unregister <- client
 
+						// todo broadcast for clients
 						if len(hub.Guests) > 0 {
 							hub.BroadcastGusets <- &SocketResponse{
 								Status:  true,
 								Action:  `USER_DISCONNECT_FROM_ROOM`,
 								Message: `user disconnected from the room`,
-								Data: client.user,
+								Data:    client.user,
 							}
 						}
 					}
@@ -131,5 +133,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 		case "GUEST":
 			GetClients(req, client)
 		}
+
 	}
 }

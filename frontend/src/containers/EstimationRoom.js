@@ -72,8 +72,11 @@ class EstimationRoom extends Component {
         this.setState({users: data})
         break
       case 'NEW_USER_IN_ROOM':
-          console.log(data)
-          break
+          let newUsers = this.state.users.slice()
+          newUsers.push(data)
+          this.setState({users: newUsers})
+          console.log("new user added")
+        break
     }
   }
 
