@@ -119,9 +119,6 @@ func (h *Hub) run() {
 		case guest := <-h.UnregisterGuest:
 			if _, ok := h.Guests[guest.user.UUID]; ok {
 				delete(h.Guests, guest.user.UUID)
-				if len(h.Guests) == 0 {
-					delete(ActiveHubs, h.Issue.UUID)
-				}
 			}
 		case client := <-h.Register:
 			h.Clients[client.user.UUID] = client
@@ -136,10 +133,10 @@ func (h *Hub) run() {
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client.user.UUID]; ok {
 				delete(h.Clients, client.user.UUID)
-				//close(client.send)
-				if len(h.Clients) == 0 {
-					delete(ActiveHubs, h.Issue.UUID)
-				}
+			}
+
+			if len(h.Clients) == 0 && len(h.Guests) == 0 {
+				delete(ActiveHubs, h.Issue.UUID)
 			}
 		case msg := <-h.Broadcast:
 			if len(h.Clients) > 0 {

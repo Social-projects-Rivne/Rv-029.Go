@@ -70,13 +70,26 @@ class EstimationRoom extends Component {
         break
       case 'GUEST':
         this.setState({users: data})
+          console.log(this.state.users)
         break
       case 'NEW_USER_IN_ROOM':
           let newUsers = this.state.users.slice()
           newUsers.push(data)
           this.setState({users: newUsers})
-          console.log("new user added")
         break
+      case 'USER_DISCONNECT_FROM_ROOM':
+          let users = this.state.users.slice()
+
+          users.forEach(function(element, key) {
+              if(element.UUID === data.UUID){
+                  users.splice(key, 1)
+              }
+
+          });
+          console.log(users)
+          this.setState({users: users})
+          break
+
     }
   }
 

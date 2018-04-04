@@ -44,7 +44,6 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		hub = ActiveHubs[issueUUID]
 		hub.Register <- client
 		hub.UnregisterGuest <- client
-
 		if len(hub.Guests) > 0 {
 			hub.BroadcastGusets <- &SocketResponse{
 				Status:  true,
@@ -62,6 +61,7 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 				Data:    client.user,
 			}
 		}
+
 	} else {
 		client.send(SocketResponse{
 			Status:  false,
