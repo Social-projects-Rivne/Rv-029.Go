@@ -66,6 +66,7 @@ class EstimationRoom extends Component {
 
     switch (action) {
       case 'CREATE_ESTIMATION_ROOM':
+
         break
       case 'REGISTER_CLIENT':
         if (status) { this.props.scrumPokerActions.setStep(2) }
@@ -187,7 +188,6 @@ class EstimationRoom extends Component {
       })
 
       socket.send(msg)
-
     }
   }
 
