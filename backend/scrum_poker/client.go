@@ -13,7 +13,6 @@ import (
 
 type Client struct {
 	conn *websocket.Conn
-	//send chan []byte
 	user *models.User
 	mu   sync.Mutex
 }
@@ -48,7 +47,7 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 			Status:  true,
 			Action:  `NEW_USER_IN_ROOM`,
 			Message: `new user connected to the room`,
-			Data: client.user,
+			Data:    client.user,
 		}
 	} else {
 		client.send(SocketResponse{
@@ -59,11 +58,6 @@ func RegisterClient(req map[string]interface{}, client *Client) {
 		return
 	}
 
-	client.send(SocketResponse{
-		Status:  true,
-		Action:  `REGISTER_CLIENT`,
-		Message: `you was successfully connected to the estimation room`,
-	})
 	return
 }
 
@@ -99,7 +93,6 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 		})
 		return
 	}
-
 
 	if _, ok := ActiveHubs[issueUUID].Clients[client]; !ok {
 		client.send(SocketResponse{
@@ -170,49 +163,13 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 		return
 	}
 
-	client.send(SocketResponse{
-		Status:  true,
-		Action:  `ESTIMATION`,
-		Message: `your estimate was successfully saved`,
-	})
+	ActiveHubs[issueUUID].DirectedBroadcast <- &DirectedResponse{
+		&SocketResponse{
+			Status:  true,
+			Action:  `ESTIMATION`,
+			Message: `your estimate was successfully saved`,
+		},
+		client.user.UUID,
+	}
 }
 
-//
-//func (c *Client) WriteWorker() {
-//	const (
-//		writeWait = 10 * time.Second
-//	)
-//
-//	defer func() {
-//		c.conn.Close()
-//	}()
-//
-//	for {
-//		select {
-//		case message, ok := <-c.send:
-//			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-//			if !ok {
-//				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-//				return
-//			}
-//
-//			w, err := c.conn.NextWriter(websocket.TextMessage)
-//			if err != nil {
-//				return
-//			}
-//
-//			w.Write(message)
-//
-//			n := len(c.send)
-//			for i := 0; i < n; i++ {
-//				w.Write([]byte{'\n'})
-//				w.Write(<-c.send)
-//			}
-//
-//			err = w.Close()
-//			if err != nil {
-//				return
-//			}
-//		}
-//	}
-//}

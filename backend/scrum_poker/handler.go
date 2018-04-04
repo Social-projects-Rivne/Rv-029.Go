@@ -25,8 +25,13 @@ type SocketResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
+type DirectedResponse struct {
+	*SocketResponse
+	UserUUID gocql.UUID
+}
+
 var ActiveHubs = make(map[gocql.UUID]*Hub, 0)
-var ConnectedUsers = make(map[gocql.UUID]*Client, 0)
+var ConnectedUsers = make(map[*Client]gocql.UUID, 0)
 
 func SocketHandler(w http.ResponseWriter, r *http.Request) {
 	var client *Client
@@ -65,13 +70,10 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 		client = &Client{
 			conn: conn,
-			//send: make(chan []byte, 256),
 			user: &user,
 		}
 
-		//go client.WriteWorker()
-
-		ConnectedUsers[user.UUID] = client
+		ConnectedUsers[client] = user.UUID
 
 		conn.WriteJSON(SocketResponse{
 			Status:  true,
@@ -81,11 +83,10 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// on disconnect remove from hub clients
 	defer func() {
 		for _, hub := range ActiveHubs {
 			if len(hub.Clients) > 0 {
-				for userID, _ := range hub.Clients {
+				for _, userID := range hub.Clients {
 					if reflect.DeepEqual(userID, client.user.UUID) {
 						hub.Calculate()
 						hub.Unregister <- client
@@ -95,7 +96,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 								Status:  true,
 								Action:  `USER_DISCONNECT_FROM_ROOM`,
 								Message: `user disconnected from the room`,
-								Data: client.user,
+								Data:    client.user,
 							}
 						}
 					}
@@ -104,7 +105,7 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// on disconnect remove from ConnectedUsers
-		delete(ConnectedUsers, client.user.UUID)
+		delete(ConnectedUsers, client)
 	}()
 
 	for {

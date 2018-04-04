@@ -64,6 +64,8 @@ class EstimationRoom extends Component {
     // set state for notification message
     this.setState({responseData: res})
 
+    console.log(`actions: ${action}, message: ${message}`)
+
     switch (action) {
       case 'CREATE_ESTIMATION_ROOM':
 

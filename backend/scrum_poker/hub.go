@@ -9,13 +9,14 @@ import (
 const LIMIT = 0.6
 
 type Hub struct {
-	Clients    map[*Client]gocql.UUID
-	Register   chan *Client
-	Unregister chan *Client
-	Broadcast  chan *SocketResponse
-	Issue      models.Issue
-	Summary    map[gocql.UUID]int
-	Results    map[int]float32
+	Clients           map[*Client]gocql.UUID
+	Register          chan *Client
+	Unregister        chan *Client
+	Broadcast         chan *SocketResponse
+	DirectedBroadcast chan *DirectedResponse
+	Issue             models.Issue
+	Summary           map[gocql.UUID]int
+	Results           map[int]float32
 }
 
 func (h *Hub) Calculate() {
@@ -45,9 +46,9 @@ func (h *Hub) Calculate() {
 				Action:  `ESTIMATION_RESULTS`,
 				Message: message,
 				Data: struct {
-					Summary map[gocql.UUID]int `json:"summary"`
-					Results map[int]float32    `json:"results"`
-					Estimate int `json:"estimate,omitempty"`
+					Summary  map[gocql.UUID]int `json:"summary"`
+					Results  map[int]float32    `json:"results"`
+					Estimate int                `json:"estimate,omitempty"`
 				}{
 					h.Summary,
 					h.Results,
@@ -60,13 +61,14 @@ func (h *Hub) Calculate() {
 
 func newHub(issue models.Issue) Hub {
 	return Hub{
-		Clients:    make(map[*Client]gocql.UUID),
-		Register:   make(chan *Client),
-		Unregister: make(chan *Client),
-		Broadcast:  make(chan *SocketResponse),
-		Issue:      issue,
-		Summary:    make(map[gocql.UUID]int, 0),
-		Results:    make(map[int]float32, 0),
+		Clients:           make(map[*Client]gocql.UUID),
+		Register:          make(chan *Client),
+		Unregister:        make(chan *Client),
+		Broadcast:         make(chan *SocketResponse),
+		DirectedBroadcast: make(chan *DirectedResponse),
+		Issue:             issue,
+		Summary:           make(map[gocql.UUID]int, 0),
+		Results:           make(map[int]float32, 0),
 	}
 }
 
@@ -122,12 +124,21 @@ func (h *Hub) run() {
 		select {
 
 		case client := <-h.Register:
-			h.Clients[client] = client.user.UUID
+			for onlineClient, userUUID := range ConnectedUsers {
+				if client.user.UUID == userUUID {
+					h.Clients[onlineClient] = userUUID
+
+					onlineClient.send(SocketResponse{
+						Status:  true,
+						Action:  `REGISTER_CLIENT`,
+						Message: `you was successfully connected to the estimation room`,
+					})
+				}
+			}
 		case client := <-h.Unregister:
 			for hclient, _ := range h.Clients {
 				if reflect.DeepEqual(hclient, client) {
 					delete(h.Clients, client)
-					//close(client.send)
 					if len(h.Clients) == 0 {
 						delete(ActiveHubs, h.Issue.UUID)
 					}
@@ -137,6 +148,13 @@ func (h *Hub) run() {
 			if len(h.Clients) > 0 {
 				for client, _ := range h.Clients {
 					client.send(msg)
+				}
+			}
+		case msg := <-h.DirectedBroadcast:
+			//TODO:
+			for client, userUUID := range h.Clients {
+				if userUUID == msg.UserUUID {
+					client.send(msg.SocketResponse)
 				}
 			}
 		}
