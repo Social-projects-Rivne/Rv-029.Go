@@ -62,6 +62,10 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
     action.handleSurname(e.target.value)
   }
 
+  const handleFileSelected = (e) => {
+    action.handleFile(e.target.value)
+  }
+
   return (
     <div className={classes.container}>
     <Paper
@@ -109,6 +113,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         setErrorMessage={action.setErrorMessage}/>
 
     </Paper>
+
     </div>
   )
 }

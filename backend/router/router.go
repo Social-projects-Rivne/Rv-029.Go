@@ -77,11 +77,14 @@ func applyUserRoutes(r *mux.Router) {
 }
 
 func applyProfileRoutes(r *mux.Router) {
-	r.HandleFunc("/{user_id}/", controllers.GetUserInfo).Methods("GET")
-	r.HandleFunc("/{user_id}", controllers.GetUserInfo).Methods("GET")
+	r.HandleFunc("/{user_id}/", controllers.GetUserInfo).Methods("GET").Name(`profile.get.info`)
+	r.HandleFunc("/{user_id}", controllers.GetUserInfo).Methods("GET").Name(`profile.get.info`)
 
-	r.HandleFunc("/own/update/", controllers.UpdateUserInfo).Methods("POST")
-	r.HandleFunc("/own/update", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/own/update/", controllers.UpdateUserInfo).Methods("POST").Name(`profile.update.info`)
+	r.HandleFunc("/own/update", controllers.UpdateUserInfo).Methods("POST").Name(`profile.update.info`)
+
+	r.HandleFunc("/photo/", controllers.ImportPhoto).Methods("POST")
+	r.HandleFunc("/photo", controllers.ImportPhoto).Methods("POST")
 }
 
 func applyProjectsRoutes(r *mux.Router) {

@@ -91,7 +91,7 @@ export const routes = (
         <Route path="sprint/:id" component={SprintPage}/>
         <Route path="profile/:id" component={VeiwUserProfile}/>
         <Route path="profile/own/update" component={FormUpdate}/>
-        {/* <Route path="profile/update" component={ChangeUserInformation}/> */}
+        {/* <Route path="profile/photo/:id" component={VeiwUserProfile}/> */}
       </Route>
 
       <Route path="socket" component={Socket}/>

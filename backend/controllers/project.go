@@ -89,10 +89,10 @@ func UsersToAddProjectList(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
-	users , err := models.UserDB.List()
+	users, err := models.UserDB.List()
 	if err != nil {
-		log.Printf("Error in controllers/project error: %+v",err)
-		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()) ,StatusCode: http.StatusInternalServerError}
+		log.Printf("Error in controllers/project error: %+v", err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error()), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -104,12 +104,12 @@ func UsersToAddProjectList(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	response := helpers.Response{Message:"List of users to assigned to current project", Data: notOwners}
+	response := helpers.Response{Message: "List of users to assigned to current project", Data: notOwners}
 	response.Success(w)
 
 }
 
-func CreateProject(w http.ResponseWriter, r *http.Request)  {
+func CreateProject(w http.ResponseWriter, r *http.Request) {
 
 	var projectRequestData validator.ProjectRequestData
 
@@ -217,7 +217,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 }
 
-func ProjectAddUser(w http.ResponseWriter, r *http.Request)  {
+func ProjectAddUser(w http.ResponseWriter, r *http.Request) {
 	var userToProjectRequestData validator.UserProjectRequestData
 	err := decodeAndValidate(r, &userToProjectRequestData)
 	if err != nil {
@@ -228,9 +228,9 @@ func ProjectAddUser(w http.ResponseWriter, r *http.Request)  {
 
 	vars := mux.Vars(r)
 
-	projectId , err := gocql.ParseUUID(vars["project_id"])
+	projectId, err := gocql.ParseUUID(vars["project_id"])
 	if err != nil {
-		log.Printf("Error in controllers/project. Can`t parse project UUID. error: %+v",err)
+		log.Printf("Error in controllers/project. Can`t parse project UUID. error: %+v", err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
@@ -238,7 +238,7 @@ func ProjectAddUser(w http.ResponseWriter, r *http.Request)  {
 
 	userID, err := gocql.ParseUUID(userToProjectRequestData.UserID)
 	if err != nil {
-		log.Printf("Error in controllers/project. Can`t parse user UUID. error: %+v",err)
+		log.Printf("Error in controllers/project. Can`t parse user UUID. error: %+v", err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
@@ -248,16 +248,24 @@ func ProjectAddUser(w http.ResponseWriter, r *http.Request)  {
 	user.UUID = userID
 	err = models.UserDB.FindByID(&user)
 	if err != nil {
-		log.Printf("Error in controllers/project. Can`t find user by UUID. error: %+v",err)
+		log.Printf("Error in controllers/project. Can`t find user by UUID. error: %+v", err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
 	}
 
+	if err, ok := user.Projects[projectId]; !ok {
+		log.Printf("Error in controllers/project. No map with projectId key. error: %+v", err)
+		response := helpers.Response{Message: fmt.Sprintf("Error %+v", err)}
+		response.Failed(w)
+		return
+	}
+
 	user.Projects[projectId] = userToProjectRequestData.Role
+
 	models.UserDB.Update(&user)
 	if err != nil {
-		log.Printf("Error in controllers/project. Can`t update user. error: %+v",err)
+		log.Printf("Error in controllers/project. Can`t update user. error: %+v", err)
 		response := helpers.Response{Message: fmt.Sprintf("Error %s", err.Error())}
 		response.Failed(w)
 		return
@@ -266,4 +274,3 @@ func ProjectAddUser(w http.ResponseWriter, r *http.Request)  {
 	response := helpers.Response{Message: fmt.Sprintf("User %s was added to project", user.Email)}
 	response.Success(w)
 }
-

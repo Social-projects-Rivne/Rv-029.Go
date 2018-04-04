@@ -16,7 +16,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// show project tests
+
+// ######## SHOW PROJECT ########
+
 
 func TestShowProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -105,7 +107,9 @@ func TestShowProjectDBError(t *testing.T) {
 
 }
 
-// update project tests
+
+// ######## UPDATE PROJECT ########
+
 
 func TestUpdateProjectBadVariable(t *testing.T) {
 
@@ -209,7 +213,9 @@ func TestUpdateProjectSuccess(t *testing.T) {
 
 }
 
-// project list test
+
+// ######## PROJECT LIST ########
+
 
 func TestProjectsListSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -266,7 +272,9 @@ func TestProjectsListDBError(t *testing.T) {
 
 }
 
-// Create Project test
+
+// ######## CREATE PROJECT ########
+
 
 func TestCreateProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -391,7 +399,9 @@ func TestCreateProjectDBError(t *testing.T) {
 
 }
 
-// Delete Project test
+
+// ######## DELETE PROJECT ########
+
 
 func TestDeleteProjectSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -634,3 +644,66 @@ func TestUsersToAddProjectListSuccess(t *testing.T) {
 	}
 
 }
+
+func TestUsersToAddProjectListDBError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	
+	mockUserCRUD.EXPECT().List().Return(nil,errors.New("DB Error")).Times(1)
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/project/users/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(UsersToAddProjectList)
+	r.Handle("/project/users/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+
+// ######## PROJECT ADD USER ########
+
+// func TestProjectAddUserSuccess(t *testing.T) {
+// 	mockCtrl := gomock.NewController(t)
+// 	defer mockCtrl.Finish()
+
+// 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+// 	models.InitUserDB(mockUserCRUD)
+
+	
+
+// 	mockUserCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+// 	mockUserCRUD.EXPECT().Update(gomock.Any()).Return(nil).Times(1)
+
+// 	body := bytes.NewBufferString(`{"role": "Owner", "user": "7b1ef3e9-13e0-11e8-ba83-b06ebf83499f"}`)
+	
+	
+// 	r := *mux.NewRouter()
+// 	res := httptest.NewRecorder()
+// 	req, err := http.NewRequest("POST", "/project/7b1ef3e9-13e0-11e8-ba83-b06ebf83499f/add/user/", body)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	handler := http.HandlerFunc(ProjectAddUser)
+// 	r.Handle("/project/{project_id}/add/user/", handler).Methods("POST")
+// 	r.ServeHTTP(res, req)
+
+// 	if status := res.Code; status != http.StatusOK {
+// 		t.Errorf("handler returned wrong status code: got %v want %v",
+// 			status, http.StatusOK)
+// 	}
+
+// }

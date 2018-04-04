@@ -310,16 +310,16 @@ const TopBar = ({ classes, defaultPage, projects, defaultPageActions, ownProps, 
                 onClose={handleImportUsersClose}
                 aria-labelledby="form-dialog-title" >
                 <DialogTitle id="form-dialog-title">Select *.csv file in appropriate format</DialogTitle>
-                <DialogContent>
-                    <div>
-                        <input
-                            type="file" name="file" id="file"
-                            className="input-file"
-                            onChange={handleFileSelected}
-                            accept="text/csv"
-                        />
-                    </div>
-                </DialogContent>
+                    <DialogContent>
+                        <div>
+                            <input
+                                type="file" name="file" id="file"
+                                className="input-file"
+                                onChange={handleFileSelected}
+                                accept="text/csv"
+                            />
+                        </div>
+                    </DialogContent>
                 <DialogActions>
                     <Button onClick={handleImportUsersClose} color="default">
                         Cancel
