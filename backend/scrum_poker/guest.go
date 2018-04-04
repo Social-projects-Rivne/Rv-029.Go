@@ -8,7 +8,6 @@ import (
 func GetClients(req map[string]interface{}, client *Client)  {
 
 	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
-
 	if err != nil {
 		client.conn.WriteJSON(SocketResponse{
 			Status: false,
@@ -32,7 +31,11 @@ func GetClients(req map[string]interface{}, client *Client)  {
 		return
 	}
 
-	if _, ok := ActiveHubs[issueUUID]; ok {
+	if hub, ok := ActiveHubs[issueUUID]; ok {
+
+		hub = ActiveHubs[issueUUID]
+		hub.RegisterGuest <- client
+
 		users := make([]*models.User, 0)
 		for v, _ := range ActiveHubs[issueUUID].Clients {
 			users = append(users, v.user)

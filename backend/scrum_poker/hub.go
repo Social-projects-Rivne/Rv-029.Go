@@ -10,10 +10,14 @@ const LIMIT = 0.6
 
 type Hub struct {
 	Clients           map[*Client]gocql.UUID
+	Guests    		  map[gocql.UUID]*Client
 	Register          chan *Client
 	Unregister        chan *Client
+	RegisterGuest     chan *Client
+	UnregisterGuest   chan *Client
 	Broadcast         chan *SocketResponse
 	DirectedBroadcast chan *DirectedResponse
+	BroadcastGusets   chan *SocketResponse
 	Issue             models.Issue
 	Summary           map[gocql.UUID]int
 	Results           map[int]float32
@@ -62,10 +66,14 @@ func (h *Hub) Calculate() {
 func newHub(issue models.Issue) Hub {
 	return Hub{
 		Clients:           make(map[*Client]gocql.UUID),
+		Guests:    	 	   make(map[gocql.UUID]*Client),
 		Register:          make(chan *Client),
 		Unregister:        make(chan *Client),
+		RegisterGuest:     make(chan *Client),
+		UnregisterGuest:   make(chan *Client),
 		Broadcast:         make(chan *SocketResponse),
 		DirectedBroadcast: make(chan *DirectedResponse),
+		BroadcastGusets:   make(chan *SocketResponse),
 		Issue:             issue,
 		Summary:           make(map[gocql.UUID]int, 0),
 		Results:           make(map[int]float32, 0),
@@ -123,6 +131,11 @@ func (h *Hub) run() {
 	for {
 		select {
 
+
+		case guest := <-h.UnregisterGuest:
+			if _, ok := h.Guests[guest.user.UUID]; ok {
+				delete(h.Guests, guest.user.UUID)
+			}
 		case client := <-h.Register:
 			for onlineClient, userUUID := range ConnectedUsers {
 				if client.user.UUID == userUUID {
@@ -135,11 +148,20 @@ func (h *Hub) run() {
 					})
 				}
 			}
+		case guest := <-h.RegisterGuest:
+			h.Guests[guest.user.UUID] = guest
+		case msg := <-h.BroadcastGusets:
+			if len(h.Guests) > 0 {
+				for _, guest := range h.Guests {
+					guest.send(msg)
+				}
+			}
 		case client := <-h.Unregister:
 			for hclient, _ := range h.Clients {
 				if reflect.DeepEqual(hclient, client) {
 					delete(h.Clients, client)
-					if len(h.Clients) == 0 {
+
+					if len(h.Clients) == 0 && len(h.Guests) == 0 {
 						delete(ActiveHubs, h.Issue.UUID)
 					}
 				}
@@ -151,12 +173,12 @@ func (h *Hub) run() {
 				}
 			}
 		case msg := <-h.DirectedBroadcast:
-			//TODO:
 			for client, userUUID := range h.Clients {
 				if userUUID == msg.UserUUID {
 					client.send(msg.SocketResponse)
 				}
 			}
 		}
+
 	}
 }
