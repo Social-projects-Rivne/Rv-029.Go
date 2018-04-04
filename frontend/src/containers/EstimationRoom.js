@@ -16,7 +16,7 @@ import Grid from 'material-ui/Grid'
 class EstimationRoom extends Component {
 
   state = {
-    users: [],
+    users: null,
     responseData: null,
     socket: null,
     issueName: '',
@@ -85,12 +85,19 @@ class EstimationRoom extends Component {
 
         break
       case 'GUEST':
-        this.setState({users: data})
-          console.log(this.state.users)
+        let roomUsers = [];
+        for (let roomUser in data) {
+            roomUsers.push(data[roomUser])
+        }
+        this.setState({users: roomUsers})
         break
       case 'NEW_USER_IN_ROOM':
           let newUsers = this.state.users.slice()
-          newUsers.push(data)
+
+          if (!newUsers.includes(data)) {
+              newUsers.push(data)
+          }
+
           this.setState({users: newUsers})
         break
       case 'USER_DISCONNECT_FROM_ROOM':
@@ -99,6 +106,7 @@ class EstimationRoom extends Component {
           users.forEach(function(element, key) {
               if(element.UUID === data.UUID){
                   users.splice(key, 1)
+                  break
               }
 
           });

@@ -36,9 +36,9 @@ func GetClients(req map[string]interface{}, client *Client)  {
 		hub = ActiveHubs[issueUUID]
 		hub.RegisterGuest <- client
 
-		users := make([]*models.User, 0)
+		users := make(map[gocql.UUID]*models.User, 0)
 		for v, _ := range ActiveHubs[issueUUID].Clients {
-			users = append(users, v.user)
+			users[v.user.UUID] = v.user
 		}
 		client.conn.WriteJSON(SocketResponse{
 			Status: false,
