@@ -87,8 +87,8 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		for _, hub := range ActiveHubs {
 			if len(hub.Clients) > 0 {
-				for _, userID := range hub.Clients {
-					if reflect.DeepEqual(userID, client.user.UUID) {
+				for hubClient := range hub.Clients {
+					if reflect.DeepEqual(hubClient, client) {
 						hub.Calculate()
 						hub.Unregister <- client
 

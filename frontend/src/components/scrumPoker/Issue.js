@@ -20,7 +20,7 @@ class Issue extends Component {
           {(this.props.estimationResult) ? (
 
             <Typography type='headline' component="h2">
-              Result: 10
+              Result: {this.props.estimationResult}
             </Typography>
 
           ) : (null)}
