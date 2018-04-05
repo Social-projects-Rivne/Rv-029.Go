@@ -106,7 +106,6 @@ class EstimationRoom extends Component {
           users.forEach(function(element, key) {
               if(element.UUID === data.UUID){
                   users.splice(key, 1)
-                  break
               }
 
           });

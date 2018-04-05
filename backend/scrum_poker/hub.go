@@ -23,6 +23,19 @@ type Hub struct {
 	Results           map[int]float32
 }
 
+func findUniqueClients(m map[*Client]gocql.UUID) map[*Client]gocql.UUID {
+	n := make(map[*Client]gocql.UUID, len(m))
+	ref := make(map[gocql.UUID]bool, len(m))
+	for k, v := range m {
+		if _, ok := ref[v]; !ok {
+			ref[v] = true
+			n[k] = v
+		}
+	}
+
+	return n
+}
+
 func (h *Hub) Calculate() {
 	var estimate int
 	message := "estimation didn't get 60%"
@@ -44,7 +57,9 @@ func (h *Hub) Calculate() {
 
 		}
 
-		if len(h.Summary) >= len(h.Clients) && len(h.Clients) > 0 {
+		uniqueClients := findUniqueClients(h.Clients)
+
+		if len(h.Summary) >= len(uniqueClients) && len(uniqueClients) > 0 {
 			h.Broadcast <- &SocketResponse{
 				Status:  true,
 				Action:  `ESTIMATION_RESULTS`,
