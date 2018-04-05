@@ -91,24 +91,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 					if reflect.DeepEqual(hubClient, client) {
 						hub.Calculate()
 						hub.Unregister <- client
-
-						if len(hub.Clients) > 0 {
-							hub.Broadcast <- &SocketResponse{
-								Status:  true,
-								Action:  `USER_DISCONNECT_FROM_ROOM`,
-								Message: `user disconnected from the room`,
-								Data:    client.user,
-							}
-						}
-
-						if len(hub.Guests) > 0 {
-							hub.BroadcastGusets <- &SocketResponse{
-								Status:  true,
-								Action:  `USER_DISCONNECT_FROM_ROOM`,
-								Message: `user disconnected from the room`,
-								Data:    client.user,
-							}
-						}
 					}
 				}
 			}

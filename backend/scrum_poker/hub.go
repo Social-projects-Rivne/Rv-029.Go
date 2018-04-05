@@ -10,7 +10,7 @@ const LIMIT = 0.6
 
 type Hub struct {
 	Clients           map[*Client]gocql.UUID
-	Guests    		  map[gocql.UUID]*Client
+	Guests    		  map[*Client]gocql.UUID
 	Register          chan *Client
 	Unregister        chan *Client
 	RegisterGuest     chan *Client
@@ -34,6 +34,20 @@ func findUniqueClients(m map[*Client]gocql.UUID) map[*Client]gocql.UUID {
 	}
 
 	return n
+}
+
+func (h *Hub) UniqueClients() []*models.User {
+	uniqueUsersMap := make(map[gocql.UUID]*models.User, 0)
+	for v := range h.Clients {
+		uniqueUsersMap[v.user.UUID] = v.user
+	}
+
+	uniqueUsers := make([]*models.User, 0)
+	for _, v := range uniqueUsersMap {
+		uniqueUsers = append(uniqueUsers, v)
+	}
+
+	return uniqueUsers
 }
 
 func (h *Hub) Calculate() {
@@ -81,7 +95,7 @@ func (h *Hub) Calculate() {
 func newHub(issue models.Issue) Hub {
 	return Hub{
 		Clients:           make(map[*Client]gocql.UUID),
-		Guests:    	 	   make(map[gocql.UUID]*Client),
+		Guests:    	 	   make(map[*Client]gocql.UUID),
 		Register:          make(chan *Client),
 		Unregister:        make(chan *Client),
 		RegisterGuest:     make(chan *Client),
@@ -148,8 +162,8 @@ func (h *Hub) run() {
 
 
 		case guest := <-h.UnregisterGuest:
-			if _, ok := h.Guests[guest.user.UUID]; ok {
-				delete(h.Guests, guest.user.UUID)
+			if _, ok := h.Guests[guest]; ok {
+				delete(h.Guests, guest)
 			}
 		case client := <-h.Register:
 			for onlineClient, userUUID := range ConnectedUsers {
@@ -164,26 +178,46 @@ func (h *Hub) run() {
 				}
 			}
 		case guest := <-h.RegisterGuest:
-			h.Guests[guest.user.UUID] = guest
+			h.Guests[guest] = guest.user.UUID
 		case msg := <-h.BroadcastGusets:
 			if len(h.Guests) > 0 {
-				for _, guest := range h.Guests {
+				for guest := range h.Guests {
 					guest.send(msg)
 				}
 			}
 		case client := <-h.Unregister:
-			for hclient, _ := range h.Clients {
+			for hclient := range h.Clients {
 				if reflect.DeepEqual(hclient, client) {
 					delete(h.Clients, client)
+				}
+			}
 
-					if len(h.Clients) == 0 && len(h.Guests) == 0 {
-						delete(ActiveHubs, h.Issue.UUID)
-					}
+			if len(h.Clients) == 0 && len(h.Guests) == 0 {
+				delete(ActiveHubs, h.Issue.UUID)
+			}
+
+			if len(h.Clients) > 0 {
+				for client := range h.Clients {
+					client.send(SocketResponse{
+						Status:  true,
+						Action:  `USER_DISCONNECT_FROM_ROOM`,
+						Message: `user disconnected from the room`,
+						Data:    h.UniqueClients(),
+					})
+				}
+
+				for guest := range h.Guests {
+					guest.send(SocketResponse{
+						Status:  true,
+						Action:  `USER_DISCONNECT_FROM_ROOM`,
+						Message: `user disconnected from the room`,
+						Data:    h.UniqueClients(),
+					})
 				}
 			}
 		case msg := <-h.Broadcast:
 			if len(h.Clients) > 0 {
-				for client, _ := range h.Clients {
+				for client := range h.Clients {
 					client.send(msg)
 				}
 			}
