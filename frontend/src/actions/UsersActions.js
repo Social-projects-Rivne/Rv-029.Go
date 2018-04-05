@@ -36,15 +36,16 @@ export const toggleUsersDialog = (state) => {
   }
 }
 
-export const setUsersFileToImport = (file) => {
+export const setUsersPhotoToImport = (file) => {
   return {
       type: HANDLE_SET_IMPORT_FILE,
       payload: file,
   }
 }
-export const resetUsersFileToImport = () => {
+export const resetUsersPhotoToImport = () => {
   return {
       type: HANDLE_SET_IMPORT_FILE,
       payload: null,
   }
 }
+

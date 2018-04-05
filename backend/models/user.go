@@ -87,8 +87,8 @@ func (u *UserStorage) Insert(user *User) error {
 //Update func finds user from database
 func (u *UserStorage) Update(user *User) error {
 
-	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? WHERE id= ? ;`,
-		user.Password, user.UpdatedAt, user.UUID).Exec(); err != nil {
+	if err := u.DB.Query(`Update users SET password = ? ,updated_at = ? ,photo = ? WHERE id= ? ;`,
+		user.Password, user.UpdatedAt, user.Photo, user.UUID).Exec(); err != nil {
 
 		log.Printf("Error occured while updating user %v", err)
 		return err
@@ -135,9 +135,9 @@ func (u *UserStorage) Delete(user *User) error {
 //FindByID finds user by id
 func (u *UserStorage) FindByID(user *User) error {
 	if err := u.DB.Query(`SELECT id, email, first_name, last_name,
-		 projects, updated_at, created_at, password, salt, role, status FROM users WHERE id = ? LIMIT 1`, user.UUID).
+		 projects, updated_at, created_at, password, salt, role, status, photo FROM users WHERE id = ? LIMIT 1`, user.UUID).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName,
-		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status); err != nil {
+		&user.Projects, &user.UpdatedAt, &user.CreatedAt, &user.Password, &user.Salt, &user.Role, &user.Status, &user.Photo); err != nil {
 
 		log.Printf("Error occured in models/user.go, method: FindByID, error: %v", err)
 		return err
@@ -148,9 +148,9 @@ func (u *UserStorage) FindByID(user *User) error {
 //FindByEmail finds user by email
 func (u *UserStorage) FindByEmail(user *User) error {
 	if err := u.DB.Query(`SELECT id, email, first_name, last_name, password, salt, role, status, 
-		projects, created_at, updated_at FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`, user.Email).
+		projects, created_at, updated_at, photo FROM users WHERE email = ? LIMIT 1 ALLOW FILTERING`, user.Email).
 		Consistency(gocql.One).Scan(&user.UUID, &user.Email, &user.FirstName, &user.LastName, &user.Password,
-		&user.Salt, &user.Role, &user.Status, &user.Projects, &user.CreatedAt, &user.UpdatedAt); err != nil {
+		&user.Salt, &user.Role, &user.Status, &user.Projects, &user.CreatedAt, &user.UpdatedAt, &user.Photo); err != nil {
 
 		log.Printf("Error occured in models/user.go, method: FindByEmail, error: %v", err)
 		return err

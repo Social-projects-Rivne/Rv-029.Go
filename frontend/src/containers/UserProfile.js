@@ -34,15 +34,30 @@ import Dialog, {
 class ViewUserProfile extends Component {
 
 
+
+  state = {
+    file: null
+  }
+
   handleFileSelected = (e) => {
-    this.props.userActions.setUsersFileToImport(e.target.files[0]);
+    this.props.userActions.setUsersPhotoToImport(e.target.files[0]);
+    // Assuming only image
+      var file = e.target.files[0];
+      var reader = new FileReader();
+      var url = reader.readAsDataURL(file);
+    
+       reader.onloadend = function (e) {
+          this.setState({
+              file: [reader.result]
+          })
+        }.bind(this);
+      console.log(url) // Would see a path?
+      // TODO: concat files
   };
   
   handleImportUsers = () => {
-    console.log('handleImportUsers')
     const formData = new FormData();
-  
-    formData.append('import', this.props.user.file);
+    formData.append('image', this.props.user.file);
   
     const config = {
         headers: {
@@ -54,14 +69,16 @@ class ViewUserProfile extends Component {
     axios.post(API_URL + `profile/photo`, formData, config)
     .then((response) => {
       this.handleUsersClose()
+      let user = this.props.user.userInfo
+      user.Photo = response.data.Data      
+      this.props.userActions.setCurrentUser(user)
     })
     .catch((error) => {
       if (error.response && error.response.data.Message) {
-        this.props.userActions.setErrorMessage(error.response.data.Message)
+        messages(error.response.data.Message)
       } else {
-        this.props.userActions.setErrorMessage("Server error occured")
+        messages("Server error occured")
       }
-      this.handleClose()
     })
   };
   
@@ -76,6 +93,10 @@ class ViewUserProfile extends Component {
 
   componentDidMount() {
     this.getUserInfo()
+
+      
+
+    console.log(this.props.user.userInfo)
     this.props.defaultPageActions.changePageTitle("Profile")
   }
 
@@ -102,7 +123,10 @@ class ViewUserProfile extends Component {
   getUserInfo = () => {
     axios.get(API_URL + `profile/${this.props.ownProps.params.id}`)
       .then((response) => {
-        this.props.userActions.setCurrentUser(this.sortUserProjects( response.data.Data ))
+        this.props.userActions.setCurrentUser(this.sortUserProjects( response.data.Data )) 
+        this.setState({
+          file: response.data.Data.Photo
+        })
       })
       .catch((error) => {
         if (error.response && error.response.data.Message) {
@@ -129,7 +153,7 @@ class ViewUserProfile extends Component {
             <Paper className={classes.paper}>
                     <Grid container>
                         <Grid item>
-                          <img  className={classes.img} src={(user.userInfo) ? (user.userInfo.Photo) : ('aaaa')}/>
+                          <img  className={classes.img} src={(this.state.file) ? (this.state.file) : ('No image found')}/>
                         </Grid>
                         <Grid item>
                             <Typography variant="headline" gutterBottom component="h2">
@@ -146,13 +170,13 @@ class ViewUserProfile extends Component {
                             <div>  
                               <Link className={classes.link} to={'/profile/own/update'}>         
                                 <Button variant="raised" color="primary">
-                                  Edit
+                                  Edit Info
                                 </Button>
                               </Link>
 
                               <Link onClick={this.handleUsersOpen} className={classes.link}>
                                 <Button variant="raised" color="primary">
-                                  Change Photo
+                                  Change Avatar
                                 </Button>
                               </Link>
                             </div>
@@ -248,6 +272,8 @@ const styles = {
   },
   img: {
     border: '2px solid #FF9800',
+    width: '200px',
+    height: '200px',    
   },  
   link: {
     textDecoration: 'none',

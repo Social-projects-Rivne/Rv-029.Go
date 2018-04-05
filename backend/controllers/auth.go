@@ -3,11 +3,21 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"image/jpeg"
+	"image"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/nfnt/resize"
+
 	"github.com/gorilla/mux"
+
+	"bytes"
+	"encoding/csv"
+	"io"
+	"strings"
+	"os"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
@@ -16,10 +26,6 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
-	"bytes"
-	"strings"
-	"io"
-	"encoding/csv"
 )
 
 type errorResponse struct {
@@ -109,7 +115,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
 		Status:    0,
-		Photo:     "../static/nigga.png",
+		Photo:     "static/nigga.png",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -280,7 +286,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		user = models.User{
 			UUID: userID,
 		}
-		models.UserDB.FindByID(&user)		
+		models.UserDB.FindByID(&user)
 	}
 
 	var b gocql.UUID
@@ -300,15 +306,13 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		for k := range user.Projects {
 			for i := 0; flag; i++ {
 				if k == projects[i].ID {
-					user.Projects[k] = projects[i].Name					
+					user.Projects[k] = projects[i].Name
 					flag = false
 				}
 			}
 			flag = true
 		}
 	}
-	user.Photo = "static/nigga.jpeg"
-
 	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
 	response.Success(w)
 	return
@@ -341,80 +345,48 @@ func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 //ImportPhoto changing photo in current user
-func ImportPhoto(w http.ResponseWriter, r *http.Request)  {
-	fmt.Println("controller")
-	var respLogs []string
-	var Buf bytes.Buffer
-	// vars := mux.Vars(r)
-	// userID, err := gocql.ParseUUID(vars["user_id"])
-	// get file from request
-	file, _, err := r.FormFile("import")
+func ImportPhoto(w http.ResponseWriter, r *http.Request) {
+	// in your case file would be fileupload
+	file, _, err := r.FormFile("image")
 	if err != nil {
-		panic(err)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error: %+v", err), StatusCode: http.StatusUnsupportedMediaType}
+		response.Failed(w)
+		return
+	}
+	img, _, err := image.Decode(file)
+	if err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusUnsupportedMediaType}
+		response.Failed(w)
+		return
 	}
 	defer file.Close()
 
-	// copy the file data to the buffer
-	io.Copy(&Buf, file)
-	contents := Buf.String()
+	user := r.Context().Value("user").(models.User)
 
-	// create reader
-	reader := csv.NewReader(strings.NewReader(contents))
-
-	// read file content line by line
-	for i := 0 ; ; i++  {
-		line, err := reader.Read()
-		// check if not the end of file
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			log.Println(err)
-			response := helpers.Response{Status: false, Message: fmt.Sprintf("error during reading file content. error: %+v", err), StatusCode: http.StatusInternalServerError}
-			response.Failed(w)
-			return
-		}
-		if i == 0 { // skip headers
-			continue
-		}
-
-		user := models.User{
-			Email: line[0],
-		}
-		// check if user with such email already exists
-		err = models.UserDB.FindByEmail(&user)
-		if err != nil { // user not exists
-			user.UUID = gocql.TimeUUID()
-			user.FirstName = line[1]
-			user.LastName = line[2]
-			user.Salt = password.GenerateSalt(8)
-			user.Password = password.EncodePassword(password.EncodeMD5(line[3]), user.Salt)
-			user.Role = line[3]
-			user.Status = 1
-			user.CreatedAt = time.Now()
-			user.UpdatedAt = time.Now()
-
-			err = models.UserDB.Insert(&user)
-			if err != nil {
-				respLogs = append(respLogs, fmt.Sprintf("Error occurred: %v", err))
-				response := helpers.Response{Status: false, Message: fmt.Sprintf("error during importing users. error: %+v", err), StatusCode: http.StatusInternalServerError}
-				response.Failed(w)
-				return
-			}
-
-			respLogs = append(respLogs, fmt.Sprintf("User with email %s successfully imported", line[0]))
-		} else {
-			respLogs = append(respLogs, fmt.Sprintf("User with email %s already exists", line[0]))
-		}
+	m := resize.Resize(200, 200, img, resize.Lanczos3)
+	place := fmt.Sprintf("frontend/public/static/%s.jpeg",user.UUID.String())
+	user.Photo = fmt.Sprintf("static/%s.jpeg",user.UUID.String())
+	models.UserDB.Update(&user)
+	out, err := os.Create(place)
+	if err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
 	}
+	defer out.Close()
 
-	Buf.Reset()
-
-	response := helpers.Response{Message: "Done", Data: respLogs, StatusCode: http.StatusOK}
+	err = jpeg.Encode(out, m, nil)
+	if err != nil {
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+		response.Failed(w)
+		return
+	}
+	response := helpers.Response{Message: "Done", Data: user.Photo, StatusCode: http.StatusOK}
 	response.Success(w)
 	return
 }
 
-func Import(w http.ResponseWriter, r *http.Request)  {
+func Import(w http.ResponseWriter, r *http.Request) {
 	var respLogs []string
 	var Buf bytes.Buffer
 	// get file from request
@@ -432,7 +404,7 @@ func Import(w http.ResponseWriter, r *http.Request)  {
 	reader := csv.NewReader(strings.NewReader(contents))
 
 	// read file content line by line
-	for i := 0 ; ; i++  {
+	for i := 0; ; i++ {
 		line, err := reader.Read()
 		// check if not the end of file
 		if err == io.EOF {
