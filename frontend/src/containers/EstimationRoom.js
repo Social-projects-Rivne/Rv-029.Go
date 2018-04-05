@@ -92,25 +92,41 @@ class EstimationRoom extends Component {
         this.setState({users: roomUsers})
         break
       case 'NEW_USER_IN_ROOM':
-          let newUsers = this.state.users.slice()
+        // let existedUsers = this.state.users.slice()
 
-          if (!newUsers.includes(data)) {
-              newUsers.push(data)
+        // console.log("Existed : ", existedUsers.length)
+        // if (existedUsers.length > 0) {
+        //   let newUsers = existedUsers.filter((val) => {
+        //     console.log("VAL: ", val);
+        //     console.log("DATA: ", data);
+        //     return val.UUID !== data.UUID
+        //   })
+        //
+        //   console.log("New : ", existedUsers.length)
+        //   if (newUsers.length > 0) {
+        //     existedUsers.push(data)
+        //   }
+        // } else {
+        //   existedUsers.push(data)
+        // }
+
+          let exists = false
+          for (let i = 0; i < this.state.users.length; i++) {
+            if (this.state.users[i].UUID === data.UUID) {
+              exists = true
+            }
           }
 
-          this.setState({users: newUsers})
+          if (!exists) {
+            let users = this.state.users.slice();
+            users.push(data)
+            this.setState({users: users})
+          }
+
         break
       case 'USER_DISCONNECT_FROM_ROOM':
-          let users = this.state.users.slice()
-
-          users.forEach(function(element, key) {
-              if(element.UUID === data.UUID){
-                  users.splice(key, 1)
-              }
-
-          });
-          console.log(users)
-          this.setState({users: users})
+        console.log(data)
+          this.setState({users: data})
           break
 
     }
