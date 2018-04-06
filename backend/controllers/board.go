@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/validator"
 	"github.com/gocql/gocql"
 	"github.com/gorilla/mux"
-	"net/http"
-	"time"
-	"log"
 )
 
 func CreateBoard(w http.ResponseWriter, r *http.Request) {
@@ -173,7 +174,7 @@ func BoardsList(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 }
 
-func AssignUserToBoard(w http.ResponseWriter, r *http.Request)  {
+func AssignUserToBoard(w http.ResponseWriter, r *http.Request) {
 
 	var UserBoardRequestData validator.UserBoardRequestData
 	err := decodeAndValidate(r, &UserBoardRequestData)
@@ -200,7 +201,7 @@ func AssignUserToBoard(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	err = models.BoardDB.AddUserToBoard(userId,UserBoardRequestData.Email,boardId)
+	err = models.BoardDB.AddUserToBoard(userId, UserBoardRequestData.Email, boardId)
 	if err != nil {
 		response := helpers.Response{Message: "Error while accessing to database", StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -210,14 +211,14 @@ func AssignUserToBoard(w http.ResponseWriter, r *http.Request)  {
 	response := helpers.Response{Message: "User successfully added to the board"}
 	response.Success(w)
 
-
 }
 
-func DeleteUserFromBoard(w http.ResponseWriter, r *http.Request)  {
+//DeleteUserFromBoard removes user from board
+func DeleteUserFromBoard(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	boardId, err := gocql.ParseUUID(vars["board_id"])
-	if err != nil {
+	if err != nil {	
 		log.Printf("Error in controllers/board: %v", err)
 		response := helpers.Response{Message: "Board ID is not valid"}
 		response.Failed(w)
@@ -241,6 +242,5 @@ func DeleteUserFromBoard(w http.ResponseWriter, r *http.Request)  {
 
 	response := helpers.Response{Message: "User successfully delete from board"}
 	response.Success(w)
-
 
 }

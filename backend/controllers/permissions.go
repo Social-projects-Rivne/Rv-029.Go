@@ -99,3 +99,12 @@ func SetUserPermissions(w http.ResponseWriter, r *http.Request) {
 	response.Success(w)
 }
 
+func PermissionsList(w http.ResponseWriter, r *http.Request) {
+	response := helpers.Response{Message: "Permissions List", Data: models.GetPermissionsList()}
+	response.Success(w)
+}
+
+func RolesList(w http.ResponseWriter, r *http.Request) {
+	response := helpers.Response{Message: "Roles List", Data: models.GetRolesList()}
+	response.Success(w)
+}

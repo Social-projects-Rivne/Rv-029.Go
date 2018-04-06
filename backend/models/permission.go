@@ -34,3 +34,11 @@ func GetPermissionsList() []string {
 		PERMISSION_MANAGE_USER_PERMISSIONS,
 	}
 }
+
+func GetRolesList() []string {
+	return []string{
+		ROLE_ADMIN,
+		ROLE_USER,
+		ROLE_STAFF,
+	}
+}

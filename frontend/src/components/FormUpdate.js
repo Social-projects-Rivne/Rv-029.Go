@@ -23,12 +23,12 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
 
     if (!checkValidation()) return
 
-    axios.post(API_URL + 'profile/update', {
+    axios.post(API_URL + 'profile/own/update', {
       name: form.name,
       surname: form.surname,
     })
     .then((res) => {
-      browserHistory.push('/profile')
+      browserHistory.push('/profile/own')
     })
     .catch((err) => {
 
@@ -60,6 +60,10 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
 
   const handleSurnameInput = (e) => {
     action.handleSurname(e.target.value)
+  }
+
+  const handleFileSelected = (e) => {
+    action.handleFile(e.target.value)
   }
 
   return (
@@ -94,6 +98,14 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         alignItems={'center'}
         justify={'space-around'}
         className={classes.buttons}>
+        <Link className={classes.link} to={'profile/own'}>
+          <Button
+            type='cancel'
+            color='primary'
+            className={classes.button}>
+            Cancel
+          </Button>  
+        </Link>          
 
         <Button
           type='submit'
@@ -101,7 +113,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
           onClick={sendUserData}
           className={classes.button}>
           Submit
-        </Button>
+        </Button>       
       </Grid>
 
       <SnackBar
@@ -109,6 +121,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         setErrorMessage={action.setErrorMessage}/>
 
     </Paper>
+
     </div>
   )
 }

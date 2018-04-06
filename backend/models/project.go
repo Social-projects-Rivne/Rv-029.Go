@@ -3,6 +3,8 @@ package models
 import (
 	"fmt"
 	"log"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -14,13 +16,33 @@ const (
 	UPDATE_PROJECT        = "Update projects SET name = ? ,updated_at = ? WHERE id= ? ;"
 	DELETE_PROJECT        = "DELETE FROM projects WHERE id= ? ;"
 	FIND_PROJECT          = "SELECT id, name, created_at, updated_at FROM projects WHERE id = ? LIMIT 1"
-	GET_PROJECTS          = "SELECT id,name,created_at,updated_at from projects"
-	GET_PROJECTS_WHERE_IN    = "SELECT name FROM projects WHERE id IN ("
+	GET_PROJECTS          = "SELECT id, name, created_at, updated_at FROM projects"
+	GET_PROJECTS_WHERE_IN = "SELECT id, name FROM projects WHERE id IN ("
 )
+
+type ProjSortName []ProjectName
+
+func (s ProjSortName) Len() int {
+	return len(s)
+}
+func (s ProjSortName) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s ProjSortName) Less(i, j int) bool {
+	var si string = s[i].Name
+	var sj string = s[j].Name
+	var si_lower = strings.ToLower(si)
+	var sj_lower = strings.ToLower(sj)
+	if si_lower == sj_lower {
+		return si < sj
+	}
+	return si_lower < sj_lower
+}
 
 //ProjectName is struct for getting project's names
 type ProjectName struct {
 	Name string
+	ID gocql.UUID
 }
 
 //Project type
@@ -155,7 +177,7 @@ func (p *ProjectStorage) GetProjectsNamesList(list []gocql.UUID) ([]ProjectName,
 		}
 	}
 
-	var projects []ProjectName
+	var projects ProjSortName
 	var row map[string]interface{}
 	query := fmt.Sprintln(GET_PROJECTS_WHERE_IN + tail)
 	iterator := p.DB.Query(query).Consistency(gocql.One).Iter()
@@ -170,9 +192,12 @@ func (p *ProjectStorage) GetProjectsNamesList(list []gocql.UUID) ([]ProjectName,
 
 			projects = append(projects, ProjectName{
 				Name: row["name"].(string),
+				ID	: row["id"].(gocql.UUID),
 			})
 		}
 	}
+	//listNames := ProjSortName{projects}
 
+	sort.Sort(projects)
 	return projects, nil
 }

@@ -2,7 +2,7 @@ import {
     HANDLE_PROJECT_SELECTED,
     HANDLE_PROJECTS_LOADED,
     HANDLE_PROJECT_USERS,
-    CURRENT_PROJECT
+    HANDLE_USERS_LIST
 } from '../constants/projects'
 
 export const setProjects = (projects) => {
@@ -20,6 +20,13 @@ export const setCurrentProject = (project) => {
 export const setProjectUsers = (users) => {
     return {
         type: HANDLE_PROJECT_USERS,
+        payload: users
+    }
+}
+
+export const setUsersList = (users) => {
+    return {
+        type: HANDLE_USERS_LIST,
         payload: users
     }
 }

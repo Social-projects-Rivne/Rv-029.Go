@@ -24,16 +24,20 @@ func (UsersTableSeeder) Run() {
 	users = []models.User{}
 
 	var email string
+	var role string
 
 	for i := 0; i < 10; i++ {
 		salt := password.GenerateSalt(8)
 
 		if i == 0 {
 			email = "owner@gmail.com"
+			role = models.ROLE_OWNER
 		} else if i == 1 {
 			email = "user@gmail.com"
+			role = models.ROLE_ADMIN
 		} else {
 			email = fake.EmailAddress()
+			role = models.ROLE_USER
 		}
 
 		user := models.User{
@@ -43,7 +47,7 @@ func (UsersTableSeeder) Run() {
 			LastName:  fake.LastName(),
 			Password:  password.EncodePassword(password.EncodeMD5("qwerty1234"), salt),
 			Salt:      salt,
-			Role:      models.ROLE_OWNER,
+			Role:      role,
 			Status:    1,
 			Projects:  userProjects,
 			CreatedAt: time.Now(),

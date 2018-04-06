@@ -24,6 +24,7 @@ class ProjectCard extends Component {
             this.props.projectsActions.setCurrentProject(results[0])
         }
         browserHistory.push('/project/' + projectID)
+
     }
 
     render = () => {

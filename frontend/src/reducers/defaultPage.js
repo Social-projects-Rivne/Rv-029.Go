@@ -4,12 +4,23 @@ import {
   HANDLE_NOTIFICATION_MESSAGE,
   HANDLE_PAGE_TITLE_CHANGE,
   HANDLE_ADD_USER_TO_PROJECT_TOGGLE,
-  HANDLE_SET_USER
+  HANDLE_PERMISSIONS_LOADED,
+  HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE,
+  HANDLE_ROLES_LOADED,
+  HANDLE_SET_IMPORT_FILE,
+  HANDLE_SET_USER,
+  HANDLE_IMPORT_USERS_TOGGLE
 } from '../constants/defaultPage'
 
 const initialState = {
+  isImportUsersOpened: false,
   isDrawerOpen: false,
   isUserToProjectOpen: false,
+  isUserToProjectPermissionsOpen: false,
+  userToAdd: null,
+  file: null,
+  permissions: [],
+  roles: [],
   pageTitle: null,
   user: null,
   errorMessage: null,
@@ -24,12 +35,22 @@ export default function (state = initialState, action) {
       return { ...state, user: action.payload }
     case HANDLE_ADD_USER_TO_PROJECT_TOGGLE:
       return { ...state, isUserToProjectOpen: action.payload }
+    case HANDLE_ADD_USER_TO_PROJECT_WITH_PERMISSIONS_TOGGLE:
+      return { ...state, isUserToProjectPermissionsOpen: action.payload , userToAdd: action.user}
     case HANDLE_PAGE_TITLE_CHANGE:
       return { ...state, pageTitle: action.payload }
     case HANDLE_ERROR_MESSAGE:
       return { ...state, errorMessage: action.payload }
     case HANDLE_NOTIFICATION_MESSAGE:
       return { ...state, notificationMessage: action.payload }
+    case HANDLE_PERMISSIONS_LOADED:
+      return { ...state, permissions: action.payload }
+    case HANDLE_ROLES_LOADED:
+      return { ...state, roles: action.payload }
+    case HANDLE_IMPORT_USERS_TOGGLE:
+      return { ...state, isImportUsersOpened: action.payload }
+    case HANDLE_SET_IMPORT_FILE:
+      return { ...state, file: action.payload }
     default:
       return state
   }

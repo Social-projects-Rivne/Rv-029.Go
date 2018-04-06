@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/mocks"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/helpers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/jwt"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/mail"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/utils/password"
@@ -228,7 +230,7 @@ func TestForgotPasswordSuccess(t *testing.T) {
 	r.Handle("/auth/forget-password", handler).Methods("POST")
 	r.ServeHTTP(res, req)
 
-	expected := `{"Status":true,"Message":"Your link sent","User":{"UUID":"00000000-0000-0000-0000-000000000000","Email":"","FirstName":"","LastName":"","Password":"","Salt":"","Role":"","Status":0,"Projects":null,"CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z"}}`
+	expected := `{"Status":true,"Message":"Your link sent","User":{"UUID":"00000000-0000-0000-0000-000000000000","Email":"","FirstName":"","LastName":"","Password":"","Salt":"","Role":"","Status":0,"Projects":null,"Photo":"","CreatedAt":"0001-01-01T00:00:00Z","UpdatedAt":"0001-01-01T00:00:00Z"}}`
 	if res.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)
@@ -255,15 +257,15 @@ func TestResetPasswordSuccess(t *testing.T) {
 	mockUserCRUD.EXPECT().Update(gomock.Any()).Return(nil).Times(1)
 	mockUserCRUD.EXPECT().CheckUserPassword(gomock.Any()).Return(user, nil).Times(1)
 
-requestData := &struct {
-	Email    string
-	Password string
-	Token    string
-}{
-	Email:    "nigga@gmail.com",
-	Password: "8934784566",
-	Token:    "8934784566",
-}
+	requestData := &struct {
+		Email    string
+		Password string
+		Token    string
+	}{
+		Email:    "nigga@gmail.com",
+		Password: "8934784566",
+		Token:    "8934784566",
+	}
 
 	body, _ := json.Marshal(requestData)
 
@@ -285,37 +287,90 @@ requestData := &struct {
 
 }
 
-// func TestGetUserInfoSuccess(t *testing.T) {
+func TestGetUserInfoSuccess(t *testing.T) {
 
-// 	requestData := &struct {
-// 		Email    string
-// 		Password string
-// 		Token    string
-// 	}{
-// 		Email:    "nigga@gmail.com",
-// 		Password: "8934784566",
-// 		Token:    "8934784566",
-// 	}
-// 	body, _ := json.Marshal(requestData)
-// 	r := *mux.NewRouter()
-// 	res := httptest.NewRecorder()
-// 	req, err := http.NewRequest("GET", "/profile/", strings.NewReader(string(body)))
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	// userID, err := gocql.ParseUUID("550e8400-e29b-41d4-a716-446655440000")
+	// user := models.User{UUID: userID}
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
 
-	
-// 	handler := http.HandlerFunc(GetUserInfo)
-// 	r.Handle("/profile/", handler).Methods("GET")
-// 	r.ServeHTTP(res, req)
+	models.InitUserDB(mockUserCRUD)
+	models.InitProjectDB(mockProjectCRUD)
 
-// 	if status := res.Code; status != http.StatusOK {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusOK)
-// 	}
+	mockUserCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockProjectCRUD.EXPECT().GetProjectsNamesList(gomock.Any()).Return(nil, nil).Times(1)
+		
 
-// }
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/profile/550e8400-e29b-41d4-a716-446655440000", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	user, err := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(GetUserInfo)
+	r.Handle("/profile/550e8400-e29b-41d4-a716-446655440000", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestUpdateUserInfoSuccess(t *testing.T) {
+
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	mockUserCRUD.EXPECT().UpdateFirstAndLastName(gomock.Any()).Return(nil).Times(1)
+	body := bytes.NewBufferString(`{"name" : "name","surname" : "surname"}`)
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/profile/update", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(UpdateUserInfo)
+	r.Handle("/profile/update", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	expected := `{"Status":true,"Message":"Done","StatusCode":200,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
 
 func TestLoginDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -385,7 +440,7 @@ func TestRegisterDBError(t *testing.T) {
 	customError := errors.New("DB Error")
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
-	mockUserCRUD.EXPECT().FindByEmail(gomock.Any()).Return(customError).Times(1)	
+	mockUserCRUD.EXPECT().FindByEmail(gomock.Any()).Return(customError).Times(1)
 	mockUserCRUD.EXPECT().Insert(gomock.Any()).Return(customError).Times(1)
 
 	requestData := bytes.NewBufferString(`{"name": "Nigga", "surname": "Petrovich", "email": "assdf@gmail.com", "password": "zzz"}`)
@@ -496,7 +551,7 @@ func TestResetPasswordDBError(t *testing.T) {
 	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
 	models.InitUserDB(mockUserCRUD)
 	mockUserCRUD.EXPECT().FindByEmail(gomock.Any()).Return(customError).Times(1)
-	mockUserCRUD.EXPECT().CheckUserPassword(gomock.Any()).Return(user,customError).Times(1)
+	mockUserCRUD.EXPECT().CheckUserPassword(gomock.Any()).Return(user, customError).Times(1)
 
 	requestData := &struct {
 		Email    string
@@ -520,6 +575,96 @@ func TestResetPasswordDBError(t *testing.T) {
 	handler := http.HandlerFunc(ResetPassword)
 	r.Handle("/auth/new-password", handler).Methods("POST")
 	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestGetUserInfoDBError(t *testing.T) {
+
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	customError := errors.New("DB Error")
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	mockProjectCRUD := mocks.NewMockProjectCRUD(mockCtrl)
+
+	models.InitUserDB(mockUserCRUD)
+	models.InitProjectDB(mockProjectCRUD)
+
+	mockUserCRUD.EXPECT().FindByID(gomock.Any()).Return(customError).Times(1)
+	mockProjectCRUD.EXPECT().GetProjectsNamesList(gomock.Any()).Return(nil, customError).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/profile/598de923-30c8-11e8-b80e-c85b76da292c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(GetUserInfo)
+	r.Handle("/profile/598de923-30c8-11e8-b80e-c85b76da292c", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	expected := `{"Status":false,"Message":"Error occured in controllers/auth.go error: DB Error","StatusCode":500,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestUpdateUserInfoDBError(t *testing.T) {
+
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	customError := errors.New("DB Error")
+	mockUserCRUD := mocks.NewMockUserCRUD(mockCtrl)
+	models.InitUserDB(mockUserCRUD)
+	mockUserCRUD.EXPECT().UpdateFirstAndLastName(gomock.Any()).Return(customError).Times(1)
+	body := bytes.NewBufferString(`{"name" : "name","surname" : "surname"}`)
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/profile/update", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(UpdateUserInfo)
+	r.Handle("/profile/update", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	expected := `{"Status":false,"Message":"Error occured in controllers/auth.go error: DB Error","StatusCode":500,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
 
 	if status := res.Code; status != http.StatusInternalServerError {
 		t.Errorf("handler returned wrong status code: got %v want %v",
@@ -616,6 +761,42 @@ func TestForgotPasswordBadVariable(t *testing.T) {
 	r.ServeHTTP(res, req)
 
 	expected := `{"Status":false,"Message":"Error occured in controllers/auth.go error: Invalid Email","StatusCode":400,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestUpdateUserInfoBadVariable(t *testing.T) {
+
+	body := bytes.NewBufferString(`{"name":""}`)
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/profile/update", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err := helpers.InitFakeUser()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := context.WithValue(req.Context(), "user", user)
+
+	req = req.WithContext(ctx)
+
+	handler := http.HandlerFunc(UpdateUserInfo)
+	r.Handle("/profile/update", handler).Methods("POST")
+	r.ServeHTTP(res, req)
+
+	expected := `{"Status":false,"Message":"Error occured in controllers/auth.go error: while decoding json error: User.FirstName is empty\n","StatusCode":400,"Data":null}`
 	if res.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)

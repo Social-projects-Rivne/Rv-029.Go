@@ -1,10 +1,10 @@
 package router
 
 import (
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/scrum_poker"
-	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/scrum_poker"
+	"github.com/gorilla/mux"
 )
 
 var Router *mux.Router
@@ -24,6 +24,16 @@ func init() {
 	userRouter.Use(middlewares.AuthenticatedMiddleware)
 	userRouter.Use(middlewares.OwenrMiddleware)
 
+	permissionsRouter := Router.PathPrefix("/permissions").Subrouter()
+	applyPermissionsRoutes(permissionsRouter)
+	permissionsRouter.Use(middlewares.AuthenticatedMiddleware)
+	permissionsRouter.Use(middlewares.OwenrMiddleware)
+
+	rolesRouter := Router.PathPrefix("/roles").Subrouter()
+	applyRolesRoutes(rolesRouter)
+	rolesRouter.Use(middlewares.AuthenticatedMiddleware)
+	rolesRouter.Use(middlewares.OwenrMiddleware)
+
 	projectRouter := Router.PathPrefix("/project").Subrouter()
 	applyProjectsRoutes(projectRouter)
 	applyBoardRoutes(projectRouter)
@@ -39,6 +49,7 @@ func init() {
 	profileRouter := Router.PathPrefix("/profile").Subrouter()
 	applyProfileRoutes(profileRouter)
 	profileRouter.Use(middlewares.AuthenticatedMiddleware)
+	profileRouter.Use(middlewares.ProjectAccessMiddleware)
 
 }
 
@@ -63,14 +74,18 @@ func applyUserRoutes(r *mux.Router) {
 	r.HandleFunc("/{role_name}/add/permission", controllers.AddUserPermission).Name(`user.permissions.add`)
 	r.HandleFunc("/{role_name}/remove/permission", controllers.RemoveUserPermissions).Name(`user.permissions.remove`)
 	r.HandleFunc("/{role_name}/set/permissions", controllers.SetUserPermissions).Name(`user.permissions.update`)
+	r.HandleFunc("/import", controllers.Import).Name(`user.import`)
 }
 
 func applyProfileRoutes(r *mux.Router) {
-	r.HandleFunc("/", controllers.GetUserInfo).Methods("GET")
-	r.HandleFunc("", controllers.GetUserInfo).Methods("GET")
+	r.HandleFunc("/{user_id}/", controllers.GetUserInfo).Methods("GET").Name(`profile.get.info`)
+	r.HandleFunc("/{user_id}", controllers.GetUserInfo).Methods("GET").Name(`profile.get.info`)
 
-	r.HandleFunc("/update/", controllers.UpdateUserInfo).Methods("POST")
-	r.HandleFunc("/update", controllers.UpdateUserInfo).Methods("POST")
+	r.HandleFunc("/own/update/", controllers.UpdateUserInfo).Methods("POST").Name(`profile.update.info`)
+	r.HandleFunc("/own/update", controllers.UpdateUserInfo).Methods("POST").Name(`profile.update.info`)
+
+	r.HandleFunc("/photo/", controllers.ImportPhoto).Methods("POST")
+	r.HandleFunc("/photo", controllers.ImportPhoto).Methods("POST")
 }
 
 func applyProjectsRoutes(r *mux.Router) {
@@ -91,6 +106,12 @@ func applyProjectsRoutes(r *mux.Router) {
 
 	r.HandleFunc("/{project_id}/users/", controllers.ProjectUsersList).Methods("GET")
 	r.HandleFunc("/{project_id}/users", controllers.ProjectUsersList).Methods("GET")
+
+	r.HandleFunc("/users/", controllers.UsersToAddProjectList).Methods("GET")
+	r.HandleFunc("/users", controllers.UsersToAddProjectList).Methods("GET")
+
+	r.HandleFunc("/{project_id}/add/user/", controllers.ProjectAddUser).Methods("POST")
+	r.HandleFunc("/{project_id}/add/user", controllers.ProjectAddUser).Methods("POST")
 }
 
 func applyBoardRoutes(r *mux.Router) {
@@ -135,7 +156,11 @@ func applyIssueRoutes(r *mux.Router) {
 	r.HandleFunc("/issue/show/{issue_id}/", controllers.ShowIssue).Methods("GET").Name(`issue.show`)
 	r.HandleFunc("/issue/show/{issue_id}", controllers.ShowIssue).Methods("GET").Name(`issue.show`)
 
-	r.HandleFunc("/issue/set_parent", controllers.SetParentIssue).Methods("PUT")
+	r.HandleFunc("/issue/set_parent",
+		controllers.SetParentIssue).Methods("PUT")
+
+	r.HandleFunc("/issue/add_issue_log",
+		controllers.AddIssueLog).Methods("PUT")
 }
 
 func applySprintRoutes(r *mux.Router) {
@@ -145,4 +170,12 @@ func applySprintRoutes(r *mux.Router) {
 	r.HandleFunc("/sprint/delete/{sprint_id}", controllers.DeleteSprint).Methods("DELETE").Name(`sprint.delete`)
 	r.HandleFunc("/{board_id}/sprint/list", controllers.SprintsList).Methods("GET").Name(`sprint.list`)
 	r.HandleFunc("/sprint/{sprint_id}/add/issue/{issue_id}", controllers.AddIssueToSprint).Methods("PUT").Name(`sprint.issue.add`)
+}
+
+func applyPermissionsRoutes(r *mux.Router) {
+	r.HandleFunc("/list", controllers.PermissionsList).Methods("GET").Name(`permissions.list`)
+}
+
+func applyRolesRoutes(r *mux.Router) {
+	r.HandleFunc("/list", controllers.RolesList).Methods("GET").Name(`permissions.list`)
 }

@@ -58,6 +58,18 @@ func (mr *MockBoardCRUDMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockBoardCRUD)(nil).Delete), arg0)
 }
 
+// DeleteUserFromBoard mocks base method
+func (m *MockBoardCRUD) DeleteUserFromBoard(arg0, arg1 gocql.UUID) error {
+	ret := m.ctrl.Call(m, "DeleteUserFromBoard", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserFromBoard indicates an expected call of DeleteUserFromBoard
+func (mr *MockBoardCRUDMockRecorder) DeleteUserFromBoard(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserFromBoard", reflect.TypeOf((*MockBoardCRUD)(nil).DeleteUserFromBoard), arg0, arg1)
+}
+
 // FindByID mocks base method
 func (m *MockBoardCRUD) FindByID(arg0 *models.Board) error {
 	ret := m.ctrl.Call(m, "FindByID", arg0)

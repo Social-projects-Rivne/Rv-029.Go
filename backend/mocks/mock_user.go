@@ -132,6 +132,19 @@ func (mr *MockUserCRUDMockRecorder) Insert(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockUserCRUD)(nil).Insert), arg0)
 }
 
+// List mocks base method
+func (m *MockUserCRUD) List() ([]models.User, error) {
+	ret := m.ctrl.Call(m, "List")
+	ret0, _ := ret[0].([]models.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// List indicates an expected call of List
+func (mr *MockUserCRUDMockRecorder) List() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockUserCRUD)(nil).List))
+}
+
 // Update mocks base method
 func (m *MockUserCRUD) Update(arg0 *models.User) error {
 	ret := m.ctrl.Call(m, "Update", arg0)

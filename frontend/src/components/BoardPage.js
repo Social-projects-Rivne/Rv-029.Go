@@ -26,6 +26,7 @@ import DeleteIcon from 'material-ui-icons/Delete';
 import List, { ListItem, ListItemAvatar, ListItemText } from 'material-ui/List';
 import Chip from 'material-ui/Chip';
 import FaceIcon from 'material-ui-icons/Face';
+import { Link, browserHistory} from 'react-router'
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -294,7 +295,7 @@ class BoardPage extends Component{
                 // todo: link to user page
                 onClick={this.handleClose}
                 key={i}
-                label={ `${item.FirstName} ${item.LastName}`}
+                label={ <Link className={classes.link} to={'/profile/'+item.UUID}>{item.FirstName} {item.LastName}</Link>}
                 onDelete={this.deleteUserFromBoard(item.UUID)}
                 className={classes.chip}
                 avatar={
@@ -504,7 +505,7 @@ const styles = {
     padding: '0 2em 0 1em'
   },
   link: {
-    textDecoration: 'none'
+    textDecoration: 'none',
   },
   pageTitle: {
     color: '#fff',

@@ -90,11 +90,11 @@ export const routes = (
         <Route path="project/:id/board/create" component={CreateBoardPage}/>
         <Route path="board/:id" component={BoardPage}/>
         <Route path="sprint/:id" component={SprintPage}/>
-        <Route path="profile" component={VeiwUserProfile}/>
-        <Route path="profile/update" component={FormUpdate}/>
+        <Route path="profile/:id" component={VeiwUserProfile}/>
+        <Route path="profile/own/update" component={FormUpdate}/>
         <Route path="estimation/:id" component={EstimationRoom}/>
 
-        {/* <Route path="profile/update" component={ChangeUserInformation}/> */}
+        {/* <Route path="profile/photo/:id" component={VeiwUserProfile}/> */}
       </Route>
 
       <Route path="socket" component={Socket}/>

@@ -7,6 +7,7 @@ import IssueCard from '../components/IssueCard';
 import * as projectsActions from "../actions/ProjectsActions";
 import * as defaultPageActions from "../actions/DefaultPageActions";
 import * as sprintsActions from "../actions/SprintsActions";
+import * as usersActions from '../actions/UsersActions'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {API_URL} from "../constants/global";
@@ -92,13 +93,38 @@ class SprintPage extends Component {
         return result;
     };
 
+
+  getProjectUsers = () => {
+
+    const { ProjectId } = this.props.sprints.currentSprint
+
+    axios.get(API_URL + `project/${ ProjectId }/users`)
+      .then((response) => {
+        this.props.projectsActions.setProjectUsers(response.data.Data)
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.Message) {
+          messages(error.response.data.Message)
+        } else {
+          messages("Server error occured")
+        }
+      });
+  }
+
     getIssuesList = () => {
         axios.get(API_URL + `project/board/sprint/${this.props.ownProps.params.id}/issue/list`)
             .then((response) => {
                 if (response.data.Data == null) {
                     this.props.sprintsActions.setSprintIssues([])
                 } else {
-                    this.props.sprintsActions.setSprintIssues(this.props.transformIssues(response.data.Data))
+                    this.getProjectUsers()
+
+                    this.props.sprintsActions.setSprintIssues(
+                      this.props.transformIssues(
+                        this.transformIssueLogs(response.data.Data)
+                      )
+                    )
+
                 }
             })
             .catch((error) => {
@@ -109,6 +135,21 @@ class SprintPage extends Component {
                 }
             });
     };
+
+    transformIssueLogs = (issues) => {
+        for (let i = 0; i < issues.length; i++) {
+
+            if (issues[i].Logs.length) {
+
+              issues[i].Logs = issues[i].Logs.map((item, i) => {
+                    return JSON.parse(item)
+              })
+
+            }
+        }
+
+        return issues
+    }
 
     static propTypes = {
         classes: PropTypes.object.isRequired,
@@ -173,6 +214,7 @@ const mapStateToProps = (state, ownProps) => {
         sprints: state.sprints,
         projects: state.projects,
         defaultPage: state.defaultPage,
+        users: state.users,
         ownProps
     }
 }
@@ -181,7 +223,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         sprintsActions: bindActionCreators(sprintsActions, dispatch),
         projectsActions: bindActionCreators(projectsActions, dispatch),
-        defaultPageActions: bindActionCreators(defaultPageActions, dispatch)
+        defaultPageActions: bindActionCreators(defaultPageActions, dispatch),
+        usersActions: bindActionCreators(usersActions, dispatch)
     }
 }
 

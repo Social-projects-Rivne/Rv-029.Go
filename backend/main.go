@@ -60,8 +60,6 @@ func init() {
 	APP.InitApp("./backend/config/app.yml")
 }
 
-
-
 func main() {
 	models.InitBoardDB(&models.BoardStorage{APP.DB})
 	models.InitProjectDB(&models.ProjectStorage{APP.DB})

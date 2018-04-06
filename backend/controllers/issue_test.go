@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// ######## DELETE ISSUE ########
 
 func TestDeleteIssueSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -113,7 +114,9 @@ func TestDeleteIssueDBError(t *testing.T) {
 	}
 }
 
-func TestCreateIssueDBError(t *testing.T) {
+// ######## STORE ISSUE ########
+
+func TestStoreIssueDBError(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -159,7 +162,7 @@ func TestCreateIssueDBError(t *testing.T) {
 	}
 }
 
-func TestCreateIssueBadVariable(t *testing.T) {
+func TestStoreIssueBadVariable(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -196,7 +199,7 @@ func TestCreateIssueBadVariable(t *testing.T) {
 	}
 }
 
-func TestCreateIssueSuccess(t *testing.T) {
+func TestStoreIssueSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -240,6 +243,8 @@ func TestCreateIssueSuccess(t *testing.T) {
 			res.Body.String(), expected)
 	}
 }
+
+// ######## UPDATE ISSUE ########
 
 func TestUpdateIssueSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -409,6 +414,7 @@ func TestUpdateIssueUpdateDBError(t *testing.T) {
 	}
 }
 
+// ######## BOARD ISSUES LIST ########
 
 func TestBoardIssueslistSuccess(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -416,7 +422,7 @@ func TestBoardIssueslistSuccess(t *testing.T) {
 
 	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
 	models.InitIssueDB(mockIssueCRUD)
-	mockIssueCRUD.EXPECT().GetBoardIssueList(gomock.Any()).Return(nil,nil).Times(1)
+	mockIssueCRUD.EXPECT().GetBoardBacklogIssuesList(gomock.Any()).Return(nil,nil).Times(1)
 
 	requestData := &struct {
 		Name string
@@ -450,6 +456,68 @@ func TestBoardIssueslistSuccess(t *testing.T) {
 			res.Body.String(), expected)
 	}
 }
+
+func TestBoardIssueslistBadVariable(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/project/board/does-not-valid-id/issue/list/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(BoardIssueslist)
+	r.Handle("/project/board/{board_id}/issue/list/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+
+	expected := `{"Status":false,"Message":"Error occured in controllers/issue.go error: invalid UUID \"does-not-valid-id\"","StatusCode":400,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+}
+
+func TestBoardIssueslistDBError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	customError := errors.New("DB Error")
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)	
+	mockIssueCRUD.EXPECT().GetBoardBacklogIssuesList(gomock.Any()).Return(nil,customError).Times(1)	
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/project/board/93ab624a-1cb2-228a-ba34-c06ebf83322c/issue/list/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(BoardIssueslist)
+	r.Handle("/project/board/{board_id}/issue/list/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+	expected := `{"Status":false,"Message":"Error occured in controllers/issue.go error: DB Error","StatusCode":500,"Data":null}`
+	if res.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			res.Body.String(), expected)
+	}
+}
+
+
+// ######## SPRINT ISSUES LIST ########
 
 
 func TestSprintIssueslistSuccess(t *testing.T) {
@@ -493,33 +561,6 @@ func TestSprintIssueslistSuccess(t *testing.T) {
 	}
 }
 
-func TestBoardIssueslistBadVariable(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	r := *mux.NewRouter()
-	res := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/project/board/does-not-valid-id/issue/list/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	handler := http.HandlerFunc(BoardIssueslist)
-	r.Handle("/project/board/{board_id}/issue/list/", handler).Methods("GET")
-	r.ServeHTTP(res, req)
-
-	if status := res.Code; status != http.StatusBadRequest {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusBadRequest)
-	}
-
-	expected := `{"Status":false,"Message":"Error occured in controllers/issue.go error: invalid UUID \"does-not-valid-id\"","StatusCode":400,"Data":null}`
-	if res.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			res.Body.String(), expected)
-	}
-}
-
 func TestSprintIssueslistBadVariable(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -541,39 +582,6 @@ func TestSprintIssueslistBadVariable(t *testing.T) {
 	}
 
 	expected := `{"Status":false,"Message":"Error occured in controllers/issue.go error: invalid UUID \"does-not-valid-id\"","StatusCode":400,"Data":null}`
-	if res.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			res.Body.String(), expected)
-	}
-}
-
-
-func TestBoardIssueslistDBError(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	customError := errors.New("DB Error")
-	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
-	models.InitIssueDB(mockIssueCRUD)	
-	mockIssueCRUD.EXPECT().GetBoardIssueList(gomock.Any()).Return(nil,customError).Times(1)	
-
-	r := *mux.NewRouter()
-	res := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/project/board/93ab624a-1cb2-228a-ba34-c06ebf83322c/issue/list/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	handler := http.HandlerFunc(BoardIssueslist)
-	r.Handle("/project/board/{board_id}/issue/list/", handler).Methods("GET")
-	r.ServeHTTP(res, req)
-
-	if status := res.Code; status != http.StatusInternalServerError {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusInternalServerError)
-	}
-
-	expected := `{"Status":false,"Message":"Error occured in controllers/issue.go error: DB Error","StatusCode":500,"Data":null}`
 	if res.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)
@@ -610,4 +618,306 @@ func TestSprintIssueslistUpdateDBError(t *testing.T) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			res.Body.String(), expected)
 	}
+}
+
+
+// ######## SHOW ISSUE ########
+
+func TestShowIssueSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/issue/show/93ab624a-1cb2-228a-ba34-c06ebf83322c/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(ShowIssue)
+	r.Handle("/issue/show/{issue_id}/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestShowIssueBadVariable(t *testing.T) {
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/issue/show/Wrong/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(ShowIssue)
+	r.Handle("/issue/show/{issue_id}/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+
+}
+
+func TestShowIssueDBError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", "/issue/show/93ab624a-1cb2-228a-ba34-c06ebf83322c/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(ShowIssue)
+	r.Handle("/issue/show/{issue_id}/", handler).Methods("GET")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+// ######## SET PARENT ISSUES ########
+
+// func TestSetParentIssueSuccess(t *testing.T) {
+// 	mockCtrl := gomock.NewController(t)
+// 	defer mockCtrl.Finish()
+
+// 	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+// 	models.InitIssueDB(mockIssueCRUD)
+// 	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+
+// 	r := *mux.NewRouter()
+// 	res := httptest.NewRecorder()
+// 	req, err := http.NewRequest("GET", "/issue/show/93ab624a-1cb2-228a-ba34-c06ebf83322c/", nil)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	handler := http.HandlerFunc(ShowIssue)
+// 	r.Handle("/issue/show/{issue_id}/", handler).Methods("GET")
+// 	r.ServeHTTP(res, req)
+
+// 	if status := res.Code; status != http.StatusOK {
+// 		t.Errorf("handler returned wrong status code: got %v want %v",
+// 			status, http.StatusOK)
+// 	}
+
+// }
+
+
+// ######## ADD ISSUE TO SPRINT ########
+
+
+func TestAddIssueToSprintSuccess(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockIssueCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
+	mockIssueCRUD.EXPECT().Update(gomock.Any()).Return(nil).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+}
+
+func TestAddIssueToSprintBadSprintIDVariable(t *testing.T) {
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/Wrong/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+
+}
+
+func TestAddIssueToSprintBadIssueIDVariable(t *testing.T) {
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/Wrong", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusBadRequest)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorIssueFindByID(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorSprintFindByID(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(errors.New("DB Error")).Times(1)	
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorIssueDelete(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)	
+	mockIssueCRUD.EXPECT().Delete(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+	
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
+}
+
+func TestAddIssueToSprintDBErrorIssueUpdate(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockIssueCRUD := mocks.NewMockIssueCRUD(mockCtrl)
+	mockSprintCRUD := mocks.NewMockSprintCRUD(mockCtrl)
+	models.InitIssueDB(mockIssueCRUD)
+	models.InitSprintDB(mockSprintCRUD)
+	
+	mockIssueCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)
+	mockSprintCRUD.EXPECT().FindByID(gomock.Any()).Return(nil).Times(1)	
+	mockIssueCRUD.EXPECT().Delete(gomock.Any()).Return(nil).Times(1)
+	mockIssueCRUD.EXPECT().Update(gomock.Any()).Return(errors.New("DB Error")).Times(1)
+	
+
+	r := *mux.NewRouter()
+	res := httptest.NewRecorder()
+	req, err := http.NewRequest("PUT", "/sprint/93ab624a-1cb2-228a-ba34-c06ebf83322c/add/issue/93ab624a-1cb2-228a-ba34-c06ebf83322c", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(AddIssueToSprint)
+	r.Handle("/sprint/{sprint_id}/add/issue/{issue_id}", handler).Methods("PUT")
+	r.ServeHTTP(res, req)
+
+	if status := res.Code; status != http.StatusInternalServerError {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusInternalServerError)
+	}
+
 }

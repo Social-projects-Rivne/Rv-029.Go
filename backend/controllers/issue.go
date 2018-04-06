@@ -149,7 +149,7 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = issueID
 	if err := models.IssueDB.FindByID(issue); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error())
-		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error())}
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindByID, error: %s", err.Error()), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -158,14 +158,14 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 	sprint.ID = sprintID
 	if err := models.SprintDB.FindByID(&sprint); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: sprint.FindById, error: %s", err.Error())
-		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindById, error: %s", err.Error())}
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.FindById, error: %s", err.Error()), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
 
 	if err := models.IssueDB.Delete(issue); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.Delete, error: %s", err.Error())
-		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: DeleteIssue, where: issue.Delete, error: %s", err.Error())}
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: DeleteIssue, where: issue.Delete, error: %s", err.Error()), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -174,7 +174,7 @@ func AddIssueToSprint(w http.ResponseWriter, r *http.Request) {
 	issue.UpdatedAt = time.Now()
 	if err = models.IssueDB.Update(issue); err != nil {
 		log.Printf("Error occured in controllers/issue.go method: AddIssueToSprint, where: issue.Update, error: %s", err.Error())
-		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.Update, error: %s", err.Error())}
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: AddIssueToSprint, where: issue.Update, error: %s", err.Error()), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -199,8 +199,8 @@ func DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = issueID
 
 	if err := models.IssueDB.Delete(issue); err != nil {
-		log.Printf("Error occured in controllers/issue.go method: DeleteIssue, where: issue.FindByID, error: %s", err.Error())
-		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go metod: UpdateIssue, where: issue.FindByID, error: %s", err.Error())}
+		log.Printf("Error occured in controllers/issue.go error %s", err.Error())
+		response := helpers.Response{Message: fmt.Sprintf("Error occured in controllers/issue.go error: %s", err.Error())}
 		response.Failed(w)
 		return
 	}
@@ -225,7 +225,7 @@ func BoardIssueslist(w http.ResponseWriter, r *http.Request) {
 
 	issue := models.Issue{}
 	issue.BoardID = id
-
+	
 	boardIssueList, err := models.IssueDB.GetBoardBacklogIssuesList(&issue)
 	if err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
@@ -262,7 +262,6 @@ func SprintIssueslist(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-
 	res := helpers.Response{Message: "Done", Data: sprintIssueList}
 	res.Success(w)
 }
@@ -283,7 +282,7 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 	issue.UUID = id
 	if err := models.IssueDB.FindByID(issue); err != nil {
 		log.Printf("Error in controllers/issue error: %+v", err)
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err)}
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/issue.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
 		return
 	}
@@ -298,8 +297,9 @@ func ShowIssue(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
+// todo: refactor decode and validate
 func SetParentIssue(w http.ResponseWriter, r *http.Request) {
-
+	
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Caught error (controllers/issue.SetParentIssue): %+v", err)
@@ -311,14 +311,9 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 		response.Failed(w)
 		return
 	}
-	//
-	//type ReqPayload struct {
-	//	Child gocql.UUID
-	//	Parent gocql.UUID
-	//}
 
-	req := make([]struct{
-		Child gocql.UUID
+	req := make([]struct {
+		Child  gocql.UUID
 		Parent gocql.UUID
 	}, 0)
 
@@ -345,6 +340,76 @@ func SetParentIssue(w http.ResponseWriter, r *http.Request) {
 			response.Failed(w)
 			return
 
+		} // todo: return OK
+	}
+}
+
+func AddIssueLog(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: move to decodeAndValidate
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
 		}
+
+		response.Failed(w)
+		return
+	}
+
+	req := make(map[string]interface{}, 0)
+
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
+
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	issueUUID, err := gocql.ParseUUID(req["issueID"].(string))
+	if err != nil {
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
+	}
+
+	issue := &models.Issue{}
+	issue.UUID = issueUUID
+
+	err = models.IssueDB.FindByID(issue) // todo ERROR handler
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	user := r.Context().Value("user").(models.User)
+	req["userID"] = user.UUID
+
+	delete(req, "issueID")
+
+	logJSON, _ := json.Marshal(req)
+
+	logs := make([]string, 0)
+	logs = append(logs, string(logJSON))
+
+	issue.Logs = logs
+
+	err = models.IssueDB.AddLog(issue)
+	if err != nil {
+		response := helpers.Response{
+			StatusCode: http.StatusInternalServerError,
+		}
+
+		response.Failed(w)
+		return
 	}
 }
