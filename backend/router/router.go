@@ -1,10 +1,10 @@
 package router
 
 import (
-	"github.com/Social-projects-Rivne/Rv-029.Go/backend/scrum_poker"
-	"github.com/gorilla/mux"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/controllers"
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/middlewares"
+	"github.com/Social-projects-Rivne/Rv-029.Go/backend/scrum_poker"
+	"github.com/gorilla/mux"
 )
 
 var Router *mux.Router
@@ -49,6 +49,7 @@ func init() {
 	profileRouter := Router.PathPrefix("/profile").Subrouter()
 	applyProfileRoutes(profileRouter)
 	profileRouter.Use(middlewares.AuthenticatedMiddleware)
+	profileRouter.Use(middlewares.ProjectAccessMiddleware)
 
 }
 

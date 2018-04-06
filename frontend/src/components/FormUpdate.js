@@ -98,7 +98,15 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         alignItems={'center'}
         justify={'space-around'}
         className={classes.buttons}>
-        
+        <Link className={classes.link} to={'profile/own'}>
+          <Button
+            type='cancel'
+            color='primary'
+            className={classes.button}>
+            Cancel
+          </Button>  
+        </Link>          
+
         <Button
           type='submit'
           color='primary'

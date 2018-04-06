@@ -36,21 +36,18 @@ class ViewUserProfile extends Component {
 
 
   state = {
-    file: null
+    file: null,
+    avatar: null
   }
 
   handleFileSelected = (e) => {
     this.props.userActions.setUsersPhotoToImport(e.target.files[0]);
     // Assuming only image
       var file = e.target.files[0];
-      var reader = new FileReader();
-      var url = reader.readAsDataURL(file);
-    
-       reader.onloadend = function (e) {
-          this.setState({
-              file: [reader.result]
-          })
-        }.bind(this);
+
+      this.setState({ file })
+
+
       console.log(url) // Would see a path?
       // TODO: concat files
   };
@@ -80,6 +77,17 @@ class ViewUserProfile extends Component {
         messages("Server error occured")
       }
     })
+
+    if (this.state.file) {
+      let reader = new FileReader();
+      let url = reader.readAsDataURL(this.state.file);
+    
+       reader.onloadend = function(e) {
+          this.setState({
+              avatar: [reader.result]
+          })
+        }.bind(this);
+    }
   };
   
   handleUsersOpen = () => {
@@ -125,7 +133,7 @@ class ViewUserProfile extends Component {
       .then((response) => {
         this.props.userActions.setCurrentUser(this.sortUserProjects( response.data.Data )) 
         this.setState({
-          file: response.data.Data.Photo
+          avatar: response.data.Data.Photo
         })
       })
       .catch((error) => {
@@ -153,7 +161,7 @@ class ViewUserProfile extends Component {
             <Paper className={classes.paper}>
                     <Grid container>
                         <Grid item>
-                          <img  className={classes.img} src={(this.state.file) ? (this.state.file) : ('No image found')}/>
+                          <img  className={classes.img} src={(this.state.avatar) ? (this.state.avatar) : ('static/default.png')}/>
                         </Grid>
                         <Grid item>
                             <Typography variant="headline" gutterBottom component="h2">
@@ -239,7 +247,7 @@ class ViewUserProfile extends Component {
                                 type="file" name="file" id="file"
                                 className="input-file"
                                 onChange={this.handleFileSelected}
-                                accept="text/csv"
+                                accept="image/jpeg, image/png"
                             />
                         </div>
                     </DialogContent>
@@ -247,7 +255,9 @@ class ViewUserProfile extends Component {
                     <Button onClick={this.handleUsersClose} color="default">
                         Cancel
                     </Button>
-                    <Button onClick={this.handleImportUsers} color="primary">
+                    <Button 
+                    onClick={this.handleImportUsers} 
+                    color="primary">
                         Import
                     </Button>
                 </DialogActions>
@@ -271,7 +281,6 @@ const styles = {
     padding: '1em'
   },
   img: {
-    border: '2px solid #FF9800',
     width: '200px',
     height: '200px',    
   },  

@@ -3,8 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"image/jpeg"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"log"
 	"net/http"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"encoding/csv"
 	"io"
 	"strings"
+	// "path/filepath"
 	"os"
 
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
@@ -115,7 +117,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Password:  password.EncodePassword(registerRequestData.Password, salt),
 		Role:      models.ROLE_USER,
 		Status:    0,
-		Photo:     "static/nigga.png",
+		Photo:     "static/default.png",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -278,41 +280,52 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 //GetUserInfo gives frontend information about user
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	userID, err := gocql.ParseUUID(vars["user_id"])
 	user := models.User{}
 	if vars["user_id"] == "own" {
 		user = r.Context().Value("user").(models.User)
 	} else {
+		userID, err := gocql.ParseUUID(vars["user_id"])
+		if err != nil{
+			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusBadRequest}
+			response.Failed(w)
+			return
+		}
+
 		user = models.User{
 			UUID: userID,
 		}
 		models.UserDB.FindByID(&user)
 	}
 
-	var b gocql.UUID
-	a := make([]gocql.UUID, 0)
-	for k := range user.Projects {
-		b, _ = gocql.ParseUUID(fmt.Sprintf("%s", k))
-		a = append(a, b)
-	}
-	projects, err := models.ProjectDB.GetProjectsNamesList(a)
-	if err != nil {
-		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
-		response.Failed(w)
-		return
-	}
-	flag := true
-	if len(projects) > 0 {
+	if vars["user_id"] == "own"{
+		var b gocql.UUID
+		a := make([]gocql.UUID, 0)
 		for k := range user.Projects {
-			for i := 0; flag; i++ {
-				if k == projects[i].ID {
-					user.Projects[k] = projects[i].Name
-					flag = false
-				}
-			}
-			flag = true
+			b, _ = gocql.ParseUUID(fmt.Sprintf("%s", k))
+			a = append(a, b)
 		}
+		projects, err := models.ProjectDB.GetProjectsNamesList(a)
+		if err != nil {
+			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+			response.Failed(w)
+			return
+		}
+		flag := true
+		if len(projects) > 0 {
+			for k := range user.Projects {
+				for i := 0; flag; i++ {
+					if k == projects[i].ID {
+						user.Projects[k] = projects[i].Name
+						flag = false
+					}
+				}
+				flag = true
+			}
+		}
+	}else{
+		user.Projects = nil
 	}
+	
 	response := helpers.Response{Message: "Done", Data: user, StatusCode: http.StatusOK}
 	response.Success(w)
 	return
@@ -349,23 +362,55 @@ func ImportPhoto(w http.ResponseWriter, r *http.Request) {
 	// in your case file would be fileupload
 	file, _, err := r.FormFile("image")
 	if err != nil {
+		log.Printf("Error occured in controllers/auth.go error: %+v", err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error: %+v", err), StatusCode: http.StatusUnsupportedMediaType}
 		response.Failed(w)
 		return
 	}
+
+	fileHeader := make([]byte, 512)
+
+	if _, err := file.Read(fileHeader); err != nil {
+		log.Printf("Error occured in controllers/auth.go error: %+v", err)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error: %+v", err), StatusCode: http.StatusUnsupportedMediaType}
+		response.Failed(w)
+		return
+	}
+
+	// set position back to start.
+	if _, err := file.Seek(0, 0); err != nil {
+		log.Printf("Error occured in controllers/auth.go error: %+v", err)
+		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error: %+v", err), StatusCode: http.StatusUnsupportedMediaType}
+		response.Failed(w)
+		return
+	}
+
+	if http.DetectContentType(fileHeader) != "image/png" && http.DetectContentType(fileHeader) != "image/jpeg" {
+		response := helpers.Response{Status: false, Message: "Incorrect file type", StatusCode: http.StatusUnsupportedMediaType}
+		response.Failed(w)
+		return
+	}
+
 	img, _, err := image.Decode(file)
 	if err != nil {
+		log.Printf("Error occured in controllers/auth.go error: %+v", err)
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusUnsupportedMediaType}
 		response.Failed(w)
 		return
 	}
 	defer file.Close()
 
+	var place string
 	user := r.Context().Value("user").(models.User)
-
 	m := resize.Resize(200, 200, img, resize.Lanczos3)
-	place := fmt.Sprintf("frontend/public/static/%s.jpeg",user.UUID.String())
-	user.Photo = fmt.Sprintf("static/%s.jpeg",user.UUID.String())
+	if http.DetectContentType(fileHeader) == "image/jpeg" {
+		place = fmt.Sprintf("frontend/public/static/%s.jpeg", user.UUID.String())
+		user.Photo = fmt.Sprintf("static/%s.jpeg", user.UUID.String())
+	} else if http.DetectContentType(fileHeader) == "image/png" {
+		place = fmt.Sprintf("frontend/public/static/%s.png", user.UUID.String())
+		user.Photo = fmt.Sprintf("static/%s.png", user.UUID.String())
+	}
+
 	models.UserDB.Update(&user)
 	out, err := os.Create(place)
 	if err != nil {
@@ -375,7 +420,11 @@ func ImportPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 	defer out.Close()
 
-	err = jpeg.Encode(out, m, nil)
+	if http.DetectContentType(fileHeader) == "image/jpeg" {
+		err = jpeg.Encode(out, m, nil)
+	} else if http.DetectContentType(fileHeader) == "image/png" {
+		err = png.Encode(out, m)
+	}
 	if err != nil {
 		response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
 		response.Failed(w)
@@ -454,4 +503,21 @@ func Import(w http.ResponseWriter, r *http.Request) {
 	response := helpers.Response{Message: "Done", Data: respLogs, StatusCode: http.StatusOK}
 	response.Success(w)
 	return
+}
+
+func GetFileContentType(out *os.File) (string, error) {
+
+	// Only the first 512 bytes are used to sniff the content type.
+	buffer := make([]byte, 512)
+
+	_, err := out.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	// Use the net/http package's handy DectectContentType function. Always returns a valid
+	// content-type by returning "application/octet-stream" if no others seemed to match.
+	contentType := http.DetectContentType(buffer)
+
+	return contentType, nil
 }
