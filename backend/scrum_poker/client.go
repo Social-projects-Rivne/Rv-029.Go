@@ -115,6 +115,16 @@ func SendEstimation(req map[string]interface{}, client *Client) {
 		return
 	}
 
+	if len(ActiveHubs[issueUUID].UniqueClients()) < 2 {
+		client.send(SocketResponse{
+			Status:  false,
+			Action:  `ESTIMATION`,
+			Message: `Not enough users to start estimation (must be at least 2 users)`,
+		})
+		return
+	}
+
+
 	var estimate int
 	if value, ok := req["estimate"]; !ok {
 		client.send(SocketResponse{

@@ -41,14 +41,11 @@ func GetClients(req map[string]interface{}, client *Client)  {
 			users[v.user.UUID] = v.user
 		}
 		client.conn.WriteJSON(SocketResponse{
-			Status: false,
+			Status: true,
 			Action: `GUEST`,
-			Message: `Hello guest`,
+			Message: `Welcome in estimation room`,
 			Data: users,
 		})
 		return
 	}
-
-
-
 }

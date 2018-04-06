@@ -19,9 +19,6 @@ class EstimationRoom extends Component {
     users: null,
     responseData: null,
     socket: null,
-    issueName: '',
-    issueDesc: '',
-    issueStatus: ''
   }
 
   componentWillMount() {
@@ -80,7 +77,6 @@ class EstimationRoom extends Component {
 
         if (status) {
           this.props.scrumPokerActions.setEstResult(data.estimate)
-          this.updateIssue(data.estimate)
         }
 
         break
@@ -149,29 +145,6 @@ class EstimationRoom extends Component {
         } else {
           messages("Server error occurred")
         }
-      })
-  }
-
-  updateIssue = (result) => {
-    const { id } = this.props.ownProps.params
-    const { setErrorMessage, setNotificationMessage } = this.props.defaultPageActions
-
-    axios.put(API_URL + `project/board/issue/update/${ id }`, {
-      name: this.state.issueName,
-      description: this.state.issueDesc,
-      status: this.state.issueStatus,
-      estimate: result
-    })
-      .then((res) => {
-        setNotificationMessage(res.data.Message)
-      })
-      .catch((err) => {
-        if (err.response && err.response.data.Message) {
-          setErrorMessage(err.response.data.Message)
-        } else {
-          setErrorMessage("Server error occured")
-        }
-        this.handleClose()
       })
   }
 

@@ -78,7 +78,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 		conn.WriteJSON(SocketResponse{
 			Status:  true,
 			Action:  `CONNECTION`,
-			Message: `you was successfully connected to the socket server`,
 		})
 
 	}
@@ -89,7 +88,6 @@ func SocketHandler(w http.ResponseWriter, r *http.Request) {
 			if len(hub.Clients) > 0 {
 				for hubClient := range hub.Clients {
 					if reflect.DeepEqual(hubClient, client) {
-						hub.Calculate()
 						hub.Unregister <- client
 					}
 				}

@@ -4,6 +4,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"reflect"
+	"fmt"
 )
 
 const LIMIT = 0.6
@@ -21,6 +22,7 @@ type Hub struct {
 	Issue             models.Issue
 	Summary           map[gocql.UUID]int
 	Results           map[int]float32
+	Status  		  bool
 }
 
 func findUniqueClients(m map[*Client]gocql.UUID) map[*Client]gocql.UUID {
@@ -51,6 +53,17 @@ func (h *Hub) UniqueClients() []*models.User {
 }
 
 func (h *Hub) Calculate() {
+	if !h.Status && len(h.UniqueClients()) < 2 {
+		for client := range h.Clients {
+			client.send(SocketResponse{
+				Status:  false,
+				Action:  `ESTIMATION_RESULTS`,
+				Message: `Not enough users to start estimation (must be at least 2 users)`,
+			})
+		}
+		return
+	}
+
 	var estimate int
 	message := "estimation didn't get 60%"
 
@@ -67,26 +80,41 @@ func (h *Hub) Calculate() {
 			if h.Results[mark] >= LIMIT {
 				estimate = mark
 				message = "estimation completed"
-			}
 
+				h.Issue.Estimate = estimate
+				err := models.IssueDB.Update(&h.Issue)
+
+				if err != nil {
+					for client := range h.Clients {
+						client.send(SocketResponse{
+							Status:  false,
+							Action:  `ESTIMATION_RESULTS`,
+							Message: err.Error(),
+						})
+					}
+				}
+			}
 		}
 
 		uniqueClients := findUniqueClients(h.Clients)
 
 		if len(h.Summary) >= len(uniqueClients) && len(uniqueClients) > 0 {
-			h.Broadcast <- &SocketResponse{
-				Status:  true,
-				Action:  `ESTIMATION_RESULTS`,
-				Message: message,
-				Data: struct {
-					Summary  map[gocql.UUID]int `json:"summary"`
-					Results  map[int]float32    `json:"results"`
-					Estimate int                `json:"estimate,omitempty"`
-				}{
-					h.Summary,
-					h.Results,
-					estimate,
-				},
+			h.Status = true
+			for client := range h.Clients {
+				client.send(SocketResponse{
+					Status:  true,
+					Action:  `ESTIMATION_RESULTS`,
+					Message: message,
+					Data: struct {
+						Summary  map[gocql.UUID]int `json:"summary"`
+						Results  map[int]float32    `json:"results"`
+						Estimate int                `json:"estimate,omitempty"`
+					}{
+						h.Summary,
+						h.Results,
+						estimate,
+					},
+				})
 			}
 		}
 	}
@@ -106,6 +134,7 @@ func newHub(issue models.Issue) Hub {
 		Issue:             issue,
 		Summary:           make(map[gocql.UUID]int, 0),
 		Results:           make(map[int]float32, 0),
+		Status:            false,
 	}
 }
 
@@ -137,7 +166,6 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 		client.send(SocketResponse{
 			Status:  false,
 			Action:  `CREATE_ESTIMATION_ROOM`,
-			Message: `room already exists`,
 		})
 		return
 	}
@@ -189,6 +217,8 @@ func (h *Hub) run() {
 			for hclient := range h.Clients {
 				if reflect.DeepEqual(hclient, client) {
 					delete(h.Clients, client)
+
+					h.Calculate()
 				}
 			}
 
@@ -201,16 +231,16 @@ func (h *Hub) run() {
 					client.send(SocketResponse{
 						Status:  true,
 						Action:  `USER_DISCONNECT_FROM_ROOM`,
-						Message: `user disconnected from the room`,
 						Data:    h.UniqueClients(),
 					})
 				}
+			}
 
+			if len(h.Guests) > 0 {
 				for guest := range h.Guests {
 					guest.send(SocketResponse{
 						Status:  true,
 						Action:  `USER_DISCONNECT_FROM_ROOM`,
-						Message: `user disconnected from the room`,
 						Data:    h.UniqueClients(),
 					})
 				}
