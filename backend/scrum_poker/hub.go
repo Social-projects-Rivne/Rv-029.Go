@@ -1,17 +1,17 @@
 package scrum_poker
 
 import (
+	"reflect"
+
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
-	"reflect"
-	"fmt"
 )
 
 const LIMIT = 0.6
 
 type Hub struct {
 	Clients           map[*Client]gocql.UUID
-	Guests    		  map[*Client]gocql.UUID
+	Guests            map[*Client]gocql.UUID
 	Register          chan *Client
 	Unregister        chan *Client
 	RegisterGuest     chan *Client
@@ -22,7 +22,7 @@ type Hub struct {
 	Issue             models.Issue
 	Summary           map[gocql.UUID]int
 	Results           map[int]float32
-	Status  		  bool
+	Status            bool
 }
 
 func findUniqueClients(m map[*Client]gocql.UUID) map[*Client]gocql.UUID {
@@ -123,7 +123,7 @@ func (h *Hub) Calculate() {
 func newHub(issue models.Issue) Hub {
 	return Hub{
 		Clients:           make(map[*Client]gocql.UUID),
-		Guests:    	 	   make(map[*Client]gocql.UUID),
+		Guests:            make(map[*Client]gocql.UUID),
 		Register:          make(chan *Client),
 		Unregister:        make(chan *Client),
 		RegisterGuest:     make(chan *Client),
@@ -164,8 +164,8 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 
 	if _, ok := ActiveHubs[issueUUID]; ok {
 		client.send(SocketResponse{
-			Status:  false,
-			Action:  `CREATE_ESTIMATION_ROOM`,
+			Status: false,
+			Action: `CREATE_ESTIMATION_ROOM`,
 		})
 		return
 	}
@@ -187,7 +187,6 @@ func RegisterHub(req map[string]interface{}, client *Client) {
 func (h *Hub) run() {
 	for {
 		select {
-
 
 		case guest := <-h.UnregisterGuest:
 			if _, ok := h.Guests[guest]; ok {
@@ -229,9 +228,9 @@ func (h *Hub) run() {
 			if len(h.Clients) > 0 {
 				for client := range h.Clients {
 					client.send(SocketResponse{
-						Status:  true,
-						Action:  `USER_DISCONNECT_FROM_ROOM`,
-						Data:    h.UniqueClients(),
+						Status: true,
+						Action: `USER_DISCONNECT_FROM_ROOM`,
+						Data:   h.UniqueClients(),
 					})
 				}
 			}
@@ -239,9 +238,9 @@ func (h *Hub) run() {
 			if len(h.Guests) > 0 {
 				for guest := range h.Guests {
 					guest.send(SocketResponse{
-						Status:  true,
-						Action:  `USER_DISCONNECT_FROM_ROOM`,
-						Data:    h.UniqueClients(),
+						Status: true,
+						Action: `USER_DISCONNECT_FROM_ROOM`,
+						Data:   h.UniqueClients(),
 					})
 				}
 			}

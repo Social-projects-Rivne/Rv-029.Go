@@ -417,7 +417,8 @@ class IssueCard extends Component  {
               )}
             </Grid>
 
-            <Grid container spacing={8}>
+            {(SprintID != "00000000-0000-0000-0000-000000000000") ? (
+              <Grid container spacing={8}>
               <Grid item xs={12}>
                 <TextField
                   id="logInput"
@@ -454,6 +455,8 @@ class IssueCard extends Component  {
                 </List>
 
             </Grid>
+            ) : (null) }
+
           </Grid>
 
         </ExpansionPanelDetails>
