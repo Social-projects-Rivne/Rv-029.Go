@@ -4,7 +4,7 @@ import (
 	"github.com/Social-projects-Rivne/Rv-029.Go/backend/models"
 	"github.com/gocql/gocql"
 	"reflect"
-	"fmt"
+	// "fmt"
 )
 
 const LIMIT = 0.6

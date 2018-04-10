@@ -294,7 +294,11 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		user = models.User{
 			UUID: userID,
 		}
-		models.UserDB.FindByID(&user)
+		if err = models.UserDB.FindByID(&user); err != nil{
+			response := helpers.Response{Status: false, Message: fmt.Sprintf("Error occured in controllers/auth.go error: %+v", err), StatusCode: http.StatusInternalServerError}
+			response.Failed(w)
+			return
+		}
 	}
 
 	if vars["user_id"] == "own"{

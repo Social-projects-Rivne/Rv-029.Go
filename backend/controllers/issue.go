@@ -388,7 +388,7 @@ func AddIssueLog(w http.ResponseWriter, r *http.Request) {
 
 	err = models.IssueDB.FindByID(issue) // todo ERROR handler
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("Caught error (controllers/issue.AddIssueLog): %+v", err)
 	}
 
 	user := r.Context().Value("user").(models.User)

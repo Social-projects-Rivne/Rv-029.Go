@@ -101,7 +101,7 @@ const FormUpdate = ({ classes, form, action, ...decorator}) => {
         <Link className={classes.link} to={'profile/own'}>
           <Button
             type='cancel'
-            color='primary'
+            color='default'
             className={classes.button}>
             Cancel
           </Button>  
